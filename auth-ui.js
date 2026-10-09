@@ -56,6 +56,8 @@ function renderSession(data){
    note.hidden=true;profile.textContent='Пока не вошли. Создайте аккаунт или авторизуйтесь по почте.';
    top.querySelector('span').textContent='Войти';
  }
+ window.dispatchEvent(new Event('holen-auth-changed'));
+
 }
 function selectMode(next){
  mode=next;clear();
@@ -141,5 +143,22 @@ if(hash.includes('access_token=') && hash.includes('refresh_token=')){
  navigate('auth',{push:false});
 }
 loadProfile();
-window.HOLEN_AUTH_UI={open,refresh:loadProfile};
+async function listCharacters(pack){
+ const token=await validSession();
+ if(!token)return [];
+ const p=pack==='journeys'?'journeys':'insects';
+ const data=await request('/rest/v1/characters?select=id,name,pack_key,sheet_data&pack_key=eq.'+p+'&order=created_at.desc',{token});
+ return Array.isArray(data)?data:[];
+}
+async function createCharacter(nameValue,packKey,templateId){
+ const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
+ const title=String(nameValue||'').trim();
+ if(title.length<1||title.length>72)throw Error('Имя персонажа: от 1 до 72 символов.');
+ const pack=packKey==='journeys'?'journeys':'insects';
+ const t=pack==='insects'?(window.ANT_DATA?.squads||[]).find(x=>x.id===templateId):null;
+ if(pack==='insects'&&!t)throw Error('Выберите отряд из пака.');
+ await request('/rest/v1/characters',{method:'POST',token,body:{name:title,pack_key:pack,sheet_data:t?{templateId:t.id}:{} }});
+ return true;
+}
+window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter};
 })();

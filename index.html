@@ -7,7 +7,7 @@
 <meta content="#0d1615" name="theme-color"/>
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
-<link href="styles.css?v=0115" rel="stylesheet"/>
+<link href="styles.css?v=0116" rel="stylesheet"/>
 </head>
 <body>
 <!-- ШАБЛОН ПЛАТФОРМЫ — навигация общая для всех разделов -->
@@ -35,7 +35,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.5</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.6</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -81,6 +81,7 @@
 <div class="announcement"><span class="pulsedot"></span><div>Страница пака открыта для навигации. Игровые персонажи и материалы этого пака ещё не добавлены — их не будем выдумывать.</div></div>
 
 <div aria-label="Материалы пака Путешествия Холэна" class="pack-action-row">
+<button class="btn primary" data-go="dnd-sheet" type="button">◇ Лист персонажа D&amp;D →</button>
 <button class="btn subtle" data-book-pack="journeys" type="button">▤ Книга игрока · Путешествия Холэна →</button>
 <button class="btn subtle" data-rules-pack="journeys" type="button">≡ Правила Путешествий Холэна →</button>
 </div></section><section aria-labelledby="insects-heading" class="view" id="view-insects">
@@ -95,7 +96,7 @@
 <form id="character-create-form" class="character-create-form"><h3>Добавить персонажа</h3>
 <label class="field-label" for="character-name">Имя персонажа</label><input id="character-name" type="text" maxlength="72" placeholder="Например, Меральт" required>
 <label class="field-label" for="character-pack">Игровой пак</label><select id="character-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна</option></select>
-<div id="character-template-field"><label class="field-label" for="character-template">Специализация</label><select id="character-template" class="room-select"></select></div>
+<p class="tiny-note">Для «Путешествий Холэна» сохраняется редактируемый лист D&amp;D. Класс, расу и редакцию можно выбрать в нём.</p><div id="character-template-field"><label class="field-label" for="character-template">Специализация</label><select id="character-template" class="room-select"></select></div>
 <button class="btn primary" id="character-create-btn" type="submit">Сохранить персонажа</button><p id="character-message" class="profile-feedback" role="status"></p></form></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
 </section>
 <!-- Личный кабинет: серверная авторизация по почте через Supabase -->
@@ -169,6 +170,7 @@
 <div class="sheet-note"><span class="connection-dot"></span> Пока это оригинальный HTML внутри платформы. Локальные сохранения остаются в его собственном листе; сетевой синхронизации ещё нет.</div>
 <iframe class="sheet-frame" id="sheet-frame" loading="lazy" title="Интерактивный лист отряда"></iframe>
 </section>
+<section class="view" id="view-dnd-sheet" aria-labelledby="dnd-sheet-heading"><div class="page-heading"><span class="eyebrow">ПУТЕШЕСТВИЯ ХОЛЭНА / D&amp;D</span><h1 id="dnd-sheet-heading">Лист персонажа</h1><p>Выбери редакцию, класс и происхождение. Все поля листа можно заполнить и сохранить в профиле.</p></div><div id="dnd-sheet-root"></div></section>
 <section aria-labelledby="bestiary-heading" class="view" id="view-bestiary">
 <div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ИГРОВЫЕ ПАКИ</span><h1 id="bestiary-heading">Бестиарий Холэна</h1><p>Выбери игровой пак, чтобы открыть его каталог.</p></div>
 <div class="rules-pack-selector" aria-label="Выбор игрового пака">
@@ -241,11 +243,11 @@
   
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.5</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.6</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0115"></script>
-<script src="catalog-data.js?v=0110"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0115"></script><script src="bestiary-ui.js?v=0115"></script><script src="auth-ui.js?v=0110"></script><script src="character-ui.js?v=0110"></script><script src="online-room-ui.js?v=0110"></script>
+<script src="dnd-data.js?v=0116"></script><script src="squad-abilities.js?v=0116"></script><script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0115"></script>
+<script src="catalog-data.js?v=0116"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0116"></script><script src="bestiary-ui.js?v=0115"></script><script src="auth-ui.js?v=0116"></script><script src="character-ui.js?v=0116"></script><script src="dnd-sheet-ui.js?v=0116"></script><script src="online-room-ui.js?v=0116"></script>
 </body>
 </html>

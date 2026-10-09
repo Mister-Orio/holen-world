@@ -10,8 +10,8 @@
 
 const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
+const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
+const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
 const LIBRARY_PACK_VIEWS={
  'bestiary-journeys':{library:'bestiary',pack:'journeys'},
  'bestiary-insects':{library:'bestiary',pack:'insects'},
@@ -46,6 +46,7 @@ function navigate(name, {push=true}={}) {
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
   const libraryPack=LIBRARY_PACK_VIEWS[view];
+  if(!['rooms','gm'].includes(view))document.body.classList.remove('room-focus-mode');
   currentView=view;
   if(view==='home')navigationTrail=['home'];
   else if(libraryPack)navigationTrail=['home',libraryPack.library,view];
@@ -68,6 +69,7 @@ function navigate(name, {push=true}={}) {
   $('page-back-strip').hidden=view==='home';
   closeMenu();
   if(view==='sheet' && !$('sheet-frame').getAttribute('src')) return navigate('squads');
+  window.dispatchEvent(new CustomEvent('holen-navigated',{detail:{view}}));
   window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -138,7 +140,7 @@ function renderRules() {
   // При публикации сайта PDF будет доступен любому посетителю, даже без аккаунта.
   const playerBooks={
     journeys:{file:'books/velikiy_pakt_holen_1_7.pdf',desc:'«Великий пакт», редакция 1.7: полная энциклопедия и правила мира Холэна в исходной формулировке. PDF содержит 47 страниц и таблицы.'},
-    insects:{file:'books/muravinaya_revolyutsiya_guide_v01.pdf',desc:'Полевое руководство игрока: основные правила, роли отрядов и советы для первой игры. Черновая редакция — числовые параметры сверяются с листами.'}
+    insects:{file:'books/muravinaya_revolyutsiya_guide_v01.pdf?v=0116',desc:'Полевое руководство игрока 0.2: основные правила, роли отрядов, размеры существ, типы атак и фракции. Числовые параметры сверяются с действующими листами.'}
   };
   const book=playerBooks[currentRulesPack];
   $('player-book-description').textContent=book.desc;
@@ -255,6 +257,8 @@ const catalogState = {
   classes:{category:'official', source:'dnd2014'},
   races:{category:'official', source:'dnd2014'}
 };
+const requestedSource=new URLSearchParams(location.search).get('source');
+for(const type of ['classes','races'])if(CATALOG[type].official.some(x=>x.id===requestedSource))catalogState[type].source=requestedSource;
 const SOURCE_ICONS = {
   book:'<path d="M12 7c-3.6-2-6.6-2.4-9-1v13c2.4-1.4 5.4-1 9 1 3.6-2 6.6-2.4 9-1V6c-2.4-1.4-5.4-1-9 1Z"/><path d="M12 7v13"/>',
   bug:'<path d="M8 6c0-2 1.5-3 4-3s4 1 4 3M8 10c0-2.5 1.5-4 4-4s4 1.5 4 4v4c0 3-1.5 5-4 5s-4-2-4-5v-4Z"/><path d="M12 6v13M8 10 4 8M16 10l4-2M8 14l-4 2M16 14l4 2M8 17l-3 4M16 17l3 4"/>'
@@ -295,7 +299,11 @@ function renderCatalog(type) {
   } else {
     items=selected.items.map(item=>{
       const itemData=typeof item==='string'?{name:item}:item;
-      return `<article class="catalog-item"><span class="catalog-item-symbol muted-glyph" aria-hidden="true">◈</span><div class="catalog-item-content"><strong>${escapeHtml(itemData.name)}</strong>${itemData.description?`<small>${escapeHtml(itemData.description)}</small>`:''}</div>${itemData.tag?`<span class="item-tag">${escapeHtml(itemData.tag)}</span>`:''}</article>`;
+      const edition=selected.id==='dnd2024'?'2024':'2014',kind=type==='classes'?'class':'species';
+      const entries=window.HOLEN_DND.editions[edition][type==='classes'?'classes':'species'];
+      const entry=state.category==='official'?entries.find(x=>x.name===itemData.name):null;
+      const link=entry?`<a class="catalog-action" href="${escapeHtml(window.HOLEN_DND.referenceUrl(edition,kind,entry.id))}">Лист ↗</a>`:'';
+      return `<article class="catalog-item"><span class="catalog-item-symbol muted-glyph" aria-hidden="true">◈</span><div class="catalog-item-content"><strong>${escapeHtml(itemData.name)}</strong>${itemData.description?`<small>${escapeHtml(itemData.description)}</small>`:''}</div>${itemData.tag?`<span class="item-tag">${escapeHtml(itemData.tag)}</span>`:''}${link}</article>`;
     });
   }
   results.innerHTML=`<div class="catalog-results-heading"><div><span class="overline">${state.category==='official'?'ОФИЦИАЛЬНЫЙ ИСТОЧНИК':'АВТОРСКИЙ ПАК'}</span><h2>${escapeHtml(selected.name)}</h2></div><span class="muted">${escapeHtml(selected.count)}</span></div><div class="catalog-items">${items.join('')}</div><p class="source-note">${escapeHtml(selected.note)}</p>`;

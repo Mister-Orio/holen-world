@@ -32,7 +32,9 @@ function render(){
  }
  list.innerHTML=chars.map(c=>{
    const squad=getSquad(c),opened=expandedId===c.id,editing=editingId===c.id,deleting=deletingId===c.id;
-   const subtitle=packName(c.pack_key)+(squad?' · '+squad.name:'');
+   const dnd=c.pack_key==='journeys'&&c.sheet_data?.type==='dnd'?window.HOLEN_DND.normalize(c.sheet_data):null;
+   const dndClass=dnd&&window.HOLEN_DND.editions[dnd.edition].classes.find(x=>x.id===dnd.classId);
+   const subtitle=packName(c.pack_key)+(squad?' · '+squad.name:dnd?' · '+dnd.edition+' · '+dndClass.name:'');
    const details=opened?'<div class="character-details">'+(
      squad?
      '<div class="character-stat-grid"><div><b>'+esc(squad.hp)+'</b><span>Базовые ОЗ</span></div><div><b>'+esc(squad.ac)+'</b><span>Класс доспеха</span></div><div><b>'+esc(squad.speed)+'</b><span>Скорость</span></div><div><b>'+esc(squad.number)+'</b><span>Муравьёв</span></div></div>'+
@@ -40,7 +42,7 @@ function render(){
      '<p class="character-detail-note">Это базовые показатели специализации. Текущее здоровье, заряды и другие боевые изменения пока не синхронизируются с аккаунтом.</p>'+
      '<a class="btn subtle character-sheet-link" target="_blank" rel="noopener noreferrer" href="sheets/'+encodeURIComponent(squad.id)+'.html">Открыть интерактивный лист ↗</a>'+
      '<p class="character-detail-note">Интерактивный лист пока автономен и сохраняет прогресс в этом браузере, а не в данном персонаже.</p>'
-     :'<p class="character-detail-note">Для этого пака пока доступна заготовка персонажа. Полный лист и его характеристики появятся вместе с редактором пака.</p>'
+     :'<p class="character-detail-note">'+(dnd?'Уровень '+esc(dnd.level)+' · ОЗ '+esc(dnd.hp)+' / '+esc(dnd.maxHp)+' · КД '+esc(dnd.armorClass):'Редактируемый лист D&D: выбери редакцию, класс и происхождение.')+'</p><a class="btn primary" href="index.html?character='+encodeURIComponent(c.id)+'#dnd-sheet">Открыть лист D&D →</a>' 
    )+'</div>':'';
    const editor=editing?'<form class="character-inline-form" data-character-edit="'+esc(c.id)+'">'+
      '<label for="rename-'+esc(c.id)+'">Новое имя персонажа</label><input required maxlength="72" id="rename-'+esc(c.id)+'" name="name" value="'+esc(c.name)+'">'+
@@ -97,6 +99,7 @@ list.addEventListener('submit',async event=>{
  catch(e){say(e.message||'Не удалось изменить имя.');btn.disabled=false;}
  finally{mutating=false;}
 });
+addEventListener('holen-characters-changed',refresh);
 pack.addEventListener('change',templates);
 form.addEventListener('submit',async event=>{
  event.preventDefault();

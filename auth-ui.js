@@ -163,7 +163,7 @@ async function listCharacters(pack){
  const token=await validSession();
  if(!token)return [];
  const p=pack==='journeys'?'journeys':'insects';
- const data=await request('/rest/v1/characters?select=id,name,pack_key,sheet_data&pack_key=eq.'+p+'&order=created_at.desc',{token});
+ const data=await request('/rest/v1/characters?select=id,name,pack_key,sheet_data,updated_at&pack_key=eq.'+p+'&order=created_at.desc',{token});
  return Array.isArray(data)?data:[];
 }
 async function updateCharacterName(characterId,newName){
@@ -186,21 +186,42 @@ async function deleteCharacter(characterId){
  if(!Array.isArray(rows)||rows.length!==1)throw Error('Персонаж не найден или нет прав на удаление.');
  return true;
 }
-async function createCharacter(nameValue,packKey,templateId){
+async function createCharacter(nameValue,packKey,templateId,dndSheetData){
  const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
  const title=String(nameValue||'').trim();
  if(title.length<1||title.length>72)throw Error('Имя персонажа: от 1 до 72 символов.');
  const pack=packKey==='journeys'?'journeys':'insects';
  const t=pack==='insects'?(window.ANT_DATA?.squads||[]).find(x=>x.id===templateId):null;
  if(pack==='insects'&&!t)throw Error('Выберите отряд из пака.');
- await request('/rest/v1/characters',{method:'POST',token,body:{name:title,pack_key:pack,sheet_data:t?{templateId:t.id}:{} }});
- return true;
+ const sheet=pack==='insects'?{templateId:t.id,version:1}:window.HOLEN_DND.normalize(dndSheetData||window.HOLEN_DND.blank());
+ const user=await request('/auth/v1/user',{token});
+ const rows=await request('/rest/v1/characters',{method:'POST',token,headers:{Prefer:'return=representation'},body:{owner_id:user.id,pack_key:pack,name:title,sheet_data:sheet}});
+ if(!Array.isArray(rows)||rows.length!==1)throw Error('Не удалось подтвердить создание. Обновите профиль перед повторной попыткой.');
+ return rows[0];
+}
+async function getCharacter(characterId){
+ const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(characterId))throw Error('Неверный идентификатор персонажа.');
+ const user=await request('/auth/v1/user',{token});
+ const rows=await request('/rest/v1/characters?select=id,name,pack_key,sheet_data,updated_at&id=eq.'+encodeURIComponent(characterId)+'&owner_id=eq.'+encodeURIComponent(user.id),{token});
+ if(!Array.isArray(rows)||rows.length!==1)throw Error('Персонаж не найден или принадлежит другому аккаунту.');
+ return rows[0];
+}
+async function updateDndCharacter(characterId,title,sheetData,expectedUpdatedAt){
+ const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(characterId))throw Error('Неверный идентификатор персонажа.');
+ const name=String(title||'').trim();if(!name||name.length>72)throw Error('Имя персонажа: от 1 до 72 символов.');
+ if(!expectedUpdatedAt||!Number.isFinite(Date.parse(expectedUpdatedAt)))throw Error('Сначала обновите лист из профиля.');
+ const user=await request('/auth/v1/user',{token}),sheet=window.HOLEN_DND.normalize(sheetData);
+ const rows=await request('/rest/v1/characters?id=eq.'+encodeURIComponent(characterId)+'&owner_id=eq.'+encodeURIComponent(user.id)+'&pack_key=eq.journeys&updated_at=eq.'+encodeURIComponent(expectedUpdatedAt),{method:'PATCH',token,body:{name,sheet_data:sheet,updated_at:new Date().toISOString()},headers:{Prefer:'return=representation'}});
+ if(!Array.isArray(rows)||rows.length!==1)throw Error('Лист изменён в другой вкладке или недоступен. Обновите его; ваш черновик сохранён в этом браузере.');
+ return rows[0];
 }
 async function authorizedApi(endpoint,options={}){
  const token=await validSession();
  if(!token)throw Error('Сначала войдите в аккаунт.');
  return request(endpoint,{...options,token});
 }
-window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,
+window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,getCharacter,updateDndCharacter,
  isAuthenticated:()=>authenticated,currentUserId:()=>window.__holen_current_user_id||null,api:authorizedApi};
 })();

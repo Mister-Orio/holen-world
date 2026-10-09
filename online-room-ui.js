@@ -33,7 +33,7 @@ function lobby(){
  return '<div class="online-grid">'+
  '<form id="online-create" class="panel online-card"><span class="overline">ВЕДУЩИЙ</span><h2>Создать онлайн-комнату</h2>'+
  '<label class="field-label" for="online-title">Название</label><input id="online-title" maxlength="72" required placeholder="Например, Красный тоннель">'+
- '<label class="field-label" for="online-pack">Игровой пак</label><select id="online-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна (листы в разработке)</option></select>'+
+ '<label class="field-label" for="online-pack">Игровой пак</label><select id="online-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна (листы D&D в профиле)</option></select>'+
  '<button type="submit" class="btn primary wide">Создать</button></form>'+
  '<form id="online-join" class="panel online-card"><span class="overline">ИГРОК</span><h2>Присоединиться</h2><p>Попроси у ГМа код приглашения. У каждого участника должен быть свой аккаунт.</p>'+
  '<label class="field-label" for="online-join-code">Код комнаты</label><input id="online-join-code" maxlength="24" required autocapitalize="characters" placeholder="HOL-XXXXXXXXXXXX">'+
@@ -61,9 +61,14 @@ function roomView(){
   'sheets/'+encodeURIComponent(self.template_key)+'.html?room='+encodeURIComponent(room.id)+'&character='+encodeURIComponent(self.character_id)+
   '#'+encodeURIComponent(room.id)+'-'+encodeURIComponent(self.character_id):'';
  const roster=(s.members||[]).map(m=>{
-  const u=units.find(u=>u.owner_id===m.user_id);
-  return '<div class="room-player-row"><div class="room-player-marker">'+(m.role==='gm'?'♛':'◇')+'</div>'+
-  '<div class="room-player-info"><strong>'+esc(m.display_name)+(m.role==='gm'?' · ГМ':'')+'</strong><small>'+esc(u?.name||'Персонаж не выбран')+'</small></div></div>';
+  const u=units.find(u=>u.owner_id===m.user_id),abilities=u?(window.HOLEN_SQUAD_ABILITIES?.[u.template_key]||[]):[];
+  const charges=u&&u.charges!==null&&u.charges!==undefined&&(u.charges>0||['acid','medic'].includes(u.template_key)||abilities.some(a=>/заряд/i.test(a.description)));
+  const ratio=u?.cap?Math.min(100,Math.max(0,Math.round(100*u.hp/u.cap))):0;
+  return '<tr><td class="room-table-abilities">'+(abilities.length?'<div class="room-ability-icons">'+abilities.map((a,i)=>'<button type="button" class="room-ability-icon" data-online-ability="'+i+'" data-template="'+esc(u.template_key)+'" aria-label="'+esc(a.name)+'" title="'+esc(a.name)+'">'+esc(a.icon)+'</button>').join('')+'</div>':'<span class="room-table-muted">—</span>')+
+   (charges?'<div class="room-table-charges">Заряды: <strong>'+esc(u.charges)+'</strong></div>':'')+'</td>'+
+   '<th scope="row"><strong>'+esc(m.display_name)+'</strong><small>'+(m.role==='gm'?'Ведущий':esc(u?.name||'Персонаж не выбран'))+'</small></th>'+
+   '<td class="room-table-health">'+(u?'<strong>'+esc(u.hp)+' / '+esc(u.cap)+' <small>ОЗ</small></strong><div class="room-hp-line" role="progressbar" aria-label="Здоровье: '+esc(u.name)+'" aria-valuemin="0" aria-valuemax="'+esc(u.cap)+'" aria-valuenow="'+esc(u.hp)+'"><div class="room-hp-fill" style="width:'+ratio+'%"></div></div>':'<span class="room-table-muted">—</span>')+'</td>'+
+   '<td class="room-table-stats">'+(u?'<span>КД <b>'+esc(u.armor_class)+'</b></span><span>Скорость <b>'+esc(u.speed)+'</b></span>':'<span class="room-table-muted">—</span>')+'</td></tr>';
  }).join('');
  const select=(!gm&&!self&&room.status==='active')?
   '<div class="panel online-picker"><h3>Выбери своего персонажа</h3><p>Показываются персонажи из твоего профиля, подходящие этому паку.</p>'+
@@ -72,7 +77,7 @@ function roomView(){
     const t=(window.ANT_DATA?.squads||[]).find(x=>x.id===c.sheet_data?.templateId);
     return t?'<button type="button" class="btn subtle" data-online-action="choose" data-id="'+esc(c.id)+'">'+esc(c.name)+' · '+esc(t.name)+'</button>':'';
    }).join('')+'</div>':'<p>Сначала создай персонажа в разделе «Мой профиль».</p>'):
-   '<p>Онлайн-листы для «Путешествий Холэна» пока разрабатываются.</p>')+
+   '<p>Листы D&D доступны в профиле. Добавление этих персонажей в бой онлайн-комнаты ещё не подключено.</p>')+
   '<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> '+
   '<button type="button" class="btn subtle" data-online-action="profile">Открыть профиль →</button></div>':'';
  const pending=(s.requests||[]).some(r=>r.actor_id===auth.currentUserId());
@@ -95,13 +100,13 @@ function roomView(){
  return '<section class="panel online-session"><div class="room-dash-head"><div><span class="overline">ОНЛАЙН-КОМНАТА · АЛЬФА</span>'+
  '<h2>'+esc(room.name)+'</h2><p>'+esc(packLabel(room.pack_key))+'</p>'+
  '<p>Код приглашения: <strong>'+esc(room.invite_code)+'</strong></p></div>'+
- '<div class="room-head-actions"><button class="btn subtle" type="button" data-online-action="copy">Копировать код</button>'+
+ '<div class="room-head-actions"><button class="btn subtle" type="button" data-online-action="focus">'+(document.body.classList.contains('room-focus-mode')?'Обычный вид':'Развернуть комнату')+'</button><button class="btn subtle" type="button" data-online-action="copy">Копировать код</button>'+
  '<button class="btn subtle" type="button" data-online-action="back">К списку комнат</button></div></div>'+
  '<p class="online-live-note">Участников: '+s.members.length+' / 8 · Обновление каждые 6 секунд · '+(room.status==='active'?'Комната активна':'Комната закрыта')+(room.hide_enemy_hp?' · ОЗ противников скрыты для игроков':'')+'</p>'+
- '<h3>Участники</h3><div class="room-roster">'+roster+'</div>'+
+ '<h3>Участники и здоровье</h3><div class="room-party-table-wrap"><table class="room-party-table"><thead><tr><th scope="col">Способности</th><th scope="col">Игрок / персонаж</th><th scope="col">Здоровье</th><th scope="col">Показатели</th></tr></thead><tbody>'+roster+'</tbody></table></div>'+
  (gm?'<button type="button" class="btn primary" data-online-action="gm">Открыть рубку ГМа →</button>':'')+
  select+
- '<h3>Отряды игроков</h3><div class="room-unit-list">'+(friends.length?friends.map(unitCard).join(''):'<div class="room-empty">Участники ещё не выбрали персонажей.</div>')+'</div>'+
+
  '<h3>Противники</h3><div class="room-unit-list">'+(enemies.length?enemies.map(unitCard).join(''):'<div class="room-empty">Противников пока нет. Их добавляет только ГМ.</div>')+'</div>'+
  (sheetHref?'<div class="online-sheet-access"><a class="btn primary" href="'+esc(sheetHref)+'" target="_blank" rel="noopener noreferrer">Открыть свой игровой лист ↗</a><p class="online-spawn-note">Игровые кнопки доступны только владельцу персонажа в активной комнате. Отметки способностей пока сохраняются в этом браузере; здоровье на сервере меняет ГМ.</p></div>':'')+
  actions+
@@ -216,8 +221,19 @@ document.addEventListener('submit',event=>{
  }
 });
 document.addEventListener('click',event=>{
+ const abilityButton=event.target.closest('[data-online-ability]');
+ if(abilityButton){
+  const ability=window.HOLEN_SQUAD_ABILITIES?.[abilityButton.dataset.template]?.[Number(abilityButton.dataset.onlineAbility)];
+  if(!ability)return;
+  const dialog=document.createElement('dialog');dialog.className='room-ability-dialog';
+  const heading=document.createElement('h2');heading.textContent=ability.name;
+  const text=document.createElement('p');text.textContent=ability.description;
+  const close=document.createElement('button');close.className='btn primary';close.textContent='Понятно';close.type='button';close.addEventListener('click',()=>dialog.close());
+  dialog.append(heading,text,close);document.body.appendChild(dialog);dialog.addEventListener('close',()=>{dialog.remove();abilityButton.focus();});dialog.showModal();return;
+ }
  const b=event.target.closest('[data-online-action]');if(!b)return;
  const a=b.dataset.onlineAction;
+ if(a==='focus'){document.body.classList.toggle('room-focus-mode');paint();return;}
  if(a==='login'){auth.open('login');return;}
  if(a==='profile'){navigate('profile');return;}
  if(a==='refresh-chars'){charactersLoadedFor=null;refresh(true);return;}

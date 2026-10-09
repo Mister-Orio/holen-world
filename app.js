@@ -10,8 +10,8 @@
 
 const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','profile','squads','sheet','bestiary','rules','lore','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',squads:'Специализации',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Мир Холэна',rooms:'Комнаты',gm:'Панель ГМа'};
+const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','bestiary','rules','lore','rooms','gm'];
+const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Специализации',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Мир Холэна',rooms:'Комнаты',gm:'Панель ГМа'};
 const COLONY_LABEL = {black:'Чёрная колония',green:'Зелёная колония'};
 
 // В интерфейс нельзя подставлять сырой текст пользователя через innerHTML.

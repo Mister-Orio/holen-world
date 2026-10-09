@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<!--
+  МУРАВЬИНАЯ РЕВОЛЮЦИЯ — ЛИНЕЙНАЯ ПЕХОТА v1.2
+
+  КАК ИЗМЕНЯТЬ САЙТ В VS CODE:
+  1. Ctrl + F -> "НАСТРОЙКИ": в объекте const RULES меняй цифры.
+  2. Ctrl + F -> "СПОСОБНОСТИ": здесь тексты и описания.
+  3. Ctrl + F -> "ПАЛИТРА": цвета и оформление (CSS).
+  4. Ctrl + F -> "ДИСЦИПЛИНА": бонус находится в RULES.
+  5. Ctrl + S -> обнови вкладку браузера клавишей F5.
+
+  6. Ctrl + F -> "МАСТЕРСТВО И НАВЫКИ": 0 / 1 / 2 для проверок, спасбросков и навыков.
+
+  data-rule/data-signed/data-calc — цифры из RULES, вручную в HTML не меняй.
+  Файл автономный, без библиотек и интернета.
+-->
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#161a1a" name="theme-color"/>
+<meta content="Интерактивный лист отряда для ваншота «Муравьиная революция»" name="description"/>
+<title>
+   Муравьиная революция — Линейная пехота
+  </title>
+<style>
+   /* ===== 01. ПАЛИТРА И ЦВЕТА ===== */
+:root {
+    color-scheme: dark;
+    --bg:#101415;
+    --panel:#1b2223;
+    --panel-2:#222b2b;
+    --border:#34403e;
+    --text:#f2f3eb;
+    --muted:#a5b1ad;
+    --green:#6fd8a8;
+    --red:#e87870;
+    --gold:#e9bb73;
+}
+
+* {
+    box-sizing:border-box
+}
+
+html {
+    scroll-behavior:smooth
+}
+
+body {
+    margin:0;
+    color:var(--text);
+    background:radial-gradient(ellipse at 50% -10%,#29302a 0%,transparent 45%),var(--bg);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.wrap {
+    width:min(100% - 28px,980px);
+    margin:0 auto;
+    padding-bottom:42px
+}
+
+/* ===== 02. ШАПКА И ОБЛОЖКА ===== */
+.hero {
+    margin:18px 0 16px;
+    min-height:230px;
+    border:1px solid #46443f;
+    border-radius:22px;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    align-items:end;
+    isolation:isolate;
+    background:linear-gradient(105deg,rgba(10,16,16,.94) 10%,rgba(10,16,16,.55) 72%), radial-gradient(ellipse at 84% 50%,#9f2926 0%,#532a26 27%,#252b2a 60%,#18201f 90%);
+}
+
+.hero::before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    inset:0;
+    background:repeating-radial-gradient(ellipse at 90% 52%, transparent 0 18px, rgba(3,7,8,.08) 19px 25px);
+}
+
+.hero::after {
+    content:"";
+    position:absolute;
+    right:-50px;
+    bottom:-48px;
+    width:440px;
+    height:260px;
+    background:radial-gradient(ellipse,rgba(228,43,39,.28),transparent 65%);
+    filter:blur(12px);
+    z-index:-1
+}
+
+.hero .art {
+    position:absolute;
+    right:22px;
+    bottom:3px;
+    width:min(40%,290px);
+    opacity:.82;
+    filter:drop-shadow(0 6px 14px #0b0c0c)
+}
+
+.hero-content {
+    padding:27px 30px;
+    z-index:2
+}
+
+.eyebrow {
+    color:var(--gold);
+    font-size:11px;
+    letter-spacing:.22em;
+    font-weight:800;
+    text-transform:uppercase
+}
+
+h1 {
+    line-height:1.07;
+    font-size:clamp(29px,5vw,48px);
+    margin:8px 0 12px;
+    letter-spacing:-.035em
+}
+
+.subtitle {
+    color:#d2d8ce;
+    max-width:470px;
+    margin:0
+}
+
+.badges {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:17px
+}
+
+.badge {
+    padding:5px 10px;
+    border:1px solid #6d6e55;
+    background:#c9c18e15;
+    border-radius:100px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.04em;
+    color:#eddfa8
+}
+
+.badge.secondary {
+    border-color:var(--border);
+    background:#ffffff09;
+    color:var(--muted)
+}
+
+/* ===== 03. КАРТОЧКИ И КОЛОНКИ ===== */
+.layout {
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);
+    gap:14px;
+    align-items:start
+}
+
+.column {
+    display:grid;
+    gap:14px
+}
+
+.card {
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,#202828,#1a2122);
+    padding:21px;
+    border-radius:18px;
+    box-shadow:0 14px 30px #00000018
+}
+
+h2 {
+    font-size:17px;
+    margin:0 0 14px;
+    letter-spacing:-.015em
+}
+
+h3 {
+    font-size:14px;
+    margin:0 0 5px
+}
+
+p {
+    margin:0 0 11px;
+    color:#d0d7d3
+}
+
+/* ===== 04. ХАРАКТЕРИСТИКИ ===== */
+.stat-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px
+}
+
+.stat {
+    background:#101717;
+    border:1px solid #303c39;
+    border-radius:13px;
+    padding:12px 7px;
+    text-align:center;
+    min-width:0
+}
+
+.stat strong {
+    display:block;
+    font-size:27px;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums
+}
+
+.stat span {
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.3;
+    display:block;
+    margin-top:7px
+}
+
+.ability-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px
+}
+
+.ability {
+    text-align:center;
+    padding:9px;
+    border:1px solid var(--border);
+    border-radius:11px
+}
+
+.ability span {
+    display:block;
+    color:var(--muted);
+    font-size:11px
+}
+
+.ability strong {
+    font-size:19px
+}
+
+.divider {
+    height:1px;
+    background:var(--border);
+    margin:18px 0
+}
+
+.small {
+    color:var(--muted);
+    font-size:12px
+}
+
+/* ===== 05. ЗДОРОВЬЕ И СОСТОЯНИЕ ===== */
+.statusbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px
+}
+
+.status {
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:750;
+    background:#29523f;
+    color:#9cf0c5;
+    white-space:nowrap
+}
+
+.status.warn {
+    background:#6b4e24;
+    color:#ffd494
+}
+
+.status.danger {
+    background:#623130;
+    color:#ffaaa0
+}
+
+.ants {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+    margin:17px 0
+}
+
+.ant {
+    border:1px solid #416552;
+    background:#19392d68;
+    padding:12px 2px 10px;
+    text-align:center;
+    border-radius:13px;
+    transition:.2s
+}
+
+.ant.dead {
+    background:#202728;
+    border-color:#333d3e;
+    opacity:.54
+}
+
+.ant svg {
+    display:block;
+    width:38px;
+    height:42px;
+    margin:auto auto 5px;
+    color:#80ddad
+}
+
+.ant.dead svg {
+    color:#7a8586
+}
+
+.ant span {
+    font-size:10px;
+    color:var(--muted);
+    font-weight:650
+}
+
+.hp-head {
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-top:12px
+}
+
+.hp-head strong {
+    font-size:25px;
+    font-variant-numeric:tabular-nums
+}
+
+.track {
+    margin:7px 0 13px;
+    height:13px;
+    background:#101617;
+    border:1px solid #34413e;
+    border-radius:99px;
+    overflow:hidden
+}
+
+.fill {
+    height:100%;
+    background:linear-gradient(90deg,#21845a,#6bdca6);
+    transition:width .25s ease
+}
+
+.fill.low {
+    background:linear-gradient(90deg,#ac502c,#e2a44c)
+}
+
+.fill.none {
+    background:none
+}
+
+/* ===== 06. КНОПКИ ===== */
+.buttons {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px
+}
+
+button {
+    min-height:43px;
+    border:1px solid #52605b;
+    border-radius:11px;
+    background:#2b3634;
+    color:var(--text);
+    font-weight:750;
+    font:inherit;
+    cursor:pointer;
+    transition:background .12s,transform .12s
+}
+
+button:active:not(:disabled) {
+    transform:translateY(1px)
+}
+
+button:hover:not(:disabled) {
+    background:#3b4c46
+}
+
+button:disabled {
+    opacity:.4;
+    cursor:not-allowed
+}
+
+button.primary {
+    background:#378963;
+    border-color:#59b88a;
+    color:white;
+    font-weight:800
+}
+
+button.primary:hover:not(:disabled) {
+    background:#44a576
+}
+
+button.quiet {
+    border:0;
+    background:none;
+    color:var(--muted);
+    font-size:12px;
+    min-height:32px;
+    padding:5px
+}
+
+button.quiet:hover {
+    color:var(--text)
+}
+
+.battle-line {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin:15px 0 0
+}
+
+.battle-stat {
+    background:#111818;
+    border:1px solid #33403d;
+    border-radius:12px;
+    padding:12px
+}
+
+.battle-stat .value {
+    display:block;
+    font-size:29px;
+    font-weight:800;
+    line-height:1.2;
+    font-variant-numeric:tabular-nums
+}
+
+.battle-stat .label {
+    color:var(--muted);
+    font-size:11px
+}
+
+/* ===== 07. РЕЗЕРВЫ ===== */
+.reserve-row {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin:13px 0
+}
+
+.reserve {
+    padding:12px 5px;
+    text-align:center;
+    border:1px solid #3b6d50;
+    background:#183a2a75;
+    border-radius:12px;
+    color:var(--green)
+}
+
+.reserve.used {
+    color:#77827e;
+    border-color:#343b3a;
+    background:#1a2121
+}
+
+.reserve svg {
+    width:25px;
+    height:25px;
+    display:block;
+    margin:auto
+}
+
+.reserve span {
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:5px
+}
+
+.full {
+    width:100%
+}
+
+/* ===== 08. БЛОКИ СПОСОБНОСТЕЙ ===== */
+.skill {
+    display:grid;
+    grid-template-columns:37px minmax(0,1fr);
+    gap:13px;
+    padding:13px 0;
+    border-bottom:1px solid var(--border)
+}
+
+.skill:first-of-type {
+    padding-top:0
+}
+
+.skill:last-of-type {
+    border:0;
+    padding-bottom:0
+}
+
+.skill-icon {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#303a36;
+    border-radius:9px;
+    height:37px;
+    font-size:19px
+}
+
+.skill p {
+    font-size:13px;
+    line-height:1.5;
+    margin-bottom:0
+}
+
+.list {
+    padding-left:18px;
+    margin:7px 0 0;
+    color:#d0d7d3
+}
+
+.list li {
+    margin:6px 0
+}
+
+.footer {
+    text-align:center;
+    color:#778782;
+    font-size:12px;
+    padding:19px 5px 0
+}
+
+.banner {
+    border:1px solid #735640;
+    background:#3b291e60;
+    border-radius:12px;
+    padding:10px 13px;
+    color:#dfb79a;
+    font-size:12px;
+    margin-top:13px
+}
+
+
+
+
+
+
+
+/* ===== 09. ОСОБЕННОСТИ ТЯЖЁЛЫХ ===== */
+
+.tactic {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px
+}
+
+.ability-btn.active {
+    border-color:#b08e5c;
+    color:#f4d79e;
+    background:#524028
+}
+
+.ability-btn {
+    font-size:13px;
+    padding:9px
+}
+
+.ability-btn small {
+    display:block;
+    font-size:10px;
+    font-weight:500;
+    opacity:.75
+}
+
+.hint {
+    background:#101717;
+    border:1px dashed #52605b;
+    border-radius:12px;
+    padding:12px;
+    color:#d0d7d3;
+    font-size:13px
+}
+
+.warning-highlight {
+    color:#f5c583
+}
+
+/* ===== 10. АДАПТАЦИЯ ПОД ТЕЛЕФОН ===== */
+@media(max-width:740px) {
+    .layout {
+        grid-template-columns:1fr
+    }
+    .hero {
+        min-height:215px
+    }
+    .hero-content {
+        padding:22px
+    }
+    .hero .art {
+        width:41%;
+        right:-9px;
+        opacity:.46
+    }
+    .card {
+        padding:17px
+    }
+    .stat strong {
+        font-size:23px
+    }
+}
+
+@media(max-width:380px) {
+    .stat-grid {
+        grid-template-columns:repeat(2,1fr)
+    }
+    .hero .art {
+        display:none
+    }
+    .buttons button {
+        font-size:13px
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    * {
+        transition:none!important;
+        scroll-behavior:auto
+    }
+}
+
+@media(max-width:385px) {
+    .tactic {
+        grid-template-columns:1fr
+    }
+}
+    
+/* ================================================================
+   СОСТАВ ОТРЯДА: ДО 8 — СЕТКА, ОТ 9 — СТОПКИ С ЧИСЛАМИ
+   Количество столбцов до порога задаёт RULES.antsPerRow.
+   Порог компактного режима задаёт RULES.stackFrom.
+   ================================================================ */
+.ants.ant-stacks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+}
+
+/* Одна стопка: зелёная — живые, серая — погибшие. */
+.ant-stack {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 1 1 154px;
+    min-width: 0;
+    padding: 12px 13px;
+    border: 1px solid #416552;
+    border-radius: 13px;
+    background: #19392d68;
+}
+
+.ant-stack.dead {
+    background: #202728;
+    border-color: #454e51;
+}
+
+.ant-stack-icons {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-left: 10px;
+}
+
+.ant-stack-icon {
+    display: block;
+    width: 29px;
+    height: 43px;
+    margin-left: -10px;
+    color: #80ddad;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+}
+
+.ant-stack-icon svg {
+    display: block;
+    width: 29px;
+    height: 43px;
+}
+
+.ant-stack.dead .ant-stack-icon {
+    color: #7a8586;
+}
+
+.ant-stack-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.ant-stack-info strong {
+    color: #80ddad;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.ant-stack.dead .ant-stack-info strong {
+    color: #c1c7c9;
+}
+
+.ant-stack-info span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+
+
+/* ===== 11. ЕДИНЫЙ СТАНДАРТ v1.0 — СОСТОЯНИЯ КНОПОК ===== */
+.ability-btn.active, .ability-btn.selected {
+    background: #244f3d;
+    border-color: #66c99b;
+    color: #e9fff1;
+}
+.ability-btn.spent, .ability-btn:disabled {
+    background: #232a29;
+    border-color: #3b4240;
+    color: #9ca6a0;
+    opacity: .55;
+}
+.ability-btn:focus-visible, .squad-id-controls input:focus-visible {
+    outline: 2px solid #73dcac;
+    outline-offset: 3px;
+}
+/* Тактические кнопки в две колонки, как у тяжёлых. */
+.tactic .ability-btn { min-width: 0; overflow-wrap: anywhere; }
+.tactic .ability-btn small { margin-top: 4px; }
+.ability-summary {
+    border: 1px solid #41534a;
+    background: #101c19;
+    color: #c8d9d1;
+    padding: 10px 11px;
+    border-radius: 11px;
+    margin-top: 9px;
+    font-size: 12px;
+}
+.ability-static {
+    border: 1px solid #42514a;
+    border-radius: 11px;
+    background: #24302e;
+    padding: 9px;
+    text-align: center;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+.ability-static small {color: var(--muted); font-size: 10px;}
+/* У каждого экземпляра собственное локальное сохранение. */
+.squad-id-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.squad-id-controls input {
+    min-width: 0;
+    flex: 1 1 110px;
+    padding: 10px 11px;
+    color: var(--text);
+    background: #101717;
+    border: 1px solid #556c5f;
+    border-radius: 10px;
+    font: inherit;
+}
+.squad-id-controls button { padding: 8px 14px; min-height: 41px; }
+.instance-hint { color: var(--muted); font-size: 12px; line-height: 1.55; margin-top: 8px; }
+@media (max-width:380px) {
+    .tactic {grid-template-columns: repeat(2, minmax(0,1fr));}
+    .ability-btn {font-size:11px;}
+}
+/* ================================================================
+   12. РАСКРЫВАЮЩАЯСЯ ПАНЕЛЬ ХАРАКТЕРИСТИК (ЕДИНЫЙ СТАНДАРТ v1.2)
+   Цвета наследуются от тяжёлых муравьёв; здесь только анимация и компоновка.
+   Чтобы поменять МАСТЕРСТВО, НЕ нужно редактировать CSS — ищи RULES.
+   ================================================================ */
+.ability-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 76px;
+    background: #101717;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: background .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.ability-trigger:hover { border-color: #658b76; background: #202f29; }
+.ability-trigger.is-open {
+    background: #244f3d;
+    border-color: #66c99b;
+    box-shadow: inset 0 0 0 1px rgba(111,216,168,.15);
+}
+.ability-trigger:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+}
+.ability-trigger strong {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    transition: filter .19s ease, opacity .19s ease, transform .19s ease;
+}
+/* Нажатая цифра плавно размывается, при закрытии возвращается. */
+.ability-trigger.is-open strong {
+    filter: blur(4px);
+    opacity: .17;
+    transform: scale(.86);
+}
+.ability-trigger .ability-chevron {
+    font-size: 12px;
+    color: #8fbba7;
+    line-height: 1;
+    margin-top: 2px;
+    transition: transform .25s ease;
+}
+.ability-trigger.is-open .ability-chevron { transform: rotate(180deg); }
+
+/* Сетка из 0fr в 1fr позволяет раскрыть панель без заданной высоты. */
+.attribute-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    margin-top: 0;
+    transition: grid-template-rows .30s ease, opacity .23s ease,
+                margin-top .30s ease, visibility 0s linear .30s;
+}
+.attribute-panel.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 12px;
+    transition: grid-template-rows .30s ease, opacity .23s ease,
+                margin-top .30s ease, visibility 0s;
+}
+.attribute-panel-inner { min-height: 0; overflow: hidden; }
+.attribute-panel-body {
+    padding: 13px;
+    border: 1px solid #476255;
+    border-radius: 12px;
+    background: #111d19;
+}
+.attribute-heading { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.attribute-heading strong { font-size: 14px; letter-spacing: .03em; }
+.attribute-heading span { color: var(--muted); font-size: 12px; }
+.attribute-rolls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+.attribute-roll {
+    border: 1px solid #435750;
+    background: #26332e;
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 0;
+}
+.attribute-roll-label { display: block; font-size: 10px; color: #abc4b8; font-weight: 800; letter-spacing: .03em; }
+.attribute-roll-value { display: block; font-size: 24px; font-weight: 800; line-height: 1.18; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.attribute-rank { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #b1c6ba; }
+.attribute-rank.proficient { color: #78d8aa; }
+.attribute-rank.expert { color: #e9bb73; }
+.attribute-rank-symbol { font-size: 17px; line-height: 1; font-weight: 800; min-width: 16px; }
+.attribute-section-heading { color: #b7d3c5; font-size: 11px; font-weight: 800; letter-spacing: .05em; margin: 4px 0 7px; }
+.attribute-skills { display: flex; flex-direction: column; gap: 6px; }
+.attribute-skill {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; min-width: 0;
+    border-radius: 9px; background: #25352f; padding: 8px 10px;
+}
+.attribute-skill-name { display: block; font-size: 13px; color: #f2f3eb; font-weight: 700; }
+.attribute-skill-value {
+    flex-shrink: 0; font-size: 15px; font-weight: 800;
+    background: #354840; border-radius: 7px;
+    min-width: 44px; text-align: center; padding: 6px 7px;
+    font-variant-numeric: tabular-nums;
+}
+.attribute-empty { color: var(--muted); font-size: 12px; padding: 10px 0 2px; }
+.attribute-legend { margin-top: 11px; font-size: 10px; color: #a4bcb0; line-height: 1.6; }
+/* При каждом выборе характеристики строки проявляются одна за другой. */
+.attribute-panel.open .attribute-stagger { animation: attributeReveal .33s cubic-bezier(.22,.7,.2,1) both; animation-delay: var(--stagger-delay,0ms); }
+@keyframes attributeReveal {
+    from { opacity: 0; transform: translateY(7px); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@media (max-width:380px) {
+    .attribute-panel-body { padding: 10px; }
+    .attribute-roll { padding: 8px; }
+    .attribute-roll-value { font-size: 22px; }
+    .attribute-skill { padding: 7px 8px; }
+}
+@media (prefers-reduced-motion:reduce) {
+    .attribute-panel, .attribute-panel.open, .ability-trigger,
+    .ability-trigger strong, .ability-trigger .ability-chevron,
+    .attribute-panel.open .attribute-stagger {
+        transition: none !important;
+        animation: none !important;
+        filter: none !important;
+    }
+    .ability-trigger.is-open strong { opacity: .38; }
+}
+
+
+  
+/* ===== ДОПОЛНЕНИЕ: КОРОТКИЙ И ДОЛГИЙ ОТДЫХ ===== */
+.damage-buttons {grid-template-columns:repeat(2,minmax(0,1fr))}
+.rest-row {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.rest-row button {padding:10px 8px;min-height:66px;line-height:1.25}
+.rest-row button span {display:block;font-size:13px;font-weight:750}
+.rest-row button small {display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:5px}
+@media(max-width:360px){.rest-row button span{font-size:11px}.rest-row button small{font-size:9px}}
+
+
+/* ===== ЕДИНЫЕ ОБЩИЕ ПРАВИЛА v1.0: ЭТОТ CSS ОДИНАКОВ ДЛЯ ВСЕХ ЛИСТОВ ===== */
+.common-rule-group { margin: 12px 0 0; }
+.common-rule-group h3 { color: #dbece4; font-size: 13px; margin: 0 0 6px; letter-spacing: .01em; }
+.common-rule-group ul { margin-top: 0; }
+.common-rules li { line-height: 1.48; }
+.class-rule-hint { background: #101717; border: 1px dashed #52605b; border-radius: 12px; padding: 10px 12px; }
+.class-rule-hint ul { margin: 4px 0 0; }
+@media (prefers-reduced-motion: reduce) { .common-rule-group { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<!-- НАЧАЛО HTML: то, что отображается в браузере. -->
+<main class="wrap">
+<!-- ОБЛОЖКА: здесь можно заменить название или описание. -->
+<section aria-label="Обложка отряда" class="hero">
+<svg aria-hidden="true" class="art" viewbox="0 0 360 300">
+<g fill="#070d0c" stroke="#1c2524" stroke-linecap="round" stroke-width="2">
+<g transform="translate(95 110) rotate(-14)">
+<ellipse cx="55" cy="108" rx="45" ry="38">
+</ellipse>
+<ellipse cx="91" cy="74" rx="27" ry="29">
+</ellipse>
+<ellipse cx="119" cy="38" rx="38" ry="33">
+</ellipse>
+<path d="M88 73 22 37 10 75M85 85 30 122 20 165M90 94 48 184M104 73 166 106 171 157M104 85 178 57 212 73M111 96 184 183M120 14 102 -20M142 15 170 -15" fill="none" stroke="#080d0c" stroke-width="13">
+</path>
+</g>
+<g transform="translate(210 163) scale(.65)">
+<ellipse cx="42" cy="95" rx="40" ry="38">
+</ellipse>
+<ellipse cx="80" cy="70" rx="24" ry="24">
+</ellipse>
+<ellipse cx="108" cy="35" rx="36" ry="29">
+</ellipse>
+<path d="M76 70 25 23M75 80 30 125M80 90 69 150M95 70 145 100M98 82 160 44M105 94 150 145M104 13 93 -12M127 13 145 -18" fill="none" stroke="#080d0c" stroke-width="12">
+</path>
+</g>
+</g>
+</svg>
+<div class="hero-content">
+<div class="eyebrow">
+      Холэн · Муравьиная революция
+     </div>
+<h1>
+      Линейная
+      <br/>
+      пехота
+     </h1>
+<p class="subtitle">
+      Чёрная колония · средний отряд. Четверо бойцов — один жетон, одна цель, один ход.
+     </p>
+<div class="badges">
+<span class="badge">
+       Универсальный отряд
+      </span>
+<span class="badge secondary">
+       Стандарт v1.0 · Плейтест
+      </span>
+</div>
+</div>
+</section>
+<div class="layout">
+<div class="column">
+<section class="card">
+<h2>
+       Характеристики отряда
+      </h2>
+<!-- ХАРАКТЕРИСТИКИ: цифры идут из блока JavaScript RULES, вручную править их здесь не нужно. -->
+<div class="stat-grid">
+<div class="stat">
+<strong data-rule="members">
+         4
+        </strong>
+<span>
+         Муравья
+        </span>
+</div>
+<div class="stat">
+<strong data-calc="maxHp">
+         12
+        </strong>
+<span>
+         Макс. ОЗ
+        </span>
+</div>
+<div class="stat">
+<strong data-rule="armorClass">
+         13
+        </strong>
+<span>
+         Класс защиты
+        </span>
+</div>
+<div class="stat">
+<strong data-rule="speed">
+         4
+        </strong>
+<span>
+         Скорость, клетки
+        </span>
+</div>
+<div class="stat">
+<strong data-signed="attackBonus">
+         +4
+        </strong>
+<span>
+         Бонус атаки
+        </span>
+</div>
+<div class="stat">
+<strong id="top-damage">
+         4
+        </strong>
+<span>
+         Урон жвалами сейчас
+        </span>
+</div>
+</div>
+<div class="divider">
+</div>
+<h2>
+       Модификаторы
+      </h2>
+<!-- =====================================================
+           ИНТЕРАКТИВНЫЕ ХАРАКТЕРИСТИКИ И РАСКРЫВАЮЩИЕСЯ НАВЫКИ
+           Ранги мастерства и спасбросков изменяются ТОЛЬКО в RULES.mastery.
+           ===================================================== -->
+<p class="small" style="margin-bottom:10px">Нажми на характеристику: появятся проверка, спасбросок и навыки.</p>
+<div class="ability-grid" id="ability-buttons">
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="strength" title="Показать навыки: Сила" type="button">
+<span>Сила</span>
+<strong data-signed="strength">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="dexterity" title="Показать навыки: Ловкость" type="button">
+<span>Ловкость</span>
+<strong data-signed="dexterity">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="constitution" title="Показать навыки: Телосложение" type="button">
+<span>Телосложение</span>
+<strong data-signed="constitution">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="intelligence" title="Показать навыки: Интеллект" type="button">
+<span>Интеллект</span>
+<strong data-signed="intelligence">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="wisdom" title="Показать навыки: Мудрость" type="button">
+<span>Мудрость</span>
+<strong data-signed="wisdom">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="charisma" title="Показать навыки: Харизма" type="button">
+<span>Харизма</span>
+<strong data-signed="charisma">+0</strong>
+<span aria-hidden="true" class="ability-chevron">⌄</span>
+</button>
+</div>
+<div aria-hidden="true" aria-label="Проверки, спасброски и навыки" class="attribute-panel" id="ability-details" role="region">
+<div class="attribute-panel-inner">
+<div class="attribute-panel-body" id="ability-details-content"></div>
+</div>
+</div>
+<p class="small" style="margin-top:13px">
+       Модификаторы условны: они описывают особенности муравьиных отрядов, а не человеческое мышление.
+      </p>
+</section>
+<section class="card">
+<h2>
+       Боевые способности
+      </h2>
+<!-- СПОСОБНОСТИ: чтобы добавить описательную способность, скопируй целиком соседний div class="skill". -->
+<div class="skill">
+<div class="skill-icon">
+        ⚔
+       </div>
+<div>
+<h3>
+         Укус жвалами
+        </h3>
+<p>
+         Действие, ближняя атака на соседний жетон. Брось d20
+         <span data-signed="attackBonus">
+          +4
+         </span>
+         против КД врага. Урон равен числу выживших бойцов (от
+         <span data-rule="damagePerAnt">
+          1
+         </span>
+         до
+         <span data-calc="maxDamage">
+          4
+         </span>
+         ).
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ◆
+       </div>
+<div>
+<h3>
+         Дисциплина · пассивно
+        </h3>
+<p>
+<span data-signed="disciplineBonus">
+          +1
+         </span>
+         к броску атаки, если ещё один союзный отряд стоит рядом с целью. От нескольких союзников бонус не увеличивается.
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ➜
+       </div>
+<div>
+<h3>
+         Рывок · действие
+        </h3>
+<p>
+         Вместо атаки переместись на дополнительные
+         <span data-rule="speed">
+          4
+         </span>
+         клетки. Итого до
+         <span data-calc="dashSpeed">
+          8
+         </span>
+         клеток за ход.
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ◉
+       </div>
+<div>
+<h3>
+         Обнаружение
+        </h3>
+<p>
+         Дальность обнаружения — до
+         <span data-rule="visionRange">
+          6
+         </span>
+         клеток при отсутствии препятствий, дыма и помех.
+        </p>
+</div>
+</div>
+</section>
+<section class="card">
+<h2>
+       Сильные и слабые стороны
+      </h2>
+<div class="hint">
+<strong style="color:var(--green)">
+        Сильны:
+       </strong>
+       совместные атаки, гибкость, удержание позиции и бой при поддержке союзников.
+       <br/>
+<strong class="warning-highlight">
+        Уязвимы:
+       </strong>
+       кислота и дальний обстрел, изоляция от соседних отрядов, опасные обходы тяжёлой пехоты.
+      </div>
+<div class="divider">
+</div>
+<h2>
+       Общие правила
+      </h2><div class="common-rules"><!-- ОБЩИЙ ШАБЛОН: не менять отдельно в одном листе. Синхронизировать во всех семи. --><div class="common-rule-group"><h3>Отряд и порядок хода</h3><ul class="list"><li>Один жетон на карте — один отряд. Он занимает одну клетку, передвигается и действует целиком: отдельных ходов у каждого муравья нет.</li><li>Инициатива в начале боя: d20 + модификатор Ловкости. Один бросок на весь отряд; при равенстве порядок определяет ГМ.</li><li>В свой ход отряд может пройти расстояние до своей скорости и совершить одно основное действие: атаку, особую способность или другое доступное действие.</li><li>Рывок расходует основное действие и позволяет пройти за ход до удвоенной скорости. Если у специализации есть ограничение на рывок, оно указано в её способностях.</li><li>Ближняя атака — по соседней клетке. Дистанционная требует прямой видимости. Подходящее укрытие даёт +2 к КД против атак через него, если ГМ разрешает защиту этим укрытием.</li></ul></div><div class="common-rule-group"><h3>Броски и навыки</h3><ul class="list"><li>Атака: d20 + бонус попадания против КД цели. Если итог не ниже КД — попадание. Урон фиксирован и указан в листе; изменения от потерь считаются по правилам типа отряда.</li><li>Натуральная 1 на броске атаки — автоматический промах. Натуральная 20 — автоматическое попадание и +2 дополнительного урона. Для обычных проверок и спасбросков эти автоматические исходы не применяются.</li><li>Проверка характеристики, навык или спасбросок: d20 + соответствующий модификатор. Если указано владение, добавь +2 за мастерство либо +4 за супермастерство; если владения нет — только модификатор.</li><li>Карточки шести характеристик раскрываются нажатием: внутри показаны проверка, спасбросок, связанные навыки и уровень владения. Эти значения нужны для бросков, а не заменяют их.</li></ul></div><div class="common-rule-group"><h3>Здоровье и потери</h3><ul class="list"><li>Здоровье одно на весь отряд. У каждого бойца есть свой сегмент ОЗ: если из-за урона сегмент опустел, боец погибает. Количество выживших и текущий урон пересчитываются автоматически.</li><li>После гибели бойца максимально доступные ОЗ отряда уменьшаются. Короткий отдых или лечение не воскрешают погибших; вернуть численность может только разрешённое пополнение при долгом отдыхе либо новый отряд из резерва.</li><li>При 0 ОЗ отряд уничтожен: он не ходит, не атакует, не использует способности и не может отдыхать. Продолжить игру можно только через резерв.</li></ul></div><div class="common-rule-group"><h3>Отдых и ресурсы</h3><ul class="list"><li>Короткий отдых возможен только вне боя. Он восстанавливает ОЗ до максимума оставшихся в живых бойцов, но не восполняет погибших и не возвращает израсходованные резервы.</li><li>Долгий отдых возможен только вне боя в безопасной точке с разрешения ГМа. Он возвращает полный состав за счёт пополнения из тыла и восстанавливает все ОЗ; погибший целиком отряд (0 ОЗ) так вернуть нельзя.</li><li>«Новый бой» обновляет только способности и боевые отметки, которые должны обновляться между боями. ОЗ, погибшие и резерв от этого не восстанавливаются. Ежедневные ресурсы и особые правила отдыха указаны в специализации.</li></ul></div><div class="common-rule-group"><h3>Резерв и сохранение</h3><ul class="list"><li>У каждого игрока один стартовый отряд и три запасных: всего не более четырёх отрядов за ваншот. После уничтожения новый выходит в следующий ход и может двигаться, но не атаковать в ход появления.</li><li>Пока каждый HTML-лист самостоятельный, резерв создаёт отряд того же типа. Свободный выбор нового типа войск появится в будущем общем сайте.</li><li>Лист автоматически сохраняет здоровье, ресурсы, способности и резервы в данном браузере. Разные номера отрядов имеют отдельные сохранения; между игроками синхронизации пока нет, поэтому эффекты и чужое лечение отмечайте вручную.</li></ul></div></div><div class="divider"></div><h2>Особенности отряда</h2><div class="class-rule-hint"><ul class="list"><li>«Дисциплина» даёт +1 к атаке, когда союзный отряд находится рядом с целью; количество союзников не увеличивает бонус.</li><li>Рывок доступен каждый ход, но заменяет атаку. «Следующий ход» снимает только его отметку.</li></ul></div><div class="banner">⚠ Правила и баланс проходят плейтест. Спорные действия, отдых и изменения карты подтверждает ГМ.</div></section>
+</div>
+<div class="column">
+<!-- ИНТЕРАКТИВНЫЙ ЛИСТ: кнопки с id подключены в разделе СОБЫТИЯ JavaScript. -->
+<section class="card" id="sheet">
+<div class="statusbar">
+<h2 style="margin:0">
+        Состояние отряда
+       </h2>
+<span class="status" id="status">
+        Боеспособен
+       </span>
+</div>
+<div aria-live="polite" class="ants" id="ants">
+</div>
+<div class="hp-head">
+<span>
+        Здоровье
+       </span>
+<strong id="hp-label">
+        0 / 0 ОЗ
+       </strong>
+</div>
+<div aria-label="Здоровье отряда" aria-valuemax="16" aria-valuemin="0" aria-valuenow="16" class="track" id="hp-track" role="progressbar">
+<div class="fill" id="hp-fill" style="width:100%">
+</div>
+</div>
+<div class="buttons damage-buttons">
+<button id="hit1" type="button">
+        −1 ОЗ
+       </button>
+<button id="hit3" type="button">
+        −3 ОЗ
+       </button>
+</div><div class="rest-row"><button id="short-rest" type="button"><span>☕ Короткий отдых</span><small>До максимума выживших</small></button><button id="long-rest" type="button"><span>☾ Долгий отдых</span><small>Пополнение из тыла · с разрешения ГМа</small></button></div><p class="small" id="rest-help">Отдых возможен только вне боя. Короткий отдых не возвращает погибших, долгий восполняет отряд из тыла.</p>
+<div class="battle-line">
+<div class="battle-stat">
+<span class="value" id="alive">
+         —
+        </span>
+<span class="label">
+         Выжившие муравьи
+        </span>
+</div>
+<div class="battle-stat">
+<span class="value" id="damage">
+         —
+        </span>
+<span class="label">
+         Текущий урон жвалами
+        </span>
+</div>
+</div>
+<div class="divider">
+</div>
+<div class="statusbar">
+<h2 style="margin:0">
+        Боевые состояния
+       </h2>
+</div>
+<div class="tactic">
+<button aria-pressed="false" class="ability-btn" id="discipline" type="button">
+<span class="action-title">
+         ◆ Дисциплина
+        </span>
+<small>
+         +1 к атаке при союзнике у цели
+        </small>
+</button>
+<!-- РЫВОК: обычное действие каждого хода, без ограничения зарядов. -->
+<button aria-pressed="false" class="ability-btn" id="dash" type="button">
+<span class="action-title">➜ Рывок</span>
+<small>Действие · <span data-calc="dashSpeed">8</span> клеток вместо атаки</small>
+</button>
+</div>
+<p class="small" id="combat-help" style="margin-top:9px">
+       Дисциплина срабатывает, если союзный отряд находится рядом с целью. Включи отметку для подсчёта бонуса.
+      </p>
+<!-- Следующий ход сбрасывает выбор действия, но не меняет здоровье. -->
+<button class="quiet full" id="next-turn" type="button">↪ Следующий ход: снять отметку рывка</button>
+<button class="quiet full" id="new-battle" type="button">
+       ↻ Новый бой: снять боевые отметки
+      </button>
+<div class="divider">
+</div>
+<div class="statusbar">
+<h2 style="margin:0">
+        Резерв игрока
+       </h2>
+<span class="small" id="reserve-count">
+        —
+       </span>
+</div>
+<!-- РЕЗЕРВЫ: значки генерируются в render(). -->
+<div class="reserve-row" id="reserve-row">
+</div>
+<button class="primary full" id="replace" type="button">
+       Получить новый отряд
+      </button>
+<p class="small" style="margin-top:10px">
+       После уничтожения отряда резерв создаёт новую группу того же типа. Выбор другого типа добавим в общем сайте.
+      </p>
+<div style="text-align:center">
+<button class="quiet" id="reset" type="button">
+        ↻ Сбросить весь лист
+       </button>
+</div>
+</section>
+<section class="card">
+<h2>
+       Автосохранение
+      </h2>
+<p>
+       Здоровье, погибшие бойцы, расход способностей и подкрепления сохраняются автоматически в этом браузере.
+      </p>
+<p class="small">
+<strong>
+        Номер отряда:
+       </strong>
+<span id="instance-label">
+        01
+       </span>
+       . У разных номеров отдельные сохранения, даже если открыть этот лист в двух вкладках.
+      </p>
+<div class="squad-id-controls">
+<input aria-label="Номер отряда" autocomplete="off" id="squad-id" maxlength="24" placeholder="Например: 01 или Б-2"/>
+<button id="open-squad" type="button">
+        Открыть отряд
+       </button>
+</div>
+<p class="instance-hint">
+       Для ещё одного такого же отряда введи другой номер и нажми «Открыть отряд». Номер останется в адресе страницы после обновления. Не вводи один номер для разных отрядов одного типа.
+      </p>
+</section>
+</div>
+</div>
+<div class="footer">
+    Муравьиная революция · Холэн · Лист отряда · Стандарт интерфейса v1.0 · Линейная пехота
+   </div>
+</main>
+<script>
+   "use strict";
+
+// ================================================================
+//  1. НАСТРОЙКИ — ОСНОВНЫЕ ЦИФРЫ МЕНЯЮТСЯ ЗДЕСЬ
+// ================================================================
+// Совет: меняй числа после двоеточия, не убирай запятые или скобки.
+// Везде, где в HTML стоит data-rule/data-signed/data-calc,
+// значение обновится автоматически. Ничего искать по файлу не нужно.
+const RULES = {
+    // ОТОБРАЖЕНИЕ МУРАВЬЁВ В БЛОКЕ «СОСТОЯНИЕ ОТРЯДА»
+    antsPerRow: 4,          // 4 иконки в ряд; 5-я переходит на новую строку
+    stackFrom: 8,           // 8 и меньше — сетка, с 9 — стопки + число
+
+    members: 4,            // Муравьёв в отряде
+    hpPerAnt: 3,           // ОЗ одного муравья (всего 4 * 3 = 12)
+    armorClass: 13,        // Класс защиты (КД)
+    speed: 4,              // Скорость, клеток за ход
+    visionRange: 6,        // Дальность обнаружения, клетки
+    attackBonus: 4,        // Бонус к броску атаки
+    damagePerAnt: 1,       // Урон за каждого ВЫЖИВШЕГО бойца
+    disciplineBonus: 1,    // +к атаке, если цель окружена союзниками
+    criticalExtra: 2,      // Доп. урон при натуральной 20
+
+    maxReserves: 3,        // Сколько раз можно получить новый отряд
+
+    // Модификаторы характеристик
+    strength: 0,          // Сила
+    dexterity: 1,         // Ловкость
+    constitution: 0,      // Телосложение
+    intelligence: 1,      // Интеллект
+    wisdom: 0,            // Мудрость
+    charisma: 0,           // Харизма
+
+    // ============================================================
+    //  МАСТЕРСТВО И НАВЫКИ — РЕДАКТИРОВАТЬ ЗДЕСЬ
+    // ============================================================
+    // 0 — без мастерства; 1 — мастерство (+2); 2 — супермастерство (+4).
+    // Можешь менять 0 / 1 / 2, не редактируя HTML, CSS и функции.
+    // Распределение пока ПРЕДВАРИТЕЛЬНОЕ, утверждается с ГМ.
+    mastery: {
+        bonus: 2,                   // Базовый бонус мастерства
+
+        // Проверки основных характеристик (без навыков)
+        checks: {
+            strength: 0,  // Сила
+            dexterity: 0,  // Ловкость
+            constitution: 0,  // Телосложение
+            intelligence: 0,  // Интеллект
+            wisdom: 0,  // Мудрость
+            charisma: 0,  // Харизма
+        },
+
+        // Спасброски по характеристикам
+        saves: {
+            strength: 0,  // Сила
+            dexterity: 1,  // Ловкость
+            constitution: 0,  // Телосложение
+            intelligence: 0,  // Интеллект
+            wisdom: 0,  // Мудрость
+            charisma: 0,  // Харизма
+        },
+
+        // Владение навыками (в том же порядке, что в раскрывающихся панелях)
+        skills: {
+            athletics: 0,  // Сила: Атлетика
+            acrobatics: 0,  // Ловкость: Акробатика
+            sleightOfHand: 0,  // Ловкость: Ловкость рук
+            stealth: 0,  // Ловкость: Скрытность
+            arcana: 0,  // Интеллект: Магия
+            history: 0,  // Интеллект: История
+            investigation: 1,  // Интеллект: Анализ
+            nature: 0,  // Интеллект: Природа
+            religion: 0,  // Интеллект: Религия
+            animalHandling: 0,  // Мудрость: Уход за животными
+            insight: 0,  // Мудрость: Проницательность
+            medicine: 0,  // Мудрость: Медицина
+            perception: 1,  // Мудрость: Внимательность
+            survival: 0,  // Мудрость: Выживание
+            deception: 0,  // Харизма: Обман
+            intimidation: 0,  // Харизма: Запугивание
+            performance: 0,  // Харизма: Выступление
+            persuasion: 0  // Харизма: Убеждение
+        }
+    }
+};
+
+// Вычисления ниже зависят от RULES, вручную их менять не нужно.
+const MAX_HP = RULES.members * RULES.hpPerAnt;
+const DASH_SPEED = RULES.speed * 2;
+
+
+// ================================================================
+//  2. СОСТОЯНИЕ И АВТОСОХРАНЕНИЕ
+// ================================================================
+// RULES = правила отряда, state = то, что меняется во время боя.
+// Старое сохранение будет открыто, если исходные размеры отряда не менялись.
+// У каждого экземпляра (номер в адресе #01, #02...) отдельное состояние.
+// Смена номера не уничтожает старое сохранение: оно остаётся доступным.
+const LEGACY_STORAGE_KEY = "ants-revolution-medium-squad-v1";
+const STORAGE_PREFIX = "ants-revolution-medium-squad-v1-standard-v1";
+let squadId = decodeURIComponent(window.location.hash.substring(1)) || "01";
+function storageKey() {
+    return `${STORAGE_PREFIX}:${squadId}`;
+}
+const RULES_SIGNATURE = `${RULES.members}:${RULES.hpPerAnt}:${RULES.maxReserves}`;
+
+function startingState() {
+    return {
+        hp: MAX_HP,
+        cap: MAX_HP,  // Потолок лечения: падает, если погиб целый муравей
+        reserves: RULES.maxReserves,
+        discipline: false,  // Есть ли союзник рядом с целью
+        dashSelected: false, // Выбрано действие «Рывок» в текущем ходу
+    };
+}
+
+let state = startingState();
+
+function loadState() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(storageKey()) || (squadId === "01" ? localStorage.getItem(LEGACY_STORAGE_KEY) : null));
+        if (!saved) return;
+
+        // Это защищает от загрузки прогресса с несовместимыми настройками.
+        const validNumbers =
+            Number.isInteger(saved.hp) && Number.isInteger(saved.cap) &&
+            Number.isInteger(saved.reserves) &&
+            saved.hp >= 0 && saved.hp <= MAX_HP &&
+            saved.cap >= 0 && saved.cap <= MAX_HP &&
+            saved.hp <= saved.cap &&
+            saved.cap % RULES.hpPerAnt === 0 &&
+            saved.reserves >= 0 && saved.reserves <= RULES.maxReserves;
+
+        const sameRules = saved.rulesSignature === RULES_SIGNATURE ||
+            (saved.rulesSignature === undefined && RULES_SIGNATURE === "4:3:3");
+
+        if (validNumbers && sameRules && true) {
+            state = {
+                hp: saved.hp,
+                cap: saved.cap,
+                reserves: saved.reserves,
+                discipline: saved.discipline === true,
+                dashSelected: saved.dashSelected === true, // У старых сохранений false
+            };
+        }
+    } catch (error) {
+        // Если localStorage недоступен, все кнопки продолжают работать.
+    }
+}
+
+function saveState() {
+    try {
+        localStorage.setItem(storageKey(), JSON.stringify({ ...state, rulesSignature: RULES_SIGNATURE }));
+    } catch (error) {
+        // Локальное сохранение может быть отключено настройками браузера.
+    }
+}
+
+// ================================================================
+//  3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ================================================================
+function byId(id) {
+    return document.getElementById(id);
+}
+
+function survivors() {
+    // 1 непустой сегмент здоровья = 1 живой муравей.
+    return Math.ceil(state.hp / RULES.hpPerAnt);
+}
+
+function signed(value) {
+    return value >= 0 ? `+${value}` : String(value);
+}
+
+// data-rule, data-signed и data-calc — специальные метки в HTML.
+// Все подписанные ими числа автоматически приходят из RULES.
+function updateRuleLabels() {
+    const calculated = { maxHp: MAX_HP, dashSpeed: DASH_SPEED, maxDamage: RULES.members * RULES.damagePerAnt };
+
+    document.querySelectorAll("[data-rule], [data-signed], [data-calc]").forEach((element) => {
+        let value;
+        if (element.hasAttribute("data-rule")) {
+            value = RULES[element.dataset.rule];
+        } else if (element.hasAttribute("data-signed")) {
+            value = signed(RULES[element.dataset.signed]);
+        } else {
+            value = calculated[element.dataset.calc];
+        }
+
+        const prefix = element.dataset.prefix || "";
+        const suffix = element.dataset.suffix || "";
+        element.textContent = prefix + value + suffix;
+    });
+}
+
+// ================================================================
+//  3А. ВЫПАДАЮЩАЯ ПАНЕЛЬ НАВЫКОВ И СПАСБРОСКОВ
+// ================================================================
+// Здесь ТОЛЬКО отображение и подписи. Мастерство меняй в RULES.mastery.
+// Добавляешь навык? Добавь его название здесь и степень в RULES.mastery.skills.
+// Телосложение не имеет стандартных навыков в D&D — проверки и спасы есть.
+const SKILLS_BY_ABILITY = {
+    strength:      { label: "Сила", skills: [["athletics", "Атлетика"]] },
+    dexterity:     { label: "Ловкость", skills: [["acrobatics", "Акробатика"], ["sleightOfHand", "Ловкость рук"], ["stealth", "Скрытность"]] },
+    constitution:  { label: "Телосложение", skills: [] },
+    intelligence:  { label: "Интеллект", skills: [["investigation", "Анализ"], ["history", "История"], ["arcana", "Магия"], ["nature", "Природа"], ["religion", "Религия"]] },
+    wisdom:        { label: "Мудрость", skills: [["perception", "Внимательность"], ["survival", "Выживание"], ["medicine", "Медицина"], ["insight", "Проницательность"], ["animalHandling", "Уход за животными"]] },
+    charisma:      { label: "Харизма", skills: [["deception", "Обман"], ["intimidation", "Запугивание"], ["performance", "Выступление"], ["persuasion", "Убеждение"]] }
+};
+
+// Закрытая панель не влияет на сохранения и здоровье.
+let openedAbility = null;
+
+function getMasteryRank(group, name) {
+    const rank = RULES.mastery[group][name] ?? 0;
+    // В случае опечатки в настройках не выдаём бесконечные бонусы.
+    return [0, 1, 2].includes(rank) ? rank : 0;
+}
+
+function rollModifier(ability, group, name) {
+    return RULES[ability] + getMasteryRank(group, name) * RULES.mastery.bonus;
+}
+
+function masteryLabel(rank) {
+    if (rank === 2) return "Супермастерство";
+    if (rank === 1) return "Мастерство";
+    return "Без мастерства";
+}
+
+function masterySymbol(rank) {
+    return rank === 2 ? "◎" : rank === 1 ? "●" : "○";
+}
+
+function rankMarkup(rank) {
+    const modifierClass = rank === 2 ? "expert" : rank === 1 ? "proficient" : "";
+    return `<span class="attribute-rank ${modifierClass}">
+        <span class="attribute-rank-symbol" aria-hidden="true">${masterySymbol(rank)}</span>
+        ${masteryLabel(rank)}
+    </span>`;
+}
+
+function renderAbilityDetails(key) {
+    const ability = SKILLS_BY_ABILITY[key];
+    const checkRank = getMasteryRank("checks", key);
+    const saveRank = getMasteryRank("saves", key);
+    const skills = ability.skills.map(([id, label], index) => {
+        const rank = getMasteryRank("skills", id);
+        return `<div class="attribute-skill attribute-stagger" style="--stagger-delay:${115 + index * 50}ms">
+            <div><span class="attribute-skill-name">${label}</span>${rankMarkup(rank)}</div>
+            <strong class="attribute-skill-value">${signed(rollModifier(key,"skills",id))}</strong>
+        </div>`;
+    }).join("");
+
+    byId("ability-details-content").innerHTML = `
+        <div class="attribute-heading attribute-stagger" style="--stagger-delay:20ms">
+            <strong>${ability.label.toUpperCase()}</strong>
+            <span>Модификатор ${signed(RULES[key])}</span>
+        </div>
+        <div class="attribute-rolls">
+            <div class="attribute-roll attribute-stagger" style="--stagger-delay:45ms">
+                <span class="attribute-roll-label">ПРОВЕРКА</span>
+                <strong class="attribute-roll-value">${signed(rollModifier(key,"checks",key))}</strong>
+                ${rankMarkup(checkRank)}
+            </div>
+            <div class="attribute-roll attribute-stagger" style="--stagger-delay:85ms">
+                <span class="attribute-roll-label">СПАСБРОСОК</span>
+                <strong class="attribute-roll-value">${signed(rollModifier(key,"saves",key))}</strong>
+                ${rankMarkup(saveRank)}
+            </div>
+        </div>
+        <div class="attribute-section-heading attribute-stagger" style="--stagger-delay:110ms">НАВЫКИ</div>
+        <div class="attribute-skills">
+            ${skills || '<div class="attribute-empty">У этой характеристики нет стандартных навыков.</div>'}
+        </div>
+        <div class="attribute-legend attribute-stagger" style="--stagger-delay:200ms">○ Без мастерства · ● Мастерство · ◎ Супермастерство</div>`;
+}
+
+function selectAbility(key) {
+    openedAbility = openedAbility === key ? null : key;
+    const panel = byId("ability-details");
+    if (openedAbility !== null) renderAbilityDetails(openedAbility);
+    // Обновляем доступность клавиатуры и состояние всех шести карточек.
+    document.querySelectorAll(".ability-trigger").forEach(button => {
+        const expanded = button.dataset.ability === openedAbility;
+        button.classList.toggle("is-open", expanded);
+        button.setAttribute("aria-expanded", String(expanded));
+    });
+    panel.classList.toggle("open", openedAbility !== null);
+    panel.setAttribute("aria-hidden", String(openedAbility === null));
+}
+
+// Карточки — настоящие кнопки, работают и мышью, и пальцем, и с клавиатуры.
+document.querySelectorAll(".ability-trigger").forEach(button => {
+    button.addEventListener("click", () => selectAbility(button.dataset.ability));
+});
+
+// Два маленьких рисунка вшиты прямо в файл: интернет не нужен.
+const ANT_ICON = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3">
+            <path d="M31 25 16 19 9 27M31 32 16 34 8 44M31 39 20 49 17 58M36 25 48 18 58 25M36 32 48 34 58 44M36 39 45 49 48 58M30 12 23 4M35 12 42 4"/>
+        </g>
+        <ellipse cx="33" cy="46" rx="12" ry="14" fill="currentColor"/>
+        <ellipse cx="33" cy="30" rx="8" ry="10" fill="currentColor"/>
+        <ellipse cx="33" cy="16" rx="13" ry="12" fill="currentColor"/>
+    </svg>`;
+
+const SHIELD_ICON = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="1.8"
+         stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M8 12l3 3 5-6"/>
+    </svg>`;
+
+function currentDamage() {
+    // Чем меньше живых бойцов, тем слабее удар отряда.
+    return survivors() * RULES.damagePerAnt;
+}
+
+// ================================================================
+//  4. ОТРИСОВКА — render() ОБНОВЛЯЕТ ЛИСТ
+// ================================================================
+// ================================================================
+//  ВИЗУАЛИЗАЦИЯ ЧИСЛЕННОСТИ — ПОНЯТНАЯ СЕТКА ИЛИ КОМПАКТНЫЕ СТОПКИ
+// ================================================================
+// Правь только RULES.members, RULES.antsPerRow и RULES.stackFrom.
+// Число живых берём из здоровья; остальные считаются погибшими.
+// Меняет только способ отображения, не правила и не сохранения.
+function renderAntIcons(alive) {
+    const container = byId("ants");
+    const compact = RULES.members > RULES.stackFrom;
+    container.classList.toggle("ant-stacks", compact);
+
+    if (!compact) {
+        // До порога: каждый муравей в карточке, по RULES.antsPerRow в ряд.
+        // CSS Grid сам переносит 5-го, 6-го и остальных вниз.
+        container.style.gridTemplateColumns =
+            `repeat(${Math.min(RULES.antsPerRow, RULES.members)}, minmax(0, 1fr))`;
+        container.innerHTML = Array.from({ length: RULES.members }, (_, index) => {
+            const isAlive = index < alive;
+            return `
+                <div class="ant ${isAlive ? "" : "dead"}">
+                    ${ANT_ICON}
+                    <span>${isAlive ? "Жив" : "Погиб"}</span>
+                </div>`;
+        }).join("");
+        return;
+    }
+
+    // Выше RULES.stackFrom: отдельные стопки без десятков карточек.
+    container.style.gridTemplateColumns = "";
+    const dead = RULES.members - alive;
+
+    function stack(count, isDead) {
+        if (count === 0) return ""; // Не рисуем пустую стопку.
+        // Даже если муравьёв 100, изображаем максимум 3 значка.
+        const icons = Array.from({ length: Math.min(3, count) }, () =>
+            `<span class="ant-stack-icon">${ANT_ICON}</span>`
+        ).join("");
+        const label = isDead ? "Погибли" : "Живы";
+        return `
+            <div class="ant-stack ${isDead ? "dead" : ""}" aria-label="${label}: ${count}">
+                <div class="ant-stack-icons" aria-hidden="true">${icons}</div>
+                <div class="ant-stack-info">
+                    <strong>×${count}</strong>
+                    <span>${label}</span>
+                </div>
+            </div>`;
+    }
+
+    container.innerHTML = stack(alive, false) + stack(dead, true);
+}
+
+function render() {
+    const alive = survivors();
+    const defeated = alive === 0;
+    
+
+    // Отображение всех живых и погибших бойцов.
+    renderAntIcons(alive);
+
+    // Здоровье и общая полоска.
+    byId("hp-label").textContent = `${state.hp} / ${state.cap} ОЗ`;
+    byId("hp-track").setAttribute("aria-valuemax", MAX_HP);
+    byId("hp-track").setAttribute("aria-valuenow", state.hp);
+    const fill = byId("hp-fill");
+    fill.style.width = `${state.hp / MAX_HP * 100}%`;
+    fill.className = `fill ${defeated ? "none" : state.hp <= MAX_HP / 2 ? "low" : ""}`;
+
+    // Текущий урон и численность, оба зависят от потерь.
+    byId("alive").textContent = `${alive} / ${RULES.members}`;
+    byId("damage").textContent = currentDamage();
+    byId("top-damage").textContent = currentDamage();
+
+    const status = byId("status");
+    status.textContent = defeated ? "Уничтожен" : alive < RULES.members ? "Ослаблен" : "Боеспособен";
+    status.className = `status ${defeated ? "danger" : alive < RULES.members ? "warn" : ""}`;
+
+    byId("hit1").disabled = defeated;
+    byId("hit3").disabled = defeated;
+    byId("short-rest").disabled = defeated || state.hp >= state.cap;
+    byId("long-rest").disabled = defeated || (state.hp === MAX_HP && state.cap === MAX_HP);
+    
+    
+
+    // Дисциплина включается только при соблюдении условия на поле боя.
+    byId("discipline").disabled = defeated;
+    byId("discipline").classList.toggle("active", state.discipline && !defeated);
+    byId("discipline").setAttribute("aria-pressed", String(state.discipline && !defeated));
+    byId("discipline").querySelector(".action-title").textContent =
+        state.discipline && !defeated ? "✓ Дисциплина действует" : "◆ Дисциплина";
+    // «Рывок» — выбор действия на один ход, а не заряд на весь бой.
+    const dash = byId("dash");
+    dash.disabled = defeated;
+    dash.classList.toggle("active", state.dashSelected && !defeated);
+    dash.setAttribute("aria-pressed", String(state.dashSelected && !defeated));
+    dash.querySelector(".action-title").textContent =
+        state.dashSelected && !defeated ? "✓ Рывок выбран" : "➜ Рывок";
+
+    // При рывке нет атаки в этом ходу, даже если действует «Дисциплина».
+    byId("combat-help").textContent = state.dashSelected && !defeated
+        ? `Рывок выбран: можно пройти до ${DASH_SPEED} клеток вместо ${RULES.speed}, но атаковать в этом ходу нельзя. Нажми ещё раз для отмены или «Следующий ход».`
+        : state.discipline && !defeated
+            ? `Союзник у цели: атака d20 +${RULES.attackBonus + RULES.disciplineBonus}. Если союзник уйдёт, выключи отметку.`
+            : `Без союзника атака d20 +${RULES.attackBonus}. Если союзник рядом с целью, включи Дисциплину.`;
+    byId("next-turn").disabled = defeated || !state.dashSelected;
+    byId("new-battle").disabled = defeated || (!state.discipline && !state.dashSelected);
+
+    // Резервы. После гибели можно взять новый отряд, а не воскресить старый.
+    byId("replace").disabled = !defeated || state.reserves === 0;
+    byId("reserve-count").textContent = `${state.reserves} из ${RULES.maxReserves}`;
+    byId("reserve-row").innerHTML = Array.from({ length: RULES.maxReserves }, (_, i) => `
+        <div class="reserve ${i < state.reserves ? "" : "used"}">
+            ${SHIELD_ICON}
+            <span>Резерв ${i + 1}</span>
+        </div>`).join("");
+    byId("reserve-row").style.gridTemplateColumns = `repeat(${RULES.maxReserves}, minmax(0, 1fr))`;
+
+    saveState();
+}
+
+// ================================================================
+//  5. ИГРОВЫЕ ДЕЙСТВИЯ
+// ================================================================
+function takeDamage(amount) {
+    if (state.hp === 0) return;
+    state.hp = Math.max(0, state.hp - amount);
+    // Гибель бойца уменьшает предел лечения.
+    state.cap = Math.min(state.cap, Math.ceil(state.hp / RULES.hpPerAnt) * RULES.hpPerAnt);
+    render();
+}
+
+function shortRest() {
+    if (state.hp === 0 || state.hp >= state.cap) return;
+    if (!confirm("Короткий отдых вне боя? Он восстановит здоровье только выживших муравьёв.")) return;
+    state.hp = state.cap;
+    render();
+}
+
+function longRest() {
+    if (state.hp === 0 || (state.hp === MAX_HP && state.cap === MAX_HP)) return;
+    if (!confirm("ГМ разрешил долгий отдых в безопасной точке? Здоровье станет полным, а потерянные муравьи будут заменены пополнением из тыла.")) return;
+    state.hp = MAX_HP;
+    state.cap = MAX_HP;
+    render();
+}
+
+function replaceSquad() {
+    if (state.hp !== 0 || state.reserves === 0) return;
+    const remaining = state.reserves - 1;
+    state = startingState();
+    state.reserves = remaining;
+    // Позже здесь будет выбор отряда из всего списка.
+    render();
+}
+
+// ================================================================
+//  6. СОБЫТИЯ — КНОПКИ И ИХ ОБРАБОТЧИКИ
+// ================================================================
+// Чтобы добавить собственную интерактивную способность:
+//   1) Добавь кнопку с id в HTML рядом с другими способностями.
+//   2) Добавь флаг в startingState() (если есть заряд/активация).
+//   3) Добавь обработчик .addEventListener(...).
+//   4) Обнови отображение кнопки в render().
+byId("hit1").addEventListener("click", () => takeDamage(1));
+byId("hit3").addEventListener("click", () => takeDamage(3));
+byId("short-rest").addEventListener("click", shortRest);
+byId("long-rest").addEventListener("click", longRest);
+
+
+byId("discipline").addEventListener("click", () => {
+    if (state.hp === 0) return;
+    state.discipline = !state.discipline;
+    render();
+});
+// Рывок выбирается и отменяется нажатием. Нет зарядов: доступен каждый ход.
+byId("dash").addEventListener("click", () => {
+    if (state.hp === 0) return;
+    state.dashSelected = !state.dashSelected;
+    render();
+});
+
+// Новый ход снимает только отметку рывка; «Дисциплина» не теряется.
+byId("next-turn").addEventListener("click", () => {
+    if (state.hp === 0) return;
+    state.dashSelected = false;
+    render();
+});
+
+// Новый бой сбрасывает временные боевые отметки, но не погибших бойцов.
+byId("new-battle").addEventListener("click", () => {
+    if (state.hp === 0) return;
+    state.discipline = false;
+    state.dashSelected = false;
+    render();
+});
+
+byId("replace").addEventListener("click", replaceSquad);
+byId("reset").addEventListener("click", () => {
+    if (!window.confirm("Сбросить здоровье, способности и все использованные резервы?")) return;
+    state = startingState();
+    render();
+});
+
+// ================================================================
+//  7. ЗАПУСК — ЭТИ СТРОКИ НЕ ТРОГАТЬ
+// ================================================================
+// ================================================================
+//  7. НЕЗАВИСИМЫЕ ЛИСТЫ — НОМЕР ОТРЯДА
+// ================================================================
+// #01 и #02 в адресе дают разные сохранения одного и того же типа.
+// Можно вернуться к сохранению, введя предыдущий номер.
+function showCurrentSquad() {
+    byId("instance-label").textContent = squadId;
+    byId("squad-id").value = squadId;
+}
+function openSquad() {
+    const id = byId("squad-id").value.trim();
+    if (!id) { byId("squad-id").focus(); return; }
+    // Символы # и ? меняют смысл адреса, поэтому в ID запрещены.
+    if (/[#?]/.test(id)) { alert("Используй буквы, цифры и дефис, без # и ?."); return; }
+    if (id === squadId) return;
+    squadId = id;
+    window.location.hash = encodeURIComponent(squadId);
+    state = startingState();
+    loadState();
+    showCurrentSquad();
+    render();
+}
+byId("open-squad").addEventListener("click", openSquad);
+byId("squad-id").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") openSquad();
+});
+window.addEventListener("hashchange", () => {
+    const id = decodeURIComponent(window.location.hash.slice(1)) || "01";
+    if (id === squadId) return;
+    squadId = id;
+    state = startingState();
+    loadState();
+    showCurrentSquad();
+    render();
+});
+
+// ================================================================
+//  8. ЗАПУСК
+// ================================================================
+loadState();
+updateRuleLabels();
+showCurrentSquad();
+render();
+  </script>
+</body>
+</html>

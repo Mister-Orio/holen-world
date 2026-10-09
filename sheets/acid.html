@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<!--
+  МУРАВЬИНАЯ РЕВОЛЮЦИЯ — КИСЛОТНЫЕ СТРЕЛКИ v1.4
+
+  КАК ИЗМЕНЯТЬ САЙТ В VS CODE:
+  1. Ctrl + F -> "НАСТРОЙКИ": в объекте const RULES меняй цифры.
+  2. Ctrl + F -> "СПОСОБНОСТИ": здесь тексты и описания.
+  3. Ctrl + F -> "ПАЛИТРА": цвета и оформление (CSS).
+  4. Ctrl + F -> "КИСЛОТА И ЗАВЕСА": расход, длительность и урон находятся в RULES.
+  5. Ctrl + F -> "МАСТЕРСТВО И НАВЫКИ": задавай 0, 1 или 2.
+  6. Ctrl + F -> "КОНТРОЛЬ ЗАВЕСЫ": СЛ, длительность и эффекты. 
+  6. Ctrl + S -> обнови вкладку браузера клавишей F5.
+
+  
+
+  data-rule/data-signed/data-calc — цифры из RULES, вручную в HTML не меняй.
+  Файл автономный, без библиотек и интернета.
+-->
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#161a1a" name="theme-color"/>
+<meta content="Интерактивный лист кислотных стрелков: здоровье, кислота, завеса, навыки и резервы" name="description"/>
+<title>
+   Муравьиная революция — Кислотные стрелки
+  </title>
+<style>
+   /* ===== 01. ПАЛИТРА И ЦВЕТА ===== */
+:root {
+    color-scheme: dark;
+    --bg:#101415;
+    --panel:#1b2223;
+    --panel-2:#222b2b;
+    --border:#34403e;
+    --text:#f2f3eb;
+    --muted:#a5b1ad;
+    --green:#6fd8a8;
+    --red:#e87870;
+    --gold:#e9bb73;
+}
+
+* {
+    box-sizing:border-box
+}
+
+html {
+    scroll-behavior:smooth
+}
+
+body {
+    margin:0;
+    color:var(--text);
+    background:radial-gradient(ellipse at 50% -10%,#29302a 0%,transparent 45%),var(--bg);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.wrap {
+    width:min(100% - 28px,980px);
+    margin:0 auto;
+    padding-bottom:42px
+}
+
+/* ===== 02. ШАПКА И ОБЛОЖКА ===== */
+.hero {
+    margin:18px 0 16px;
+    min-height:230px;
+    border:1px solid #46443f;
+    border-radius:22px;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    align-items:end;
+    isolation:isolate;
+    background:linear-gradient(105deg,rgba(10,16,16,.94) 10%,rgba(10,16,16,.55) 72%), radial-gradient(ellipse at 84% 50%,#9f2926 0%,#532a26 27%,#252b2a 60%,#18201f 90%);
+}
+
+.hero::before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    inset:0;
+    background:repeating-radial-gradient(ellipse at 90% 52%, transparent 0 18px, rgba(3,7,8,.08) 19px 25px);
+}
+
+.hero::after {
+    content:"";
+    position:absolute;
+    right:-50px;
+    bottom:-48px;
+    width:440px;
+    height:260px;
+    background:radial-gradient(ellipse,rgba(228,43,39,.28),transparent 65%);
+    filter:blur(12px);
+    z-index:-1
+}
+
+.hero .art {
+    position:absolute;
+    right:22px;
+    bottom:3px;
+    width:min(40%,290px);
+    opacity:.82;
+    filter:drop-shadow(0 6px 14px #0b0c0c)
+}
+
+.hero-content {
+    padding:27px 30px;
+    z-index:2
+}
+
+.eyebrow {
+    color:var(--gold);
+    font-size:11px;
+    letter-spacing:.22em;
+    font-weight:800;
+    text-transform:uppercase
+}
+
+h1 {
+    line-height:1.07;
+    font-size:clamp(29px,5vw,48px);
+    margin:8px 0 12px;
+    letter-spacing:-.035em
+}
+
+.subtitle {
+    color:#d2d8ce;
+    max-width:470px;
+    margin:0
+}
+
+.badges {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:17px
+}
+
+.badge {
+    padding:5px 10px;
+    border:1px solid #6d6e55;
+    background:#c9c18e15;
+    border-radius:100px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.04em;
+    color:#eddfa8
+}
+
+.badge.secondary {
+    border-color:var(--border);
+    background:#ffffff09;
+    color:var(--muted)
+}
+
+/* ===== 03. КАРТОЧКИ И КОЛОНКИ ===== */
+.layout {
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);
+    gap:14px;
+    align-items:start
+}
+
+.column {
+    display:grid;
+    gap:14px
+}
+
+.card {
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,#202828,#1a2122);
+    padding:21px;
+    border-radius:18px;
+    box-shadow:0 14px 30px #00000018
+}
+
+h2 {
+    font-size:17px;
+    margin:0 0 14px;
+    letter-spacing:-.015em
+}
+
+h3 {
+    font-size:14px;
+    margin:0 0 5px
+}
+
+p {
+    margin:0 0 11px;
+    color:#d0d7d3
+}
+
+/* ===== 04. ХАРАКТЕРИСТИКИ ===== */
+.stat-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px
+}
+
+.stat {
+    background:#101717;
+    border:1px solid #303c39;
+    border-radius:13px;
+    padding:12px 7px;
+    text-align:center;
+    min-width:0
+}
+
+.stat strong {
+    display:block;
+    font-size:27px;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums
+}
+
+.stat span {
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.3;
+    display:block;
+    margin-top:7px
+}
+
+.ability-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px
+}
+
+.ability {
+    text-align:center;
+    padding:9px;
+    border:1px solid var(--border);
+    border-radius:11px
+}
+
+.ability span {
+    display:block;
+    color:var(--muted);
+    font-size:11px
+}
+
+.ability strong {
+    font-size:19px
+}
+
+.divider {
+    height:1px;
+    background:var(--border);
+    margin:18px 0
+}
+
+.small {
+    color:var(--muted);
+    font-size:12px
+}
+
+/* ===== 05. ЗДОРОВЬЕ И СОСТОЯНИЕ ===== */
+.statusbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px
+}
+
+.status {
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:750;
+    background:#29523f;
+    color:#9cf0c5;
+    white-space:nowrap
+}
+
+.status.warn {
+    background:#6b4e24;
+    color:#ffd494
+}
+
+.status.danger {
+    background:#623130;
+    color:#ffaaa0
+}
+
+.ants {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+    margin:17px 0
+}
+
+.ant {
+    border:1px solid #416552;
+    background:#19392d68;
+    padding:12px 2px 10px;
+    text-align:center;
+    border-radius:13px;
+    transition:.2s
+}
+
+.ant.dead {
+    background:#202728;
+    border-color:#333d3e;
+    opacity:.54
+}
+
+.ant svg {
+    display:block;
+    width:38px;
+    height:42px;
+    margin:auto auto 5px;
+    color:#80ddad
+}
+
+.ant.dead svg {
+    color:#7a8586
+}
+
+.ant span {
+    font-size:10px;
+    color:var(--muted);
+    font-weight:650
+}
+
+.hp-head {
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-top:12px
+}
+
+.hp-head strong {
+    font-size:25px;
+    font-variant-numeric:tabular-nums
+}
+
+.track {
+    margin:7px 0 13px;
+    height:13px;
+    background:#101617;
+    border:1px solid #34413e;
+    border-radius:99px;
+    overflow:hidden
+}
+
+.fill {
+    height:100%;
+    background:linear-gradient(90deg,#21845a,#6bdca6);
+    transition:width .25s ease
+}
+
+.fill.low {
+    background:linear-gradient(90deg,#ac502c,#e2a44c)
+}
+
+.fill.none {
+    background:none
+}
+
+/* ===== 06. КНОПКИ ===== */
+.buttons {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px
+}
+
+button {
+    min-height:43px;
+    border:1px solid #52605b;
+    border-radius:11px;
+    background:#2b3634;
+    color:var(--text);
+    font-weight:750;
+    font:inherit;
+    cursor:pointer;
+    transition:background .12s,transform .12s
+}
+
+button:active:not(:disabled) {
+    transform:translateY(1px)
+}
+
+button:hover:not(:disabled) {
+    background:#3b4c46
+}
+
+button:disabled {
+    opacity:.4;
+    cursor:not-allowed
+}
+
+button.primary {
+    background:#378963;
+    border-color:#59b88a;
+    color:white;
+    font-weight:800
+}
+
+button.primary:hover:not(:disabled) {
+    background:#44a576
+}
+
+button.quiet {
+    border:0;
+    background:none;
+    color:var(--muted);
+    font-size:12px;
+    min-height:32px;
+    padding:5px
+}
+
+button.quiet:hover {
+    color:var(--text)
+}
+
+.battle-line {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin:15px 0 0
+}
+
+.battle-stat {
+    background:#111818;
+    border:1px solid #33403d;
+    border-radius:12px;
+    padding:12px
+}
+
+.battle-stat .value {
+    display:block;
+    font-size:29px;
+    font-weight:800;
+    line-height:1.2;
+    font-variant-numeric:tabular-nums
+}
+
+.battle-stat .label {
+    color:var(--muted);
+    font-size:11px
+}
+
+/* ===== 07. РЕЗЕРВЫ ===== */
+.reserve-row {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin:13px 0
+}
+
+.reserve {
+    padding:12px 5px;
+    text-align:center;
+    border:1px solid #3b6d50;
+    background:#183a2a75;
+    border-radius:12px;
+    color:var(--green)
+}
+
+.reserve.used {
+    color:#77827e;
+    border-color:#343b3a;
+    background:#1a2121
+}
+
+.reserve svg {
+    width:25px;
+    height:25px;
+    display:block;
+    margin:auto
+}
+
+.reserve span {
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:5px
+}
+
+.full {
+    width:100%
+}
+
+/* ===== 08. БЛОКИ СПОСОБНОСТЕЙ ===== */
+.skill {
+    display:grid;
+    grid-template-columns:37px minmax(0,1fr);
+    gap:13px;
+    padding:13px 0;
+    border-bottom:1px solid var(--border)
+}
+
+.skill:first-of-type {
+    padding-top:0
+}
+
+.skill:last-of-type {
+    border:0;
+    padding-bottom:0
+}
+
+.skill-icon {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#303a36;
+    border-radius:9px;
+    height:37px;
+    font-size:19px
+}
+
+.skill p {
+    font-size:13px;
+    line-height:1.5;
+    margin-bottom:0
+}
+
+.list {
+    padding-left:18px;
+    margin:7px 0 0;
+    color:#d0d7d3
+}
+
+.list li {
+    margin:6px 0
+}
+
+.footer {
+    text-align:center;
+    color:#778782;
+    font-size:12px;
+    padding:19px 5px 0
+}
+
+.banner {
+    border:1px solid #735640;
+    background:#3b291e60;
+    border-radius:12px;
+    padding:10px 13px;
+    color:#dfb79a;
+    font-size:12px;
+    margin-top:13px
+}
+
+
+
+
+
+
+
+/* ===== 09. ОСОБЕННОСТИ ТЯЖЁЛЫХ ===== */
+
+.tactic {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px
+}
+
+.ability-btn.active {
+    border-color:#b08e5c;
+    color:#f4d79e;
+    background:#524028
+}
+
+.ability-btn {
+    font-size:13px;
+    padding:9px
+}
+
+.ability-btn small {
+    display:block;
+    font-size:10px;
+    font-weight:500;
+    opacity:.75
+}
+
+.hint {
+    background:#101717;
+    border:1px dashed #52605b;
+    border-radius:12px;
+    padding:12px;
+    color:#d0d7d3;
+    font-size:13px
+}
+
+.warning-highlight {
+    color:#f5c583
+}
+
+/* ===== 10. АДАПТАЦИЯ ПОД ТЕЛЕФОН ===== */
+@media(max-width:740px) {
+    .layout {
+        grid-template-columns:1fr
+    }
+    .hero {
+        min-height:215px
+    }
+    .hero-content {
+        padding:22px
+    }
+    .hero .art {
+        width:41%;
+        right:-9px;
+        opacity:.46
+    }
+    .card {
+        padding:17px
+    }
+    .stat strong {
+        font-size:23px
+    }
+}
+
+@media(max-width:380px) {
+    .stat-grid {
+        grid-template-columns:repeat(2,1fr)
+    }
+    .hero .art {
+        display:none
+    }
+    .buttons button {
+        font-size:13px
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    * {
+        transition:none!important;
+        scroll-behavior:auto
+    }
+}
+
+@media(max-width:385px) {
+    .tactic {
+        grid-template-columns:1fr
+    }
+}
+    
+/* ================================================================
+   СОСТАВ ОТРЯДА: ДО 8 — СЕТКА, ОТ 9 — СТОПКИ С ЧИСЛАМИ
+   Количество столбцов до порога задаёт RULES.antsPerRow.
+   Порог компактного режима задаёт RULES.stackFrom.
+   ================================================================ */
+.ants.ant-stacks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+}
+
+/* Одна стопка: зелёная — живые, серая — погибшие. */
+.ant-stack {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 1 1 154px;
+    min-width: 0;
+    padding: 12px 13px;
+    border: 1px solid #416552;
+    border-radius: 13px;
+    background: #19392d68;
+}
+
+.ant-stack.dead {
+    background: #202728;
+    border-color: #454e51;
+}
+
+.ant-stack-icons {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-left: 10px;
+}
+
+.ant-stack-icon {
+    display: block;
+    width: 29px;
+    height: 43px;
+    margin-left: -10px;
+    color: #80ddad;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+}
+
+.ant-stack-icon svg {
+    display: block;
+    width: 29px;
+    height: 43px;
+}
+
+.ant-stack.dead .ant-stack-icon {
+    color: #7a8586;
+}
+
+.ant-stack-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.ant-stack-info strong {
+    color: #80ddad;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.ant-stack.dead .ant-stack-info strong {
+    color: #c1c7c9;
+}
+
+.ant-stack-info span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+
+
+/* ===== 11. ЕДИНЫЙ СТАНДАРТ v1.0 — СОСТОЯНИЯ КНОПОК ===== */
+.ability-btn.active, .ability-btn.selected {
+    background: #244f3d;
+    border-color: #66c99b;
+    color: #e9fff1;
+}
+.ability-btn.spent, .ability-btn:disabled {
+    background: #232a29;
+    border-color: #3b4240;
+    color: #9ca6a0;
+    opacity: .55;
+}
+.ability-btn:focus-visible, .squad-id-controls input:focus-visible {
+    outline: 2px solid #73dcac;
+    outline-offset: 3px;
+}
+/* Тактические кнопки в две колонки, как у тяжёлых. */
+.tactic .ability-btn { min-width: 0; overflow-wrap: anywhere; }
+.tactic .ability-btn small { margin-top: 4px; }
+.ability-summary {
+    border: 1px solid #41534a;
+    background: #101c19;
+    color: #c8d9d1;
+    padding: 10px 11px;
+    border-radius: 11px;
+    margin-top: 9px;
+    font-size: 12px;
+}
+.ability-static {
+    border: 1px solid #42514a;
+    border-radius: 11px;
+    background: #24302e;
+    padding: 9px;
+    text-align: center;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+.ability-static small {color: var(--muted); font-size: 10px;}
+/* У каждого экземпляра собственное локальное сохранение. */
+.squad-id-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.squad-id-controls input {
+    min-width: 0;
+    flex: 1 1 110px;
+    padding: 10px 11px;
+    color: var(--text);
+    background: #101717;
+    border: 1px solid #556c5f;
+    border-radius: 10px;
+    font: inherit;
+}
+.squad-id-controls button { padding: 8px 14px; min-height: 41px; }
+.instance-hint { color: var(--muted); font-size: 12px; line-height: 1.55; margin-top: 8px; }
+@media (max-width:380px) {
+    .tactic {grid-template-columns: repeat(2, minmax(0,1fr));}
+    .ability-btn {font-size:11px;}
+}
+/* ================================================================
+   12. РАСКРЫВАЮЩАЯСЯ ПАНЕЛЬ ХАРАКТЕРИСТИК (ЕДИНЫЙ СТАНДАРТ v1.2)
+   Цвета наследуются от тяжёлых муравьёв; здесь только анимация и компоновка.
+   Чтобы поменять МАСТЕРСТВО, НЕ нужно редактировать CSS — ищи RULES.
+   ================================================================ */
+.ability-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 76px;
+    background: #101717;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: background .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.ability-trigger:hover { border-color: #658b76; background: #202f29; }
+.ability-trigger.is-open {
+    background: #244f3d;
+    border-color: #66c99b;
+    box-shadow: inset 0 0 0 1px rgba(111,216,168,.15);
+}
+.ability-trigger:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+}
+.ability-trigger strong {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    transition: filter .19s ease, opacity .19s ease, transform .19s ease;
+}
+/* Нажатая цифра плавно размывается, при закрытии возвращается. */
+.ability-trigger.is-open strong {
+    filter: blur(4px);
+    opacity: .17;
+    transform: scale(.86);
+}
+.ability-trigger .ability-chevron {
+    font-size: 12px;
+    color: #8fbba7;
+    line-height: 1;
+    margin-top: 2px;
+    transition: transform .25s ease;
+}
+.ability-trigger.is-open .ability-chevron { transform: rotate(180deg); }
+
+/* Сетка из 0fr в 1fr позволяет раскрыть панель без заданной высоты. */
+.attribute-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    margin-top: 0;
+    transition: grid-template-rows .30s ease, opacity .23s ease,
+                margin-top .30s ease, visibility 0s linear .30s;
+}
+.attribute-panel.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 12px;
+    transition: grid-template-rows .30s ease, opacity .23s ease,
+                margin-top .30s ease, visibility 0s;
+}
+.attribute-panel-inner { min-height: 0; overflow: hidden; }
+.attribute-panel-body {
+    padding: 13px;
+    border: 1px solid #476255;
+    border-radius: 12px;
+    background: #111d19;
+}
+.attribute-heading { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.attribute-heading strong { font-size: 14px; letter-spacing: .03em; }
+.attribute-heading span { color: var(--muted); font-size: 12px; }
+.attribute-rolls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+.attribute-roll {
+    border: 1px solid #435750;
+    background: #26332e;
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 0;
+}
+.attribute-roll-label { display: block; font-size: 10px; color: #abc4b8; font-weight: 800; letter-spacing: .03em; }
+.attribute-roll-value { display: block; font-size: 24px; font-weight: 800; line-height: 1.18; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.attribute-rank { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #b1c6ba; }
+.attribute-rank.proficient { color: #78d8aa; }
+.attribute-rank.expert { color: #e9bb73; }
+.attribute-rank-symbol { font-size: 17px; line-height: 1; font-weight: 800; min-width: 16px; }
+.attribute-section-heading { color: #b7d3c5; font-size: 11px; font-weight: 800; letter-spacing: .05em; margin: 4px 0 7px; }
+.attribute-skills { display: flex; flex-direction: column; gap: 6px; }
+.attribute-skill {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; min-width: 0;
+    border-radius: 9px; background: #25352f; padding: 8px 10px;
+}
+.attribute-skill-name { display: block; font-size: 13px; color: #f2f3eb; font-weight: 700; }
+.attribute-skill-value {
+    flex-shrink: 0; font-size: 15px; font-weight: 800;
+    background: #354840; border-radius: 7px;
+    min-width: 44px; text-align: center; padding: 6px 7px;
+    font-variant-numeric: tabular-nums;
+}
+.attribute-empty { color: var(--muted); font-size: 12px; padding: 10px 0 2px; }
+.attribute-legend { margin-top: 11px; font-size: 10px; color: #a4bcb0; line-height: 1.6; }
+/* При каждом выборе характеристики строки проявляются одна за другой. */
+.attribute-panel.open .attribute-stagger { animation: attributeReveal .33s cubic-bezier(.22,.7,.2,1) both; animation-delay: var(--stagger-delay,0ms); }
+@keyframes attributeReveal {
+    from { opacity: 0; transform: translateY(7px); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@media (max-width:380px) {
+    .attribute-panel-body { padding: 10px; }
+    .attribute-roll { padding: 8px; }
+    .attribute-roll-value { font-size: 22px; }
+    .attribute-skill { padding: 7px 8px; }
+}
+@media (prefers-reduced-motion:reduce) {
+    .attribute-panel, .attribute-panel.open, .ability-trigger,
+    .ability-trigger strong, .ability-trigger .ability-chevron,
+    .attribute-panel.open .attribute-stagger {
+        transition: none !important;
+        animation: none !important;
+        filter: none !important;
+    }
+    .ability-trigger.is-open strong { opacity: .38; }
+}
+
+
+  
+
+/* ===== 11. КИСЛОТНЫЕ СТРЕЛКИ: СЧЁТЧИК ЗАРЯДОВ ===== */
+.acid-resources { margin-top: 12px; border: 1px solid #43584f; background: #121e1b; border-radius: 12px; padding: 12px; }
+.acid-resources-top { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size: 13px; }
+.acid-resources-top span { font-size: 12px; color:var(--muted); }
+.acid-pips { display:flex; gap:9px; margin-top:10px; }
+.acid-pip { flex: 1; min-width:0; padding:6px; text-align:center; border: 1px solid #4f9473; background: #254d3e; color: #88edbb; border-radius: 10px; font-size: 21px; }
+.acid-pip.spent { border-color:#394541; background:#1a2120; color:#60716a; }
+.ability-btn.spent { opacity:.68; }
+@media (max-width: 360px) { .acid-resources {padding:10px;} .acid-resources-top {font-size:12px;} }
+
+/* ===== 12. ЗЕЛЁНАЯ КОЛОНИЯ: ФРАКЦИОННАЯ МЕТКА И ХИТИН ===== */
+.hero-title-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px 14px; }
+.hero-title-row h1 { margin-right: 2px; }
+.faction-badge {
+    color:#a3e9bf; background:rgba(39,111,69,.30);
+    border-color:#518b68; letter-spacing:.02em;
+    white-space:nowrap; font-size:11px;
+}
+/* Погибшие иконки теряют зелёные пятна. */
+.ant.dead .chitin-patch, .ant-stack.dead .chitin-patch { fill:#65736d; }
+
+/* ===== 13. ЖУРНАЛ КИСЛОТНЫХ ОЖОГОВ (НЕОБЯЗАТЕЛЬНЫЙ БЛОК) ===== */
+.burn-journal {
+    margin-top:12px; border:1px solid #465a50; border-radius:12px;
+    background:#141f1b; padding:12px; overflow:hidden;
+}
+.burn-journal summary {cursor:pointer; font-weight:750; color:#c4e9d1; padding:4px 1px;}
+.burn-journal summary:focus-visible {outline:2px solid var(--green); outline-offset:3px;}
+.burn-journal-body {padding-top:12px;}
+.burn-explain {margin:0 0 10px; font-size:12px; color:var(--muted); line-height:1.5;}
+.burn-controls {display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; margin-bottom:10px;}
+.burn-controls input {
+    width:100%; min-width:0; padding:10px; background:#202d28;
+    border:1px solid #506357; color:var(--text); border-radius:9px;
+    font:inherit; font-size:13px;
+}
+.burn-controls input:focus-visible {outline:2px solid var(--green);}
+.burn-controls button {padding:8px 12px; font-size:12px; min-height:42px;}
+.burn-list {display:grid; gap:8px;}
+.burn-target {border:1px solid #6b6350; background:#292720; border-radius:11px; padding:10px;}
+.burn-target-head {display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center; justify-content:space-between; margin-bottom:7px;}
+.burn-target-head strong {font-size:13px; overflow-wrap:anywhere;}
+.burn-target-head span {font-size:11px; color:#d2b78e;}
+.burn-target-buttons {display:flex; flex-wrap:wrap; gap:7px;}
+.burn-target-buttons button {flex:1 1 132px; font-size:12px; padding:6px 8px; min-height:38px;}
+.burn-empty {font-size:12px; color:var(--muted);}
+@media (max-width: 420px) {
+    .burn-controls {grid-template-columns:1fr;}
+    .burn-controls button {width:100%;}
+    .hero-title-row {align-items:flex-start; gap:5px;}
+}
+
+/* ===== 14. КОНТРОЛЬ ЗАВЕСЫ: УВЯЗАНИЕ И ПОЛНОЕ ОПУТЫВАНИЕ ===== */
+/* Наследуем расположение журнала ожогов, меняем лишь зеленый акцент. */
+.curtain-journal { border-color:#47735b; background:#14241d; }
+.curtain-journal summary { color:#a9e5c4; }
+.curtain-target { border-color:#406f57; background:#1d3027; }
+.curtain-target.entangled { border-color:#819c60; background:#283326; }
+.curtain-target-head span { color:#b9d7c5; }
+.curtain-note { padding:9px 10px; background:#21392d; border-radius:8px;
+    border:1px solid #4b7860; font-size:12px; line-height:1.5; color:#d8eee2; margin:10px 0 0; }
+.curtain-tips { margin:0 0 10px; font-size:12px; line-height:1.6; color:var(--muted); }
+.curtain-tips strong { color:#b8e8cd; }
+.curtain-extra-buttons { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
+.curtain-extra-buttons button { flex:1 1 145px; min-height:42px; padding:8px; font-size:12px; }
+.curtain-target .burn-target-buttons button { min-width:0; }
+@media (max-width:420px) { .curtain-extra-buttons button {flex-basis:100%;} }
+
+
+/* ===== 15. СЧЁТЧИК ЦЕЛЕЙ И ПРЯМЫЕ ПОПАДАНИЯ ПО НЕСКОЛЬКИМ ОТРЯДАМ ===== */
+/* Никаких таблиц, которые разъедутся на телефоне: карточки с гибкими кнопками. */
+.curtain-target-picker {
+    border:1px solid #4b7860; background:#1a3026;
+    padding:12px; border-radius:11px; margin:12px 0;
+}
+.curtain-picker-title,.curtain-counter-row {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; flex-wrap:wrap;
+}
+.curtain-picker-title {margin-bottom:11px; font-size:13px;}
+.curtain-picker-title span {color:#a6c9b5; font-size:11px;}
+.curtain-counter-row {font-size:12px; color:#d8e8dc; margin-bottom:12px;}
+.curtain-counter {display:flex; align-items:center; gap:5px; flex-shrink:0;}
+.curtain-counter button {
+    width:40px; height:40px; min-height:40px; padding:0;
+    border-radius:9px; border:1px solid #4f856a;
+    background:#294939; color:#effcf1; font-size:21px;
+}
+.curtain-counter button:disabled {opacity:.4;cursor:not-allowed;}
+.curtain-counter output {
+    display:grid;place-items:center;min-width:36px;height:38px;
+    border-radius:8px;background:#0f2119; color:#fff;
+    font-size:18px;font-weight:700;
+}
+.curtain-direct-targets {display:grid;gap:8px;}
+.curtain-direct-slot {background:#17261f;border:1px solid #415d4a;border-radius:9px;padding:10px;}
+.curtain-direct-slot.resolved {background:#20342a;border-color:#4b7860;}
+.curtain-direct-slot label {display:block;color:#d6e9df;font-size:12px;font-weight:650;margin-bottom:6px;}
+.curtain-direct-slot input {
+    width:100%;min-width:0;background:#111e18;color:#f4f8f5;
+    border:1px solid #52715f;border-radius:8px;padding:10px;
+    font:inherit;font-size:13px;
+}
+.curtain-direct-slot input:focus-visible {outline:2px solid #81c49b;outline-offset:2px;}
+.curtain-direct-actions {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;}
+.curtain-direct-actions button {padding:9px 6px;min-height:42px;font-size:12px;}
+.curtain-direct-result {font-size:12px;color:#aedfc3;margin:8px 0 0;}
+.curtain-direct-placeholder {font-size:12px;color:#a9c3b4;margin:3px 0 0;}
+@media(max-width:360px) {
+    .curtain-direct-actions {grid-template-columns:1fr;}
+    .curtain-counter-row>span {max-width:168px;}
+}
+
+  
+/* ===== ДОПОЛНЕНИЕ: КОРОТКИЙ И ДОЛГИЙ ОТДЫХ ===== */
+.damage-buttons {grid-template-columns:repeat(2,minmax(0,1fr))}
+.rest-row {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.rest-row button {padding:10px 8px;min-height:66px;line-height:1.25}
+.rest-row button span {display:block;font-size:13px;font-weight:750}
+.rest-row button small {display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:5px}
+@media(max-width:360px){.rest-row button span{font-size:11px}.rest-row button small{font-size:9px}}
+
+
+/* ===== ЕДИНЫЕ ОБЩИЕ ПРАВИЛА v1.0: ЭТОТ CSS ОДИНАКОВ ДЛЯ ВСЕХ ЛИСТОВ ===== */
+.common-rule-group { margin: 12px 0 0; }
+.common-rule-group h3 { color: #dbece4; font-size: 13px; margin: 0 0 6px; letter-spacing: .01em; }
+.common-rule-group ul { margin-top: 0; }
+.common-rules li { line-height: 1.48; }
+.class-rule-hint { background: #101717; border: 1px dashed #52605b; border-radius: 12px; padding: 10px 12px; }
+.class-rule-hint ul { margin: 4px 0 0; }
+@media (prefers-reduced-motion: reduce) { .common-rule-group { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<!-- НАЧАЛО HTML: то, что отображается в браузере. -->
+<main class="wrap">
+<!-- ОБЛОЖКА: здесь можно заменить название или описание. -->
+<section aria-label="Обложка отряда" class="hero">
+<svg aria-hidden="true" class="art" viewbox="0 0 360 300">
+<g fill="#070d0c" stroke="#1c2524" stroke-linecap="round" stroke-width="2">
+<g transform="translate(95 110) rotate(-14)">
+<ellipse cx="55" cy="108" rx="45" ry="38">
+</ellipse>
+<ellipse cx="91" cy="74" rx="27" ry="29">
+</ellipse>
+<ellipse cx="119" cy="38" rx="38" ry="33">
+</ellipse>
+<path d="M88 73 22 37 10 75M85 85 30 122 20 165M90 94 48 184M104 73 166 106 171 157M104 85 178 57 212 73M111 96 184 183M120 14 102 -20M142 15 170 -15" fill="none" stroke="#080d0c" stroke-width="13">
+</path>
+<!-- Зелёные участки только на спинке и верхней части брюшка. -->
+<path d="M30 94 Q55 69 78 93 Q61 102 34 103Z" fill="#457b5d" opacity=".72"></path>
+<ellipse cx="90" cy="66" fill="#557f64" opacity=".42" rx="14" ry="6"></ellipse>
+</g>
+<g transform="translate(210 163) scale(.65)">
+<ellipse cx="42" cy="95" rx="40" ry="38">
+</ellipse>
+<ellipse cx="80" cy="70" rx="24" ry="24">
+</ellipse>
+<ellipse cx="108" cy="35" rx="36" ry="29">
+</ellipse>
+<path d="M76 70 25 23M75 80 30 125M80 90 69 150M95 70 145 100M98 82 160 44M105 94 150 145M104 13 93 -12M127 13 145 -18" fill="none" stroke="#080d0c" stroke-width="12">
+</path>
+<path d="M20 83 Q40 65 62 84 Q46 93 23 93Z" fill="#457b5d" opacity=".70"></path>
+</g>
+</g>
+</svg>
+<div class="hero-content">
+<div class="eyebrow">
+      Холэн · Муравьиная революция
+     </div>
+<div class="hero-title-row">
+<h1>
+      Кислотные стрелки
+     </h1>
+<span class="badge faction-badge" title="Союзная колония">◈ <span data-rule="factionName">Зелёная колония</span></span>
+</div>
+<p class="subtitle">
+      Союзная Зелёная колония · дистанционная поддержка Чёрной колонии.
+      Тёмные муравьи с зеленоватым хитином на спине и брюшке поражают врагов кислотой,
+      оставляют едкие ожоги и прикрывают тоннели кислотными завесами.
+     </p>
+<div class="badges">
+<span class="badge">
+       Дальний бой · контроль тоннелей
+      </span>
+<span class="badge secondary">
+       Единый стандарт v1.4 · Плейтест
+      </span>
+</div>
+</div>
+</section>
+<div class="layout">
+<div class="column">
+<section class="card">
+<h2>
+       Характеристики отряда
+      </h2>
+<!-- ХАРАКТЕРИСТИКИ: цифры идут из блока JavaScript RULES, вручную править их здесь не нужно. -->
+<div class="stat-grid">
+<div class="stat">
+<strong data-rule="members">
+         3
+        </strong>
+<span>
+         Муравья
+        </span>
+</div>
+<div class="stat">
+<strong data-calc="maxHp">
+         9
+        </strong>
+<span>
+         Макс. ОЗ
+        </span>
+</div>
+<div class="stat">
+<strong data-rule="armorClass">
+         12
+        </strong>
+<span>
+         Класс защиты (КД)
+        </span>
+</div>
+<div class="stat">
+<strong data-rule="speed">
+         4
+        </strong>
+<span>
+         Скорость, клетки
+        </span>
+</div>
+<div class="stat">
+<strong data-signed="acidAttackBonus">
+         +5
+        </strong>
+<span>
+         Атака кислотой
+        </span>
+</div>
+<div class="stat">
+<strong id="top-damage">
+         3
+        </strong>
+<span>
+         Урон кислотой сейчас
+        </span>
+</div>
+</div>
+<div class="divider">
+</div>
+<h2>
+       Модификаторы
+      </h2>
+<!-- =====================================================
+           ИНТЕРАКТИВНЫЕ ХАРАКТЕРИСТИКИ И РАСКРЫВАЮЩИЕСЯ НАВЫКИ
+           Ранги мастерства и спасбросков изменяются ТОЛЬКО в RULES.mastery.
+           ===================================================== -->
+<p class="small" style="margin-bottom:10px">
+       Нажми на характеристику: появятся проверка, спасбросок и навыки.
+      </p>
+<div class="ability-grid" id="ability-buttons">
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="strength" title="Показать навыки: Сила" type="button">
+<span>
+         Сила
+        </span>
+<strong data-signed="strength">
+         +0
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="dexterity" title="Показать навыки: Ловкость" type="button">
+<span>
+         Ловкость
+        </span>
+<strong data-signed="dexterity">
+         +2
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="constitution" title="Показать навыки: Телосложение" type="button">
+<span>
+         Телосложение
+        </span>
+<strong data-signed="constitution">
+         +0
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="intelligence" title="Показать навыки: Интеллект" type="button">
+<span>
+         Интеллект
+        </span>
+<strong data-signed="intelligence">
+         +0
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="wisdom" title="Показать навыки: Мудрость" type="button">
+<span>
+         Мудрость
+        </span>
+<strong data-signed="wisdom">
+         +0
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+<button aria-controls="ability-details" aria-expanded="false" class="ability ability-trigger" data-ability="charisma" title="Показать навыки: Харизма" type="button">
+<span>
+         Харизма
+        </span>
+<strong data-signed="charisma">
+         +0
+        </strong>
+<span aria-hidden="true" class="ability-chevron">
+         ⌄
+        </span>
+</button>
+</div>
+<div aria-hidden="true" aria-label="Проверки, спасброски и навыки" class="attribute-panel" id="ability-details" role="region">
+<div class="attribute-panel-inner">
+<div class="attribute-panel-body" id="ability-details-content">
+</div>
+</div>
+</div>
+<p class="small" style="margin-top:13px">
+       Модификаторы условны: они описывают особенности муравьиных отрядов, а не человеческое мышление.
+      </p>
+</section>
+<section class="card">
+<h2>
+       Боевые способности
+      </h2>
+<!-- СПОСОБНОСТИ: все величины связываются с RULES, ничего не нужно менять в тексте дважды. -->
+<div class="skill">
+<div class="skill-icon">
+        ◈
+       </div>
+<div>
+<h3>
+         Кислотный залп · действие
+        </h3>
+<p>
+         Дистанционная атака на расстояние до
+         <span data-rule="acidRange">
+          5
+         </span>
+         клеток, при прямой видимости. Бросок d20
+         <span data-signed="acidAttackBonus">
+          +5
+         </span>
+         против КД цели. При полном составе
+         <span data-rule="acidDamage">
+          3
+         </span>
+         урона; с потерями урон снижается до
+         <span data-rule="minAcidDamage">
+          1
+         </span>
+         . Один залп расходует
+         <span data-rule="acidShotCost">
+          1
+         </span>
+         заряд даже при промахе.
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">♨</div>
+<div>
+<h3>Кислотный ожог · состояние цели</h3>
+<p>
+      Успешный <strong>кислотный залп</strong> дополнительно накладывает ожог.
+      В начале каждого своего хода поражённый отряд получает
+      <span data-rule="burnDamage">1</span> урон кислотой и, пока действует ожог,
+      совершает <strong>все атаки с помехой</strong>.
+      В конце каждого своего хода он делает спасбросок Телосложения со
+      СЛ <span data-rule="burnSaveDC">13</span>. При успехе ожог снимается.
+      Без успешного спасброска эффект прекращается после
+      <span data-rule="burnTurns">3</span> ходов цели.
+      Повторное попадание обновляет срок, но не складывает урон.
+      Кислотная завеса не вызывает этот статус.
+    </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">☣</div>
+<div>
+<h3>Кислотная завеса · действие</h3>
+<p>
+      Расходует <span data-rule="curtainCost">2</span> заряда; создаёт квадрат
+      <strong><span data-calc="curtainSize">2×2</span></strong> (<span data-calc="curtainArea">4</span> клетки)
+      на расстоянии до <span data-rule="acidRange">5</span> клеток при прямой видимости.
+      Область действует до начала следующего хода стрелков. Враг получает
+      <span data-rule="curtainDamage">1</span> урон при первом входе либо в начале хода внутри
+      области (не более одного раза за раунд). Урон списывается вручную.
+    </p>
+<p>
+<strong>Увязание при входе:</strong> спасбросок Телосложения СЛ
+      <span data-rule="curtainSaveDC">13</span>. При провале скорость становится 0,
+      но атаки разрешены. В конце каждого хода — повторный спасбросок; при успехе эффект исчезает.
+    </p>
+<p>
+<strong>Полное опутывание:</strong> при создании завесы выбери от 0 до <span data-calc="curtainMaxTargets">4</span> целей внутри квадрата
+      и брось для каждой d20 <span data-signed="acidAttackBonus">+5</span> против её КД.
+      Попадание запрещает этой цели двигаться и атаковать; все атаки против неё идут
+      с преимуществом. В конце каждого её хода — спасбросок Телосложения
+      СЛ <span data-rule="curtainSaveDC">13</span>;
+      эффект автоматически заканчивается максимум после
+      <span data-rule="entangleMaxTurns">2</span> ходов цели.
+      При промахе по отдельной цели завеса всё равно появляется. Полное опутывание накладывается на каждую цель, по которой ты попал.
+      Завеса <strong>не вызывает Кислотный ожог</strong>.
+    </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ⚔
+       </div>
+<div>
+<h3>
+         Укус жвалами · действие
+        </h3>
+<p>
+         Ближняя атака по соседней клетке, d20
+         <span data-signed="biteAttackBonus">
+          +3
+         </span>
+         против КД цели. При полном составе наносит
+         <span data-rule="biteDamage">
+          2
+         </span>
+         урона, при потерях —
+         <span data-rule="minBiteDamage">
+          1
+         </span>
+         . Заряды кислоты не требуются.
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ➜
+       </div>
+<div>
+<h3>
+         Рывок · действие
+        </h3>
+<p>
+         Вместо атаки пройти до
+         <span data-calc="dashSpeed">
+          8
+         </span>
+         клеток. Можно использовать каждый ход, без расхода кислоты.
+        </p>
+</div>
+</div>
+<div class="skill">
+<div class="skill-icon">
+        ◉
+       </div>
+<div>
+<h3>
+         Обнаружение
+        </h3>
+<p>
+         Обзор — до
+         <span data-rule="visionRange">
+          6
+         </span>
+         клеток, если нет препятствий, дыма или иных помех.
+        </p>
+</div>
+</div>
+</section>
+<section class="card">
+<h2>
+       Сильные и слабые стороны
+      </h2>
+<div class="hint">
+<strong style="color:var(--green)">
+        Сильны:
+       </strong>
+       прицельная дистанционная атака, удержание узких тоннелей, перекрытие проходов кислотной завесой.
+       <br/>
+<strong class="warning-highlight">
+        Уязвимы:
+       </strong>
+       КД всего
+       <span data-rule="armorClass">
+        12
+       </span>
+       , лишь
+       <span data-calc="maxHp">
+        9
+       </span>
+       ОЗ, слабые жвалы,
+ограниченный запас кислоты, необходимость прямой видимости цели.
+      </div>
+<div class="divider">
+</div>
+<h2>
+       Общие правила
+      </h2><div class="common-rules"><!-- ОБЩИЙ ШАБЛОН: не менять отдельно в одном листе. Синхронизировать во всех семи. --><div class="common-rule-group"><h3>Отряд и порядок хода</h3><ul class="list"><li>Один жетон на карте — один отряд. Он занимает одну клетку, передвигается и действует целиком: отдельных ходов у каждого муравья нет.</li><li>Инициатива в начале боя: d20 + модификатор Ловкости. Один бросок на весь отряд; при равенстве порядок определяет ГМ.</li><li>В свой ход отряд может пройти расстояние до своей скорости и совершить одно основное действие: атаку, особую способность или другое доступное действие.</li><li>Рывок расходует основное действие и позволяет пройти за ход до удвоенной скорости. Если у специализации есть ограничение на рывок, оно указано в её способностях.</li><li>Ближняя атака — по соседней клетке. Дистанционная требует прямой видимости. Подходящее укрытие даёт +2 к КД против атак через него, если ГМ разрешает защиту этим укрытием.</li></ul></div><div class="common-rule-group"><h3>Броски и навыки</h3><ul class="list"><li>Атака: d20 + бонус попадания против КД цели. Если итог не ниже КД — попадание. Урон фиксирован и указан в листе; изменения от потерь считаются по правилам типа отряда.</li><li>Натуральная 1 на броске атаки — автоматический промах. Натуральная 20 — автоматическое попадание и +2 дополнительного урона. Для обычных проверок и спасбросков эти автоматические исходы не применяются.</li><li>Проверка характеристики, навык или спасбросок: d20 + соответствующий модификатор. Если указано владение, добавь +2 за мастерство либо +4 за супермастерство; если владения нет — только модификатор.</li><li>Карточки шести характеристик раскрываются нажатием: внутри показаны проверка, спасбросок, связанные навыки и уровень владения. Эти значения нужны для бросков, а не заменяют их.</li></ul></div><div class="common-rule-group"><h3>Здоровье и потери</h3><ul class="list"><li>Здоровье одно на весь отряд. У каждого бойца есть свой сегмент ОЗ: если из-за урона сегмент опустел, боец погибает. Количество выживших и текущий урон пересчитываются автоматически.</li><li>После гибели бойца максимально доступные ОЗ отряда уменьшаются. Короткий отдых или лечение не воскрешают погибших; вернуть численность может только разрешённое пополнение при долгом отдыхе либо новый отряд из резерва.</li><li>При 0 ОЗ отряд уничтожен: он не ходит, не атакует, не использует способности и не может отдыхать. Продолжить игру можно только через резерв.</li></ul></div><div class="common-rule-group"><h3>Отдых и ресурсы</h3><ul class="list"><li>Короткий отдых возможен только вне боя. Он восстанавливает ОЗ до максимума оставшихся в живых бойцов, но не восполняет погибших и не возвращает израсходованные резервы.</li><li>Долгий отдых возможен только вне боя в безопасной точке с разрешения ГМа. Он возвращает полный состав за счёт пополнения из тыла и восстанавливает все ОЗ; погибший целиком отряд (0 ОЗ) так вернуть нельзя.</li><li>«Новый бой» обновляет только способности и боевые отметки, которые должны обновляться между боями. ОЗ, погибшие и резерв от этого не восстанавливаются. Ежедневные ресурсы и особые правила отдыха указаны в специализации.</li></ul></div><div class="common-rule-group"><h3>Резерв и сохранение</h3><ul class="list"><li>У каждого игрока один стартовый отряд и три запасных: всего не более четырёх отрядов за ваншот. После уничтожения новый выходит в следующий ход и может двигаться, но не атаковать в ход появления.</li><li>Пока каждый HTML-лист самостоятельный, резерв создаёт отряд того же типа. Свободный выбор нового типа войск появится в будущем общем сайте.</li><li>Лист автоматически сохраняет здоровье, ресурсы, способности и резервы в данном браузере. Разные номера отрядов имеют отдельные сохранения; между игроками синхронизации пока нет, поэтому эффекты и чужое лечение отмечайте вручную.</li></ul></div></div><div class="divider"></div><h2>Особенности отряда</h2><div class="class-rule-hint"><ul class="list"><li>Зелёная колония: кислотный залп и завеса расходуют общий запас зарядов. Залп накладывает ожог с уроном и помехой на атаки; завеса 2×2 клетки расходует два заряда.</li><li>Увязание и полное опутывание отмечай по каждой поражённой цели в журнале. Полное опутывание длится не более двух ходов цели; спасбросок может снять эффект раньше.</li><li>Эффекты на чужом здоровье в автономном листе не списываются — ГМ или владелец вражеского листа отмечает их вручную.</li></ul></div><div class="banner">⚠ Правила и баланс проходят плейтест. Спорные действия, отдых и изменения карты подтверждает ГМ.</div></section>
+</div>
+<div class="column">
+<!-- ИНТЕРАКТИВНЫЙ ЛИСТ: кнопки с id подключены в разделе СОБЫТИЯ JavaScript. -->
+<section class="card" id="sheet">
+<div class="statusbar">
+<h2 style="margin:0">
+        Состояние отряда
+       </h2>
+<span class="status" id="status">
+        Боеспособен
+       </span>
+</div>
+<div aria-live="polite" class="ants" id="ants">
+</div>
+<div class="hp-head">
+<span>
+        Здоровье
+       </span>
+<strong id="hp-label">
+        0 / 0 ОЗ
+       </strong>
+</div>
+<div aria-label="Здоровье отряда" aria-valuemax="16" aria-valuemin="0" aria-valuenow="16" class="track" id="hp-track" role="progressbar">
+<div class="fill" id="hp-fill" style="width:100%">
+</div>
+</div>
+<div class="buttons damage-buttons">
+<button id="hit1" type="button">
+        −1 ОЗ
+       </button>
+<button id="hit3" type="button">
+        −3 ОЗ
+       </button>
+</div><div class="rest-row"><button id="short-rest" type="button"><span>☕ Короткий отдых</span><small>До максимума выживших</small></button><button id="long-rest" type="button"><span>☾ Долгий отдых</span><small>Пополнение из тыла · с разрешения ГМа</small></button></div><p class="small" id="rest-help">Отдых возможен только вне боя. Короткий отдых не возвращает погибших, долгий восполняет отряд из тыла.</p>
+<div class="battle-line">
+<div class="battle-stat">
+<span class="value" id="alive">
+         —
+        </span>
+<span class="label">
+         Выжившие муравьи
+        </span>
+</div>
+<div class="battle-stat">
+<span class="value" id="damage">
+         —
+        </span>
+<span class="label">
+         Текущий урон кислотой
+        </span>
+</div>
+</div>
+<div class="divider">
+</div>
+<div class="statusbar">
+<h2 style="margin:0">
+        Боевые состояния
+       </h2>
+</div>
+<!-- =======================================================
+   БОЕВЫЕ СОСТОЯНИЯ — стрелок. Все кнопки редактируются здесь.
+   Кислота — ограниченный ресурс. Жвалы / рывок — без заряда.
+   ======================================================= -->
+<div class="tactic">
+<button class="ability-btn" id="acid-shot" type="button">
+<span class="action-title" id="acid-shot-title">
+         ◈ Кислотный залп
+        </span>
+<small>
+         Действие · 1 заряд · до 5 клеток
+        </small>
+</button>
+<button class="ability-btn" id="acid-curtain" type="button">
+<span class="action-title" id="acid-curtain-title">
+         ☣ Кислотная завеса
+        </span>
+<small>
+         Действие · 2 заряда · квадрат 2×2
+        </small>
+</button>
+<button aria-pressed="false" class="ability-btn" id="bite" type="button">
+<span class="action-title" id="bite-title">
+         ⚔ Укус жвалами
+        </span>
+<small>
+         Действие · ближний бой
+        </small>
+</button>
+<button aria-pressed="false" class="ability-btn" id="dash" type="button">
+<span class="action-title" id="dash-title">
+         ➜ Рывок
+        </span>
+<small>
+         Действие · 8 клеток вместо атаки
+        </small>
+</button>
+</div>
+<!-- Временное состояние и запас кислоты отображаются отдельно от кнопок. -->
+<div class="acid-resources">
+<div class="acid-resources-top">
+<strong>
+         Запас кислоты
+        </strong>
+<span id="acid-count">
+         3 из 3 зарядов
+        </span>
+</div>
+<div aria-label="Оставшиеся заряды кислоты" class="acid-pips" id="acid-pips">
+</div>
+</div>
+<!-- ==========================================================
+           КИСЛОТНЫЙ ОЖОГ — ЖУРНАЛ ЦЕЛЕЙ
+           Скрыт до раскрытия: не загромождает страницу.
+           СЛ, урон и длительность задаются в RULES.
+           ========================================================== -->
+<details class="burn-journal" id="burn-journal">
+<summary>♨ Кислотный ожог · учёт поражённых врагов <span id="burn-count">(0)</span></summary>
+<div class="burn-journal-body">
+<p class="burn-explain">
+         После успешного <strong>кислотного залпа</strong> укажи цель и нажми «Попадание».
+         В начале её хода нажимай «Ход цели»: <span data-rule="burnDamage">1</span> урон
+         необходимо вручную списать с листа врага; в конце хода — спасбросок
+         Телосложения (СЛ <span data-rule="burnSaveDC">13</span>).
+         Пока ожог активен, атаки с помехой. Через <span data-rule="burnTurns">3</span>
+         хода ожог закончится автоматически.
+        </p>
+<div class="burn-controls">
+<input aria-label="Имя поражённого отряда" autocomplete="off" id="burn-target-name" maxlength="40" placeholder="Название цели, например Красные №2"/>
+<button id="burn-add" type="button">✓ Попадание: ожог</button>
+</div>
+<div aria-live="polite" class="burn-list" id="burn-list"></div>
+</div>
+</details>
+<!-- ==========================================================
+           КОНТРОЛЬ ЗАВЕСЫ — ДВА СОСТОЯНИЯ: УВЯЗАНИЕ / ОПУТЫВАНИЕ
+           Урон отмечается как напоминание и вручную списывается с врага.
+           СЛ, срок и описание редактируются в RULES.
+           ========================================================== -->
+<details class="burn-journal curtain-journal" id="curtain-journal">
+<summary>☣ Контроль завесы · скованные враги <span id="curtain-count">(0)</span></summary>
+<div class="burn-journal-body">
+<p class="curtain-tips">
+<strong>Завеса:</strong> квадрат <span data-calc="curtainSize">2×2</span>, урон
+            <span data-rule="curtainDamage">1</span> при входе / начале хода внутри
+            (не чаще раза за раунд). Запиши название врага и отмечай исходы бросков.
+            Кнопки не бросают кубики и не списывают ОЗ с чужого листа.
+          </p>
+<div class="burn-controls">
+<input aria-label="Название отряда под завесой" autocomplete="off" id="curtain-target-name" maxlength="40" placeholder="Имя врага, например Красные №3"/>
+<button id="curtain-entry-fail" type="button">Вход: СЛ провален</button>
+</div>
+<div class="curtain-extra-buttons">
+<button id="curtain-entry-pass" type="button">Вход: СЛ успешен</button>
+</div>
+<!-- =====================================================
+               МИНИ-КАЛЬКУЛЯТОР ЦЕЛЕЙ ПРИ ПРЯМОМ ПОПАДАНИИ
+               Шаг 1: +/- задают количество врагов в квадрате 2×2.
+               Шаг 2: вводим имя каждого отряда отдельно.
+               Шаг 3: отмечаем попадание / промах для каждой цели.
+               Расчёт лимита и логика — в RULES и JS-блоке 4Б.
+               ===================================================== -->
+<div aria-label="Цели прямого попадания" class="curtain-target-picker">
+<div class="curtain-picker-title">
+<strong>Прямое попадание · несколько целей</strong>
+<span id="curtain-progress">0 из 1 обработана</span>
+</div>
+<div class="curtain-counter-row">
+<span>Сколько вражеских отрядов в завесе?</span>
+<div aria-label="Число целей" class="curtain-counter" role="group">
+<button aria-label="Уменьшить число целей" id="curtain-minus" type="button">−</button>
+<output aria-live="polite" id="curtain-target-count">1</output>
+<button aria-label="Увеличить число целей" id="curtain-plus" type="button">+</button>
+</div>
+</div>
+<div class="curtain-direct-targets" id="curtain-direct-targets"></div>
+<p class="curtain-tips" style="margin:9px 0 0">
+              Для <strong>каждой</strong> цели сделай отдельную атаку
+              d20 <span data-signed="acidAttackBonus">+5</span> против её КД.
+              Попадание → полное опутывание (до <span data-rule="entangleMaxTurns">2</span> ходов),
+              промах → без него. За дополнительные цели кислота не списывается.
+              После первого результата уменьшить число целей ниже уже обработанных нельзя.
+            </p>
+</div>
+<p class="curtain-tips">
+<strong>При входе:</strong> нанеси <span data-rule="curtainDamage">1</span> урон
+            (не чаще раза за раунд), затем проверь Телосложение
+            СЛ <span data-rule="curtainSaveDC">13</span>.
+            Провал → «Увязание» (скорость 0, атаки разрешены); успех → статус не возникает.
+          </p>
+<div aria-live="polite" class="burn-list" id="curtain-list"></div>
+<p class="curtain-note" id="curtain-note" role="status">Наложенные состояния продолжат действовать после исчезновения области.</p>
+</div>
+</details>
+<div aria-live="polite" class="ability-summary" id="curtain-help">
+       Кислотная завеса не активна.
+      </div>
+<p class="small" id="combat-help" style="margin-top:9px">
+       Дисциплина срабатывает, если союзный отряд находится рядом с целью. Включи отметку для подсчёта бонуса.
+      </p>
+<!-- Следующий ход закрывает зону, но наложенные состояния на врагах остаются. -->
+<button class="quiet full" id="next-turn" type="button">
+       ↪ Следующий ход: завершить действие / завесу
+      </button>
+<button class="quiet full" id="new-battle" type="button">
+       ↻ Новый бой: снять боевые отметки
+      </button>
+<div class="divider">
+</div>
+<div class="statusbar">
+<h2 style="margin:0">
+        Резерв игрока
+       </h2>
+<span class="small" id="reserve-count">
+        —
+       </span>
+</div>
+<!-- РЕЗЕРВЫ: значки генерируются в render(). -->
+<div class="reserve-row" id="reserve-row">
+</div>
+<button class="primary full" id="replace" type="button">
+       Получить новый отряд
+      </button>
+<p class="small" style="margin-top:10px">
+       После гибели отряд заменяется новыми кислотными стрелками. Выбор других типов откроем в будущем общем сайте.
+      </p>
+<div style="text-align:center">
+<button class="quiet" id="reset" type="button">
+        ↻ Сбросить весь лист
+       </button>
+</div>
+</section>
+<section class="card">
+<h2>
+       Автосохранение
+      </h2>
+<p>
+       Здоровье, погибшие бойцы, расход способностей и подкрепления сохраняются автоматически в этом браузере.
+      </p>
+<p class="small">
+<strong>
+        Номер отряда:
+       </strong>
+<span id="instance-label">
+        01
+       </span>
+       . У разных номеров отдельные сохранения, даже если открыть этот лист в двух вкладках.
+      </p>
+<div class="squad-id-controls">
+<input aria-label="Номер отряда" autocomplete="off" id="squad-id" maxlength="24" placeholder="Например: 01 или Б-2"/>
+<button id="open-squad" type="button">
+        Открыть отряд
+       </button>
+</div>
+<p class="instance-hint">
+       Для ещё одного такого же отряда введи другой номер и нажми «Открыть отряд». Номер останется в адресе страницы после обновления. Не вводи один номер для разных отрядов одного типа.
+      </p>
+</section>
+</div>
+</div>
+<div class="footer">
+    Муравьиная революция · Холэн · Лист отряда · Интерфейс v1.5 · Кислотные стрелки
+   </div>
+</main>
+<script>
+   "use strict";
+
+// ================================================================
+//  1. НАСТРОЙКИ — ОСНОВНЫЕ ЦИФРЫ МЕНЯЮТСЯ ЗДЕСЬ
+// ================================================================
+// Совет: меняй числа после двоеточия, не убирай запятые или скобки.
+// Везде, где в HTML стоит data-rule/data-signed/data-calc,
+// значение обновится автоматически. Ничего искать по файлу не нужно.
+const RULES = {
+    // ВНЕШНИЙ ВИД: до 8 отдельных муравьёв, с 9 — стопки со счётчиком.
+    antsPerRow: 4,            // Муравьёв на строку
+    stackFrom: 8,             // Свыше 8 включаем стопки
+
+    // СОСТАВ / ЗАЩИТА / ПЕРЕДВИЖЕНИЕ
+    members: 3,               // Численность отряда
+    hpPerAnt: 3,              // ОЗ одного муравья (итого 9 ОЗ)
+    armorClass: 12,           // Класс защиты
+    speed: 4,                 // Шаг в клетках
+    visionRange: 6,           // Дальность обнаружения
+
+    maxReserves: 3,           // Сколько замен остаётся игроку
+    criticalExtra: 2,         // +2 урона при натуральной 20
+
+    // АТАКИ
+    acidAttackBonus: 5,       // К броску кислотного залпа
+    acidDamage: 3,            // Кислота при 3 живых муравьях
+    minAcidDamage: 1,         // Кислота при 1 живом
+    acidRange: 5,             // Дальность кислоты
+    biteAttackBonus: 3,       // Ближняя атака жвалами
+    biteDamage: 2,            // Жвалы при 3 живых
+    minBiteDamage: 1,         // Жвалы при потерях
+
+    // КИСЛОТА И ЗАВЕСА — ИЗМЕНЯЙ РАСХОД ЗДЕСЬ
+    acidCharges: 3,           // Максимум зарядов кислоты за бой
+    acidShotCost: 1,          // Один кислотный залп
+    curtainCost: 2,           // Цена завесы
+    curtainWidth: 2,          // Ширина квадрата завесы
+    curtainHeight: 2,         // Высота квадрата завесы
+    curtainMaxTargets: 4,     // Максимум отрядов внутри 2×2 (1 жетон на клетку)
+    curtainDamage: 1,         // Урон: вход ИЛИ начало хода (раз в раунд)
+
+    // КОНТРОЛЬ ЗАВЕСЫ — НЕЗАВИСИМЫЙ ОТ КИСЛОТНОГО ОЖОГА
+    curtainSaveDC: 13,        // Телосложение: чтобы не увязнуть / освободиться
+    entangleMaxTurns: 2,      // Полное опутывание прекращается не позже конца 2-го хода
+    // У вязкого эффекта «Увязание» нет лимита ходов: до успешного спасброска.
+    // Для прямого опутывания используется acidAttackBonus (по умолчанию +5).
+
+    // КИСЛОТНЫЙ ОЖОГ — СОСТОЯНИЕ ПОРАЖЁННЫХ ОТРЯДОВ
+    burnDamage: 1,            // Урон в начале хода поражённой цели
+    burnSaveDC: 13,           // СЛ спасброска Телосложения в конце хода
+    burnTurns: 3,             // Максимум ходов до автоматического снятия
+
+    // ОСНОВНЫЕ ХАРАКТЕРИСТИКИ (+2 Ловкость = +2 инициативы)
+    strength: 0,
+    dexterity: 2,
+    constitution: 0,
+    intelligence: 0,
+    wisdom: 0,
+    charisma: 0,
+
+    // ============================================================
+    // МАСТЕРСТВО И НАВЫКИ: 0 = нет; 1 = мастерство; 2 = супермастерство
+    // ============================================================
+    // bonus = 2, супермастерство удваивает его до 4.
+    // Здесь фиксируем утверждённые значения стрелков:
+    // Внимательность +2 (мастерство), спасбросок Ловкости +4.
+    // Остальные навыки без мастерства, у Ловкости +2 от модификатора.
+    mastery: {
+        bonus: 2,
+        checks: {
+            strength:0, dexterity:0, constitution:0,
+            intelligence:0, wisdom:0, charisma:0
+        },
+        saves: {
+            strength:0, dexterity:1, constitution:0,
+            intelligence:0, wisdom:0, charisma:0
+        },
+        skills: {
+            athletics:0,                                        // Сила
+            acrobatics:0, sleightOfHand:0, stealth:0,             // Ловкость
+            arcana:0, history:0, investigation:0,
+            nature:0, religion:0,                               // Интеллект
+            animalHandling:0, insight:0, medicine:0,
+            perception:1, survival:0,                            // Мудрость
+            deception:0, intimidation:0,
+            performance:0, persuasion:0                         // Харизма
+        }
+    }
+};
+
+// Производные значения пересчитываются автоматически.
+const MAX_HP = RULES.members * RULES.hpPerAnt;
+const DASH_SPEED = RULES.speed * 2;
+const CURTAIN_AREA = RULES.curtainWidth * RULES.curtainHeight;
+const CURTAIN_SIZE = `${RULES.curtainWidth}×${RULES.curtainHeight}`;
+
+// ================================================================
+//  2. СОСТОЯНИЕ ОТРЯДА И АВТОСОХРАНЕНИЕ
+// ================================================================
+// Каждый номер отряда (#01, #02 и т. д.) хранится независимо.
+const STORAGE_PREFIX = "ants-revolution-acid-shooters-standard-v12";
+let squadId = decodeURIComponent(window.location.hash.slice(1)) || "01";
+function storageKey() { return `${STORAGE_PREFIX}:${squadId}`; }
+const RULES_SIGNATURE = `${RULES.members}:${RULES.hpPerAnt}:${RULES.maxReserves}:${RULES.acidCharges}`;
+
+function startingState() {
+    return {
+        hp: MAX_HP,
+        cap: MAX_HP,          // Уменьшается навсегда при гибели бойцов
+        reserves: RULES.maxReserves,
+        acid: RULES.acidCharges,
+        action: null,        // null / "shot" / "curtain" / "bite" / "dash"
+        curtainActive: false, // Завеса держится до начала следующего хода
+        shotPending: false,   // Выпущен залп — ждём подтверждения попадания
+        burns: [],            // Отдельные цели под Кислотным ожогом
+        curtainHitPending: false, // Пока можно разыгрывать прямые попадания по целям
+        curtainTargetCount: 1,   // Сколько вражеских отрядов попало в область
+        curtainTargetNames: [''], // Имена целей по порядку, заполняются в интерфейсе
+        curtainDirectResults: [], // [{name,result:'hit'|'miss'}] — один бросок на цель
+        curtainEffects: []    // [{name,kind:"stuck"/"entangled",turns}]
+    };
+}
+let state = startingState();
+
+function loadState() {
+    try {
+        const saved=JSON.parse(localStorage.getItem(storageKey()) || "null");
+        if (!saved || saved.rulesSignature !== RULES_SIGNATURE) return;
+        const valid = Number.isInteger(saved.hp) && Number.isInteger(saved.cap) &&
+            Number.isInteger(saved.reserves) && Number.isInteger(saved.acid) &&
+            saved.hp >= 0 && saved.hp <= saved.cap && saved.cap <= MAX_HP &&
+            saved.cap % RULES.hpPerAnt === 0 &&
+            saved.reserves >= 0 && saved.reserves <= RULES.maxReserves &&
+            saved.acid >= 0 && saved.acid <= RULES.acidCharges &&
+            [null,"shot","curtain","bite","dash"].includes(saved.action) &&
+            typeof saved.curtainActive === "boolean" &&
+            (saved.shotPending === undefined || typeof saved.shotPending === "boolean") &&
+            (saved.burns === undefined ||
+             (Array.isArray(saved.burns) && saved.burns.length <= 30 && saved.burns.every(b =>
+               typeof b.name === "string" && b.name.length <= 40 &&
+               Number.isInteger(b.turns) && b.turns >= 0 && b.turns < RULES.burnTurns))) &&
+            (saved.curtainHitPending === undefined || typeof saved.curtainHitPending === "boolean") &&
+            (saved.curtainTargetCount === undefined ||
+              (Number.isInteger(saved.curtainTargetCount) && saved.curtainTargetCount >= 0 &&
+               saved.curtainTargetCount <= RULES.curtainMaxTargets)) &&
+            (saved.curtainTargetNames === undefined ||
+              (Array.isArray(saved.curtainTargetNames) && saved.curtainTargetNames.length <= RULES.curtainMaxTargets &&
+               saved.curtainTargetNames.every(n => typeof n === "string" && n.length <= 40))) &&
+            (saved.curtainDirectResults === undefined ||
+              (Array.isArray(saved.curtainDirectResults) && saved.curtainDirectResults.length <= RULES.curtainMaxTargets &&
+               saved.curtainDirectResults.every(r => typeof r.name === "string" && r.name.length <= 40 &&
+               ['hit','miss'].includes(r.result)))) &&
+            (saved.curtainEffects === undefined ||
+              (Array.isArray(saved.curtainEffects) && saved.curtainEffects.length <= 30 &&
+               saved.curtainEffects.every(e => typeof e.name === "string" && e.name.length <= 40 &&
+                  ["stuck","entangled"].includes(e.kind) && Number.isInteger(e.turns) &&
+                  e.turns >= 0 && (e.kind === "stuck" || e.turns < RULES.entangleMaxTurns))));
+        if (valid) state={hp:saved.hp,cap:saved.cap,reserves:saved.reserves,
+            acid:saved.acid,action:saved.action,curtainActive:saved.curtainActive,
+            shotPending: Boolean(saved.shotPending), burns: saved.burns || [],
+            curtainHitPending: Boolean(saved.curtainHitPending),
+            curtainTargetCount: saved.curtainTargetCount ?? 1,
+            curtainTargetNames: saved.curtainTargetNames || [''],
+            curtainDirectResults: saved.curtainDirectResults || [],
+            curtainEffects: saved.curtainEffects || []};
+    } catch(error) { /* Хранилище недоступно — игра продолжается без сохранения. */ }
+}
+function saveState() {
+    try { localStorage.setItem(storageKey(), JSON.stringify({...state,rulesSignature:RULES_SIGNATURE})); }
+    catch(error) { /* Кнопки продолжают работать, даже если запись запрещена. */ }
+}
+
+// ================================================================
+//  3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ================================================================
+function byId(id) {
+    return document.getElementById(id);
+}
+
+function survivors() {
+    // 1 непустой сегмент здоровья = 1 живой муравей.
+    return Math.ceil(state.hp / RULES.hpPerAnt);
+}
+
+function signed(value) {
+    return value >= 0 ? `+${value}` : String(value);
+}
+
+// data-rule, data-signed и data-calc — специальные метки в HTML.
+// Все подписанные ими числа автоматически приходят из RULES.
+function updateRuleLabels() {
+    const calculated={maxHp:MAX_HP, dashSpeed:DASH_SPEED,
+        curtainArea: CURTAIN_AREA, curtainSize: CURTAIN_SIZE, curtainMaxTargets: RULES.curtainMaxTargets};
+    document.querySelectorAll('[data-rule], [data-signed], [data-calc], [data-skill]').forEach(el=>{
+        let value;
+        if (el.dataset.rule !== undefined) value=RULES[el.dataset.rule];
+        else if (el.dataset.signed !== undefined) value=signed(RULES[el.dataset.signed]);
+        else if (el.dataset.skill !== undefined) value=signed(rollModifier('wisdom','skills',el.dataset.skill));
+        else value=calculated[el.dataset.calc];
+        if (value !== undefined) el.textContent=(el.dataset.prefix || '')+value+(el.dataset.suffix || '');
+    });
+}
+
+// ================================================================
+//  3А. ВЫПАДАЮЩАЯ ПАНЕЛЬ НАВЫКОВ И СПАСБРОСКОВ
+// ================================================================
+// Здесь ТОЛЬКО отображение и подписи. Мастерство меняй в RULES.mastery.
+// Добавляешь навык? Добавь его название здесь и степень в RULES.mastery.skills.
+// Телосложение не имеет стандартных навыков в D&D — проверки и спасы есть.
+const SKILLS_BY_ABILITY = {
+    strength:      { label: "Сила", skills: [["athletics", "Атлетика"]] },
+    dexterity:     { label: "Ловкость", skills: [["acrobatics", "Акробатика"], ["sleightOfHand", "Ловкость рук"], ["stealth", "Скрытность"]] },
+    constitution:  { label: "Телосложение", skills: [] },
+    intelligence:  { label: "Интеллект", skills: [["investigation", "Анализ"], ["history", "История"], ["arcana", "Магия"], ["nature", "Природа"], ["religion", "Религия"]] },
+    wisdom:        { label: "Мудрость", skills: [["perception", "Внимательность"], ["survival", "Выживание"], ["medicine", "Медицина"], ["insight", "Проницательность"], ["animalHandling", "Уход за животными"]] },
+    charisma:      { label: "Харизма", skills: [["deception", "Обман"], ["intimidation", "Запугивание"], ["performance", "Выступление"], ["persuasion", "Убеждение"]] }
+};
+
+// Закрытая панель не влияет на сохранения и здоровье.
+let openedAbility = null;
+
+function getMasteryRank(group, name) {
+    const rank = RULES.mastery[group][name] ?? 0;
+    // В случае опечатки в настройках не выдаём бесконечные бонусы.
+    return [0, 1, 2].includes(rank) ? rank : 0;
+}
+
+function rollModifier(ability, group, name) {
+    return RULES[ability] + getMasteryRank(group, name) * RULES.mastery.bonus;
+}
+
+function masteryLabel(rank) {
+    if (rank === 2) return "Супермастерство";
+    if (rank === 1) return "Мастерство";
+    return "Без мастерства";
+}
+
+function masterySymbol(rank) {
+    return rank === 2 ? "◎" : rank === 1 ? "●" : "○";
+}
+
+function rankMarkup(rank) {
+    const modifierClass = rank === 2 ? "expert" : rank === 1 ? "proficient" : "";
+    return `<span class="attribute-rank ${modifierClass}">
+        <span class="attribute-rank-symbol" aria-hidden="true">${masterySymbol(rank)}</span>
+        ${masteryLabel(rank)}
+    </span>`;
+}
+
+function renderAbilityDetails(key) {
+    const ability = SKILLS_BY_ABILITY[key];
+    const checkRank = getMasteryRank("checks", key);
+    const saveRank = getMasteryRank("saves", key);
+    const skills = ability.skills.map(([id, label], index) => {
+        const rank = getMasteryRank("skills", id);
+        return `<div class="attribute-skill attribute-stagger" style="--stagger-delay:${115 + index * 50}ms">
+            <div><span class="attribute-skill-name">${label}</span>${rankMarkup(rank)}</div>
+            <strong class="attribute-skill-value">${signed(rollModifier(key,"skills",id))}</strong>
+        </div>`;
+    }).join("");
+
+    byId("ability-details-content").innerHTML = `
+        <div class="attribute-heading attribute-stagger" style="--stagger-delay:20ms">
+            <strong>${ability.label.toUpperCase()}</strong>
+            <span>Модификатор ${signed(RULES[key])}</span>
+        </div>
+        <div class="attribute-rolls">
+            <div class="attribute-roll attribute-stagger" style="--stagger-delay:45ms">
+                <span class="attribute-roll-label">ПРОВЕРКА</span>
+                <strong class="attribute-roll-value">${signed(rollModifier(key,"checks",key))}</strong>
+                ${rankMarkup(checkRank)}
+            </div>
+            <div class="attribute-roll attribute-stagger" style="--stagger-delay:85ms">
+                <span class="attribute-roll-label">СПАСБРОСОК</span>
+                <strong class="attribute-roll-value">${signed(rollModifier(key,"saves",key))}</strong>
+                ${rankMarkup(saveRank)}
+            </div>
+        </div>
+        <div class="attribute-section-heading attribute-stagger" style="--stagger-delay:110ms">НАВЫКИ</div>
+        <div class="attribute-skills">
+            ${skills || '<div class="attribute-empty">У этой характеристики нет стандартных навыков.</div>'}
+        </div>
+        <div class="attribute-legend attribute-stagger" style="--stagger-delay:200ms">○ Без мастерства · ● Мастерство · ◎ Супермастерство</div>`;
+}
+
+function selectAbility(key) {
+    openedAbility = openedAbility === key ? null : key;
+    const panel = byId("ability-details");
+    if (openedAbility !== null) renderAbilityDetails(openedAbility);
+    // Обновляем доступность клавиатуры и состояние всех шести карточек.
+    document.querySelectorAll(".ability-trigger").forEach(button => {
+        const expanded = button.dataset.ability === openedAbility;
+        button.classList.toggle("is-open", expanded);
+        button.setAttribute("aria-expanded", String(expanded));
+    });
+    panel.classList.toggle("open", openedAbility !== null);
+    panel.setAttribute("aria-hidden", String(openedAbility === null));
+}
+
+// Карточки — настоящие кнопки, работают и мышью, и пальцем, и с клавиатуры.
+document.querySelectorAll(".ability-trigger").forEach(button => {
+    button.addEventListener("click", () => selectAbility(button.dataset.ability));
+});
+
+// Два маленьких рисунка вшиты прямо в файл: интернет не нужен.
+const ANT_ICON = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3">
+            <path d="M31 25 16 19 9 27M31 32 16 34 8 44M31 39 20 49 17 58M36 25 48 18 58 25M36 32 48 34 58 44M36 39 45 49 48 58M30 12 23 4M35 12 42 4"/>
+        </g>
+        <ellipse cx="33" cy="46" rx="12" ry="14" fill="#2b3934"/>
+        <ellipse cx="33" cy="30" rx="8" ry="10" fill="#2b3934"/>
+        <ellipse cx="33" cy="16" rx="13" ry="12" fill="#23312c"/>
+        <!-- Отдельные оливково-зелёные пластины на брюшке и спинке. -->
+        <path class="chitin-patch" d="M23 43 Q33 31 43 43 Q39 48 27 48Z" fill="#4c906d"/>
+        <path class="chitin-patch" d="M28 27 Q33 22 38 27 L38 30 L28 30Z" fill="#568367"/>
+    </svg>`;
+
+const SHIELD_ICON = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="1.8"
+         stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M8 12l3 3 5-6"/>
+    </svg>`;
+
+function currentAcidDamage() {
+    const alive=survivors();
+    if (alive === 0) return 0;
+    // Каждая потеря снимает единицу урона, но выживший наносит минимум 1.
+    return Math.max(RULES.minAcidDamage, RULES.acidDamage - (RULES.members - alive));
+}
+function currentBiteDamage() {
+    const alive=survivors();
+    if (alive === 0) return 0;
+    return alive === RULES.members ? RULES.biteDamage : RULES.minBiteDamage;
+}
+
+function renderAntIcons(alive) {
+    const container = byId("ants");
+    const compact = RULES.members > RULES.stackFrom;
+    container.classList.toggle("ant-stacks", compact);
+
+    if (!compact) {
+        // До порога: каждый муравей в карточке, по RULES.antsPerRow в ряд.
+        // CSS Grid сам переносит 5-го, 6-го и остальных вниз.
+        container.style.gridTemplateColumns =
+            `repeat(${Math.min(RULES.antsPerRow, RULES.members)}, minmax(0, 1fr))`;
+        container.innerHTML = Array.from({ length: RULES.members }, (_, index) => {
+            const isAlive = index < alive;
+            return `
+                <div class="ant ${isAlive ? "" : "dead"}">
+                    ${ANT_ICON}
+                    <span>${isAlive ? "Жив" : "Погиб"}</span>
+                </div>`;
+        }).join("");
+        return;
+    }
+
+    // Выше RULES.stackFrom: отдельные стопки без десятков карточек.
+    container.style.gridTemplateColumns = "";
+    const dead = RULES.members - alive;
+
+    function stack(count, isDead) {
+        if (count === 0) return ""; // Не рисуем пустую стопку.
+        // Даже если муравьёв 100, изображаем максимум 3 значка.
+        const icons = Array.from({ length: Math.min(3, count) }, () =>
+            `<span class="ant-stack-icon">${ANT_ICON}</span>`
+        ).join("");
+        const label = isDead ? "Погибли" : "Живы";
+        return `
+            <div class="ant-stack ${isDead ? "dead" : ""}" aria-label="${label}: ${count}">
+                <div class="ant-stack-icons" aria-hidden="true">${icons}</div>
+                <div class="ant-stack-info">
+                    <strong>×${count}</strong>
+                    <span>${label}</span>
+                </div>
+            </div>`;
+    }
+
+    container.innerHTML = stack(alive, false) + stack(dead, true);
+}
+
+function render() {
+    const alive=survivors();
+    const defeated=alive===0;
+    if (defeated) {
+        // При уничтожении отряда временные состояния исчезают.
+        state.action=null;
+        state.curtainActive=false;
+        state.shotPending=false;
+        state.curtainHitPending=false;
+    }
+    renderAntIcons(alive);
+    byId('hp-label').textContent=`${state.hp} / ${state.cap} ОЗ`;
+    byId('hp-track').setAttribute('aria-valuemax',MAX_HP);
+    byId('hp-track').setAttribute('aria-valuenow',state.hp);
+    byId('hp-fill').style.width=`${100*state.hp/MAX_HP}%`;
+    byId('hp-fill').className=`fill ${defeated?'none':state.hp <= MAX_HP/2 ? 'low':''}`;
+    byId('alive').textContent=`${alive} / ${RULES.members}`;
+    byId('damage').textContent=currentAcidDamage();
+    byId('top-damage').textContent=currentAcidDamage();
+    const status=byId('status');
+    status.textContent=defeated?'Уничтожен':alive<RULES.members?'Есть потери':'Боеспособен';
+    status.className=`status ${defeated?'danger':alive<RULES.members?'warn':''}`;
+    for (const name of ['hit1','hit3']) byId(name).disabled=defeated;
+    byId("short-rest").disabled = defeated || state.hp >= state.cap;
+    byId("long-rest").disabled = defeated || (state.hp === MAX_HP && state.cap === MAX_HP);
+
+    // Кнопки взаимоисключающих действий. Расход кислоты происходит при выборе.
+    const inTurn=state.action !== null;
+    for (const [id,action,cost] of [
+        ['acid-shot','shot',RULES.acidShotCost],
+        ['acid-curtain','curtain',RULES.curtainCost],
+        ['bite','bite',0],['dash','dash',0]
+    ]) {
+        const b=byId(id);
+        const chosen=state.action===action;
+        b.classList.toggle('selected',chosen && !defeated);
+        b.classList.toggle('spent',defeated || (cost>state.acid && !chosen));
+        b.setAttribute('aria-pressed', String(chosen && !defeated));
+        b.disabled=defeated || (inTurn && !chosen) || (cost>state.acid && !chosen);
+    }
+    byId('acid-shot-title').textContent=state.action==='shot'?'✓ Залп совершен':'◈ Кислотный залп';
+    byId('acid-curtain-title').textContent=state.action==='curtain'?'✓ Завеса создана':'☣ Кислотная завеса';
+    byId('bite-title').textContent=state.action==='bite'?'✓ Жвалы выбраны':'⚔ Укус жвалами';
+    byId('dash-title').textContent=state.action==='dash'?'✓ Рывок выбран':'➜ Рывок';
+    byId('acid-shot').querySelector('small').textContent=`Действие · ${RULES.acidShotCost} заряд · до ${RULES.acidRange} клеток`;
+    byId('acid-curtain').querySelector('small').textContent=`Действие · ${RULES.curtainCost} заряда · квадрат ${CURTAIN_SIZE}`;
+    byId('dash').querySelector('small').textContent=`Действие · ${DASH_SPEED} клеток вместо атаки`;
+    byId('acid-count').textContent=`${state.acid} из ${RULES.acidCharges} зарядов`;
+    byId('acid-pips').innerHTML=Array.from({length:RULES.acidCharges},(_,i)=>
+        `<span class="acid-pip ${i < state.acid?'':'spent'}" aria-hidden="true">◆</span>`).join('');
+
+    const descriptions={
+        shot:`Кислотный залп: d20 ${signed(RULES.acidAttackBonus)}, ${currentAcidDamage()} урона при попадании. При успехе открой «Кислотный ожог» и отметь цель; при промахе нажми «Следующий ход». Заряд потрачен.`,
+        curtain:`Завеса ${CURTAIN_SIZE}: ${RULES.curtainDamage} урон при входе / начале хода. Вход: СЛ Телосложения ${RULES.curtainSaveDC} или Увязание (скорость 0). При создании выбери до ${RULES.curtainMaxTargets} целей и брось d20 ${signed(RULES.acidAttackBonus)} отдельно по каждой: попадание полностью опутывает эту цель. Открой «Контроль завесы».`,
+        bite:`Жвалы выбраны: d20 ${signed(RULES.biteAttackBonus)}, ${currentBiteDamage()} урона при попадании. Кислота не расходуется.`,
+        dash:`Рывок: пройти до ${DASH_SPEED} клеток вместо атаки. Можно отменить выбор повторным нажатием.`,
+    };
+    byId('combat-help').textContent=defeated?'Отряд уничтожен. Используй резерв для замены.':
+        state.action?descriptions[state.action]:`Выбери действие. Урон кислотой ${currentAcidDamage()}, жвалами ${currentBiteDamage()}; обзор ${RULES.visionRange} клеток.`;
+    byId('curtain-help').textContent=state.curtainActive?
+        `☣ Завеса активна: квадрат ${CURTAIN_SIZE}. При входе СЛ Телосложения ${RULES.curtainSaveDC} или Увязание, ${RULES.curtainDamage} урон за раунд. ${state.curtainHitPending?'Отметь прямые попадания по '+state.curtainTargetCount+' целям в журнале (отдельный d20 '+signed(RULES.acidAttackBonus)+' по каждой).':'Прямые попадания завершены или пропущены.'} Заверши кнопкой «Следующий ход».`:
+        'Кислотная завеса не активна.';
+    byId('next-turn').disabled=defeated || (!inTurn && !state.curtainActive);
+    byId('new-battle').disabled=defeated ||
+        (state.acid===RULES.acidCharges && !inTurn && !state.curtainActive &&
+         !state.shotPending && state.burns.length===0 &&
+         state.curtainEffects.length===0 && !state.curtainHitPending);
+    renderBurnJournal();
+    renderCurtainJournal();
+
+    // Резервы игроков и изолированные сохранения каждого номера.
+    byId('replace').disabled=!defeated || state.reserves===0;
+    byId('reserve-count').textContent=`${state.reserves} из ${RULES.maxReserves}`;
+    byId('reserve-row').innerHTML=Array.from({length:RULES.maxReserves},(_,i)=>`
+        <div class="reserve ${i<state.reserves?'':'used'}">${SHIELD_ICON}<span>Резерв ${i+1}</span></div>`).join('');
+    byId('reserve-row').style.gridTemplateColumns=`repeat(${RULES.maxReserves},minmax(0,1fr))`;
+    saveState();
+}
+
+
+// ================================================================
+//  4А. КИСЛОТНЫЙ ОЖОГ — ЖУРНАЛ ВРАЖЕСКИХ ОТРЯДОВ
+// ================================================================
+// Не меняет ОЗ на чужом листе: мастер вручную списывает урон врагу.
+// Каждая запись = одна поражённая цель, эффект не суммируется.
+// Все числа (урон, СЛ, длительность) меняй в RULES.burnDamage / burnSaveDC / burnTurns.
+function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, char => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    })[char]);
+}
+
+function renderBurnJournal() {
+    byId('burn-count').textContent = `(${state.burns.length})`;
+    byId('burn-add').disabled = state.hp===0 || !state.shotPending;
+    const list = byId('burn-list');
+    if (!state.burns.length) {
+        list.innerHTML = '<div class="burn-empty">Активных ожогов пока нет.</div>';
+        return;
+    }
+    list.innerHTML = state.burns.map((burn, index) => `
+      <div class="burn-target">
+        <div class="burn-target-head">
+          <strong>♨ ${escapeHtml(burn.name)}</strong>
+          <span>Пройдено ходов: ${burn.turns}/${RULES.burnTurns} · атаки с помехой</span>
+        </div>
+        <div class="burn-target-buttons">
+          <button type="button" data-burn-action="tick" data-burn-index="${index}">Ход цели · −${RULES.burnDamage} ОЗ</button>
+          <button type="button" data-burn-action="save" data-burn-index="${index}">✓ Спасбросок успешен</button>
+        </div>
+      </div>`).join('');
+}
+
+byId('burn-add').addEventListener('click', () => {
+    if (state.hp===0 || !state.shotPending) return;
+    const input = byId('burn-target-name');
+    const name = input.value.trim().slice(0,40);
+    if (!name) { input.focus(); return; }
+    // При повторном попадании время действия обновляется, но не удваивается урон.
+    const prev = state.burns.find(b => b.name.toLowerCase() === name.toLowerCase());
+    if (prev) prev.turns = 0;
+    else state.burns.push({name,turns:0});
+    state.shotPending = false;
+    input.value = '';
+    render();
+});
+
+// Делегируем кнопки: они создаются заново при каждом render().
+byId('burn-list').addEventListener('click', event => {
+    const button = event.target.closest('button[data-burn-action]');
+    if (!button) return;
+    const index = Number(button.dataset.burnIndex);
+    const burn = state.burns[index];
+    if (!burn) return;
+    if (button.dataset.burnAction === 'save') {
+        // В конце хода цель успешно прошла спасбросок Телосложения.
+        state.burns.splice(index,1);
+    } else if (button.dataset.burnAction === 'tick') {
+        // Начало хода врага: списать с ЕГО листа урон, затем по окончании
+        // хода дать бросить спасбросок. На третьем ходу ожог исчезает.
+        burn.turns += 1;
+        if (burn.turns >= RULES.burnTurns) state.burns.splice(index,1);
+    }
+    render();
+});
+
+// ================================================================
+//  4Б. КОНТРОЛЬ ЗАВЕСЫ — ДВА ВИДА ОГРАНИЧЕНИЙ ДВИЖЕНИЯ
+// ================================================================
+// !!! БЛОК ДЛЯ РЕДАКТИРОВАНИЯ !!!
+// СЛ меняй в RULES.curtainSaveDC, максимум полного опутывания —
+// в RULES.entangleMaxTurns; используется бонус RULES.acidAttackBonus.
+//
+// «Увязание»: скорость 0, атаковать можно; конец КАЖДОГО хода — СЛ ТЕЛ.
+// «Полное опутывание»: скорость 0, атаковать НЕЛЬЗЯ, по цели преимущество;
+//                      в конце хода СЛ ТЕЛ, максимум 2 хода цели.
+// Журнал НЕ меняет здоровье противников — урон заносится на их листах.
+// Взаимодействие с Кислотным ожогом: независимые состояния, не заменяют друг друга.
+
+let curtainNotice = 'Укажи количество противников в завесе и их имена, затем отметь попадание / промах по каждому.';
+
+// Обновляет состояние по имени. Полное опутывание сильнее Увязания.
+function putCurtainEffect(name,kind) {
+    const existing=state.curtainEffects.find(e=>e.name.toLowerCase()===name.toLowerCase());
+    if (existing) {
+        if (kind==='entangled') { existing.kind='entangled'; existing.turns=0; }
+        else if (existing.kind==='stuck') existing.turns=0;
+    } else if (state.curtainEffects.length < 30) {
+        state.curtainEffects.push({name,kind,turns:0});
+    }
+}
+
+// Калькулятор прямого попадания.
+// В квадрате 2×2 — до 4 клеток; одна клетка вмещает один жетон отряда.
+// Каждая цель получает СВОЙ бросок d20 + RULES.acidAttackBonus против своей КД.
+// Количество можно изменить, пока оно не меньше числа уже разыгранных целей.
+function setCurtainTargetCount(next) {
+    const min=state.curtainDirectResults.length;
+    const value=Math.max(min,Math.min(RULES.curtainMaxTargets,next));
+    if (value===state.curtainTargetCount) return;
+    state.curtainTargetCount=value;
+    state.curtainTargetNames=state.curtainTargetNames.slice(0,value);
+    while (state.curtainTargetNames.length < value) state.curtainTargetNames.push('');
+    state.curtainHitPending=state.curtainActive && state.curtainDirectResults.length<value;
+    render();
+}
+
+function renderCurtainDirectTargets() {
+    const active=state.curtainActive && state.hp>0;
+    const done=state.curtainDirectResults.length;
+    const total=state.curtainTargetCount;
+    byId('curtain-target-count').textContent=String(total);
+    byId('curtain-progress').textContent=`${done} из ${total} обработано`;
+    byId('curtain-minus').disabled=!active || total<=done;
+    byId('curtain-plus').disabled=!active || total>=RULES.curtainMaxTargets;
+    const list=byId('curtain-direct-targets');
+    if (!total) {
+        list.innerHTML='<p class="curtain-direct-placeholder">В завесе нет противников. Она всё равно блокирует проход.</p>';
+        return;
+    }
+    list.innerHTML=Array.from({length:total},(_,i)=>{
+        const result=state.curtainDirectResults[i];
+        const name=state.curtainTargetNames[i] || '';
+        return `<div class="curtain-direct-slot ${result?'resolved':''}">
+          <label for="curtain-direct-name-${i}">Цель ${i+1}</label>
+          <input id="curtain-direct-name-${i}" maxlength="40" autocomplete="off"
+              placeholder="Например, Красные №${i+1}"
+              data-direct-name="${i}" value="${escapeHtml(name)}"
+              ${!active || Boolean(result) ?'disabled':''}/>
+          ${result ?
+              `<p class="curtain-direct-result">${result.result==='hit'?'✓ Попадание — полное опутывание':'✕ Промах — без опутывания'}</p>`:
+              `<div class="curtain-direct-actions">
+                <button type="button" data-direct-result="hit" data-direct-index="${i}"
+                  ${!active || i!==done ?'disabled':''}>✓ Попадание</button>
+                <button type="button" data-direct-result="miss" data-direct-index="${i}"
+                  ${!active || i!==done ?'disabled':''}>✕ Промах</button>
+              </div>`}
+        </div>`;
+    }).join('');
+}
+
+function renderCurtainJournal() {
+    const active=state.curtainActive && state.hp>0;
+    byId('curtain-count').textContent=`(${state.curtainEffects.length})`;
+    byId('curtain-entry-fail').disabled=!active;
+    byId('curtain-entry-pass').disabled=!active;
+    byId('curtain-note').textContent=curtainNotice;
+    renderCurtainDirectTargets();
+    const list=byId('curtain-list');
+    if (!state.curtainEffects.length) {
+        list.innerHTML='<div class="burn-empty">Под действием завесы пока никого нет.</div>';
+        return;
+    }
+    list.innerHTML=state.curtainEffects.map((e,index)=>{
+        const full=e.kind==='entangled';
+        const statusText=full?
+            `Полное опутывание · ${e.turns}/${RULES.entangleMaxTurns} ходов · скорость 0, нет атак, по цели преимущество`:
+            `Увязание · скорость 0, атаки возможны · до успешного спасброска`;
+        return `<div class="burn-target curtain-target ${full?'entangled':''}">
+          <div class="burn-target-head">
+            <strong>${full?'⛓':'☣'} ${escapeHtml(e.name)}</strong><span>${statusText}</span>
+          </div>
+          <div class="burn-target-buttons">
+            <button type="button" data-curtain-action="fail" data-curtain-index="${index}">Конец хода · СЛ провален</button>
+            <button type="button" data-curtain-action="save" data-curtain-index="${index}">✓ СЛ успешен — свободен</button>
+          </div>
+        </div>`;
+    }).join('');
+}
+
+function curtainTargetName(required=true) {
+    const input=byId('curtain-target-name');
+    const value=input.value.trim().slice(0,40);
+    if (required && !value) { input.focus(); return null; }
+    return value;
+}
+
+// При входе в квадрат СЛ Телосложения: даже при успехе урон 1.
+byId('curtain-entry-fail').addEventListener('click',()=>{
+    if (!state.curtainActive || state.hp===0) return;
+    const name=curtainTargetName(); if (!name) return;
+    putCurtainEffect(name,'stuck');
+    curtainNotice=`${name}: вход в завесу, СЛ ${RULES.curtainSaveDC} провален. Скорость 0; атаки разрешены. Спиши ${RULES.curtainDamage} ОЗ (не более раза за раунд).`;
+    byId('curtain-target-name').value='';
+    render();
+});
+byId('curtain-entry-pass').addEventListener('click',()=>{
+    if (!state.curtainActive || state.hp===0) return;
+    const name=curtainTargetName(); if (!name) return;
+    curtainNotice=`${name}: СЛ ${RULES.curtainSaveDC} успешен, Увязание не возникло. Спиши ${RULES.curtainDamage} ОЗ за вход (не чаще раза за раунд).`;
+    byId('curtain-target-name').value='';
+    render();
+});
+
+// Отдельные кнопки + / - изменяют численность целей.
+byId('curtain-minus').addEventListener('click',()=>setCurtainTargetCount(state.curtainTargetCount-1));
+byId('curtain-plus').addEventListener('click',()=>setCurtainTargetCount(state.curtainTargetCount+1));
+
+// Имя сохраняем при вводе, без перерисовки — курсор не прыгает.
+byId('curtain-direct-targets').addEventListener('input',event=>{
+    const input=event.target.closest('input[data-direct-name]');
+    if (!input) return;
+    const index=Number(input.dataset.directName);
+    if (!Number.isInteger(index) || index<0 || index>=state.curtainTargetCount) return;
+    state.curtainTargetNames[index]=input.value.slice(0,40);
+    saveState();
+});
+
+// Весь квадрат накрывается ОДНОЙ завесой за 2 заряда.
+// Но попадания по каждой из выбранных целей проверяются отдельно, без доп. расхода.
+byId('curtain-direct-targets').addEventListener('click',event=>{
+    const button=event.target.closest('button[data-direct-result]');
+    if (!button || !state.curtainActive || state.hp===0) return;
+    const index=Number(button.dataset.directIndex);
+    if (index!==state.curtainDirectResults.length || index>=state.curtainTargetCount) return;
+    const name=(state.curtainTargetNames[index]||'').trim();
+    if (!name) { byId(`curtain-direct-name-${index}`).focus(); return; }
+    if (state.curtainTargetNames.slice(0,index).some(n=>n.trim().toLowerCase()===name.toLowerCase())) {
+        curtainNotice='Названия целей не должны повторяться в одном прямом попадании.';
+        render();
+        return;
+    }
+    const result=button.dataset.directResult;
+    if (!['hit','miss'].includes(result)) return;
+    state.curtainDirectResults.push({name,result});
+    if (result==='hit') putCurtainEffect(name,'entangled');
+    state.curtainHitPending=state.curtainDirectResults.length<state.curtainTargetCount;
+    curtainNotice=result==='hit' ?
+        `${name}: d20 ${signed(RULES.acidAttackBonus)} попал — Полное опутывание, СЛ ${RULES.curtainSaveDC} в конце хода (макс. ${RULES.entangleMaxTurns} хода).` :
+        `${name}: прямой бросок промахнулся — завеса действует, но полного опутывания нет.`;
+    render();
+});
+
+// Снятие статуса происходит индивидуально для каждого врага.
+byId('curtain-list').addEventListener('click',event=>{
+    const button=event.target.closest('button[data-curtain-action]');
+    if (!button) return;
+    const index=Number(button.dataset.curtainIndex);
+    const effect=state.curtainEffects[index]; if (!effect) return;
+    if (button.dataset.curtainAction==='save') {
+        curtainNotice=`${effect.name}: спасбросок Телосложения успешен — ${effect.kind==='entangled'?'Полное опутывание':'Увязание'} снято.`;
+        state.curtainEffects.splice(index,1);
+    } else if (button.dataset.curtainAction==='fail') {
+        effect.turns+=1;
+        if (effect.kind==='entangled' && effect.turns>=RULES.entangleMaxTurns) {
+            curtainNotice=`${effect.name}: истекли ${RULES.entangleMaxTurns} хода — Полное опутывание снято автоматически.`;
+            state.curtainEffects.splice(index,1);
+        } else {
+            curtainNotice=`${effect.name}: СЛ ${RULES.curtainSaveDC} провален. ${effect.kind==='entangled'?`Полное опутывание ${effect.turns}/${RULES.entangleMaxTurns}.`:'Увязание продолжается до успешного спасброска.'}`;
+        }
+    }
+    render();
+});
+
+// ================================================================
+//  5. ИГРОВЫЕ ДЕЙСТВИЯ — ЗДОРОВЬЕ И ПОТЕРИ
+// ================================================================
+function takeDamage(amount) {
+    if (state.hp===0) return;
+    state.hp=Math.max(0,state.hp-amount);
+    // Погибший муравей не воскреснет от лечения — режем верхний предел.
+    state.cap=Math.min(state.cap,Math.ceil(state.hp/RULES.hpPerAnt)*RULES.hpPerAnt);
+    render();
+}
+function shortRest() {
+    if (state.hp === 0 || state.hp >= state.cap) return;
+    if (!confirm("Короткий отдых вне боя? Он восстановит здоровье только выживших муравьёв.")) return;
+    state.hp = state.cap;
+    render();
+}
+
+function longRest() {
+    if (state.hp === 0 || (state.hp === MAX_HP && state.cap === MAX_HP)) return;
+    if (!confirm("ГМ разрешил долгий отдых в безопасной точке? Здоровье станет полным, а потерянные муравьи будут заменены пополнением из тыла.")) return;
+    state.hp = MAX_HP;
+    state.cap = MAX_HP;
+    render();
+}
+function replaceSquad() {
+    if (state.hp!==0 || state.reserves===0) return;
+    const remaining=state.reserves-1;
+    state=startingState();
+    curtainNotice='Новый отряд: завесу и эффекты нужно наложить заново.';
+    state.reserves=remaining;
+    render();
+}
+
+// ================================================================
+//  6. СОБЫТИЯ И КНОПКИ — ДЕЙСТВИЯ НА ОДИН ХОД
+// ================================================================
+byId('hit1').addEventListener('click',()=>takeDamage(1));
+byId('hit3').addEventListener('click',()=>takeDamage(3));
+byId("short-rest").addEventListener("click", shortRest);
+byId("long-rest").addEventListener("click", longRest);
+
+// Кислотный залп и завеса тратят ресурсы СРАЗУ, даже при промахе.
+// Одно действие за ход: кислота, завеса, жвалы ИЛИ рывок.
+function selectAction(action,cost=0) {
+    if (state.hp===0) return;
+    if (state.action !== null) {
+        // Бесплатные действия можно отменить. Потраченную кислоту — нельзя.
+        if (state.action===action && (action==='dash' || action==='bite')) {
+            state.action=null;
+            render();
+        }
+        return;
+    }
+    if (state.acid < cost) return;
+    state.acid-=cost;
+    state.action=action;
+    if (action==='curtain') {
+        state.curtainActive=true;
+        state.curtainDirectResults=[];
+        state.curtainHitPending=state.curtainTargetCount>0;
+        curtainNotice='Завеса создана! Укажи количество и имена врагов в квадрате '+CURTAIN_SIZE+', затем отметь прямой бросок d20 '+signed(RULES.acidAttackBonus)+' по каждому.';
+    }
+    if (action==='shot') state.shotPending=true; // Ждём исхода броска по цели.
+    render();
+}
+byId('acid-shot').addEventListener('click',()=>selectAction('shot',RULES.acidShotCost));
+byId('acid-curtain').addEventListener('click',()=>selectAction('curtain',RULES.curtainCost));
+byId('bite').addEventListener('click',()=>selectAction('bite'));
+byId('dash').addEventListener('click',()=>selectAction('dash'));
+
+// СЛЕДУЮЩИЙ ХОД снимает отметку действия и завершает завесу,
+// но НЕ восстанавливает кислотные заряды.
+byId('next-turn').addEventListener('click',()=>{
+    if (state.hp===0) return;
+    state.action=null;
+    state.curtainActive=false;
+    state.curtainHitPending=false; // Прямые атаки возможны только в ход создания поля.
+    state.shotPending=false; // Если выстрел промахнулся, ожог не создаётся.
+    render();
+});
+// НОВЫЙ БОЙ восстанавливает только кислоту и временные состояния.
+byId('new-battle').addEventListener('click',()=>{
+    if (state.hp===0) return;
+    state.acid=RULES.acidCharges;
+    state.action=null;
+    state.curtainActive=false;
+    state.shotPending=false;
+    state.burns=[]; // Новый бой: прошлые ожоги закончили действие.
+    state.curtainHitPending=false;
+    state.curtainDirectResults=[];
+    state.curtainTargetCount=1;
+    state.curtainTargetNames=[''];
+    state.curtainEffects=[]; // Новый бой: все прежние вязкие эффекты окончены.
+    curtainNotice='Новый бой: заряды восстановлены, прошлые состояния завесы сняты.';
+    render();
+});
+byId('replace').addEventListener('click',replaceSquad);
+byId('reset').addEventListener('click',()=>{
+    if (!window.confirm('Сбросить весь лист, погибших муравьёв и резерв игрока?')) return;
+    state=startingState();
+    curtainNotice='Весь лист сброшен.';
+    render();
+});
+
+// ================================================================
+//  7. НЕЗАВИСИМЫЕ ЛИСТЫ — НОМЕР ОТРЯДА
+// ================================================================
+// #01 и #02 в адресе дают разные сохранения одного и того же типа.
+// Можно вернуться к сохранению, введя предыдущий номер.
+function showCurrentSquad() {
+    byId("instance-label").textContent = squadId;
+    byId("squad-id").value = squadId;
+}
+function openSquad() {
+    const id = byId("squad-id").value.trim();
+    if (!id) { byId("squad-id").focus(); return; }
+    // Символы # и ? меняют смысл адреса, поэтому в ID запрещены.
+    if (/[#?]/.test(id)) { alert("Используй буквы, цифры и дефис, без # и ?."); return; }
+    if (id === squadId) return;
+    squadId = id;
+    window.location.hash = encodeURIComponent(squadId);
+    state = startingState();
+    curtainNotice='Открыт другой отряд. Показаны его собственные состояния и эффекты.';
+    loadState();
+    showCurrentSquad();
+    render();
+}
+byId("open-squad").addEventListener("click", openSquad);
+byId("squad-id").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") openSquad();
+});
+window.addEventListener("hashchange", () => {
+    const id = decodeURIComponent(window.location.hash.slice(1)) || "01";
+    if (id === squadId) return;
+    squadId = id;
+    state = startingState();
+    curtainNotice='Открыт другой отряд. Показаны его собственные состояния и эффекты.';
+    loadState();
+    showCurrentSquad();
+    render();
+});
+
+// ================================================================
+//  8. ЗАПУСК
+// ================================================================
+loadState();
+updateRuleLabels();
+showCurrentSquad();
+render();
+  </script>
+</body>
+</html>

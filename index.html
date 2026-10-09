@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#0d1615" name="theme-color"/>
+<meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
+<title>Мир Холэна — игровая платформа</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- ШАБЛОН ПЛАТФОРМЫ — навигация общая для всех разделов -->
+<div class="app-shell">
+<aside aria-label="Главная навигация" class="sidebar" id="sidebar">
+<a aria-label="Мир Холэна — главная" class="brand" data-view="home" href="#home"><span aria-hidden="true" class="brand-emblem">⬡</span><span><strong>МИР ХОЛЭНА</strong></span></a>
+<p class="sidebar-caption">БИБЛИОТЕКА</p>
+<nav class="side-nav">
+<a class="nav-link active" data-view="home" href="#home"><span class="nav-icon">⌂</span> Главная</a>
+<a class="nav-link" data-view="bestiary" href="#bestiary"><span class="nav-icon">◈</span> Бестиарий</a>
+<a class="nav-link" data-view="rules" href="#rules"><span class="nav-icon">≡</span> Правила</a>
+<a class="nav-link" data-view="lore" href="#lore"><span class="nav-icon">◇</span> Предметы Холэна</a>
+<a class="nav-link" data-view="profile" href="#profile"><span class="nav-icon">◉</span> Профиль</a></nav>
+<p class="sidebar-caption">ИГРА</p>
+<nav class="side-nav">
+<a class="nav-link" data-view="rooms" href="#rooms"><span class="nav-icon">⌘</span> Комнаты <span class="mini soon">тест</span></a>
+<a class="nav-link" data-view="gm" href="#gm"><span class="nav-icon">⚑</span> Панель ГМа <span class="mini soon">тест</span></a>
+</nav>
+<div class="sidebar-foot">
+<span class="connection-dot"></span>
+<div><strong>Автономный прототип</strong><span>Без серверов и регистрации</span></div>
+</div>
+</aside>
+<div class="main-area">
+<header class="topbar">
+<button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button>
+<div class="breadcrumb"><span>ХОЛЭН</span><span class="crumb-sep">/</span><strong id="breadcrumb-title">Главная</strong></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.7</span><span class="avatar" title="Профиль появится позже">ГМ</span></div>
+</header>
+<main id="main" tabindex="-1"><div class="page-back-strip" hidden="hidden" id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" title="Вернуться к предыдущему разделу" type="button">← Назад</button></div>
+<section aria-labelledby="home-heading" class="view active" id="view-home">
+<div class="page-heading home-intro">
+<span class="eyebrow">НАСТОЛЬНЫЕ ПРИКЛЮЧЕНИЯ / ХОЛЭН</span>
+<h1 id="home-heading">Выбери свою историю</h1>
+<p>Единый мир, разные приключения. Исследуй стимпанковый Холэн или возглавь отряды в подземной войне.</p>
+</div>
+<div aria-label="Доступные игровые паки" class="pack-grid">
+<button class="pack-card journeys" data-pack="journeys" type="button">
+<span aria-hidden="true" class="pack-art"></span><span aria-hidden="true" class="pack-shade"></span>
+<span class="pack-content"><span class="pack-brow">МИР · ПРИКЛЮЧЕНИЯ</span><strong>Путешествия Холэна</strong><span class="pack-copy">Магический стимпанк, города Великого Пакта, история и новые приключения.</span><span class="pack-cta">Открыть пак <span aria-hidden="true">↗</span></span></span>
+</button>
+<button class="pack-card ants" data-pack="insects" type="button">
+<span aria-hidden="true" class="pack-art"></span><span aria-hidden="true" class="pack-shade"></span>
+<span class="pack-content"><span class="pack-brow">ТАКТИЧЕСКИЙ ПАК · 7 СПЕЦИАЛИЗАЦИЙ</span><strong>Муравьиная революция</strong><span class="pack-copy">Три колонии, война под землёй и командование боевыми отрядами.</span><span class="pack-cta">Открыть пак <span aria-hidden="true">↗</span></span></span>
+</button>
+<article aria-label="Новый пак скоро" class="pack-card mystery">
+<span aria-hidden="true" class="mystery-mark">?</span>
+<span class="pack-content"><span class="pack-brow">СЛЕДУЮЩИЙ ПАК</span><strong>Неизвестная глава</strong><span class="pack-copy">Новые истории появятся здесь.</span><span class="pack-cta muted-cta">Скоро</span></span>
+</article>
+</div>
+<div class="section-title expedition-head"><div><span class="overline">ВАША БАЗА</span><h2>Центр экспедиции</h2></div><span class="muted">Личные инструменты</span></div>
+<div class="feature-grid exped-grid">
+<button class="feature-card" data-go="classes" type="button"><span class="feature-symbol gold"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M5 3 19 17M19 3 5 17M3 3l4 4-4 4M21 3l-4 4 4 4M12 16v5M9 21h6"></path></svg></span><span class="feature-title">Классы</span><span class="feature-text">Официальные классы D&amp;D и авторские специализации игровых паков.</span><span class="feature-foot">Каталог источников <b>↗</b></span></button>
+<button class="feature-card" data-go="races" type="button"><span class="feature-symbol green"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><circle cx="17" cy="10" r="2.4"></circle><path d="M2.5 21v-3.3c0-3 2.8-5 6.5-5s6.5 2 6.5 5V21M17 14c2.7 0 4.5 1.7 4.5 4V21"></path></svg></span><span class="feature-title">Расы</span><span class="feature-text">Игровые виды и происхождения: официальные и авторские материалы.</span><span class="feature-foot">Каталог источников <b>↗</b></span></button>
+<button class="feature-card" data-go="profile" type="button"><span class="feature-symbol blue"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-3a8 8 0 0 1 16 0v3"></path></svg></span><span class="feature-title">Мой профиль</span><span class="feature-text">Ник, личные персонажи, сохранённые листы и будущие комнаты.</span><span class="feature-foot">Локальный профиль <b>↗</b></span></button>
+</div>
+<div class="announcement"><span class="pulsedot"></span><div><strong>Прототип:</strong> каталог и листы работают локально. Онлайн-аккаунты, синхронизация персонажей и создание комнат появятся на следующих этапах.</div></div>
+</section>
+<section aria-labelledby="classes-heading" class="view" id="view-classes">
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПЕРСОНАЖИ</span><h1 id="classes-heading">Классы</h1><p>Сначала выбери тип материала, затем источник. Официальные классы и авторские специализации хранятся отдельно.</p></div>
+<div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип классов" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="classes" type="button">Официальные D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="classes" type="button">Авторские · хоумбрю</button></div></div>
+<div class="source-header"><span class="overline">ДОСТУПНЫЕ ИСТОЧНИКИ</span><span class="muted">Выбери набор</span></div>
+<div class="source-grid" id="classes-sources"></div>
+<div aria-live="polite" class="catalog-results" id="classes-results"></div>
+</section><section aria-labelledby="races-heading" class="view" id="view-races">
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПРОИСХОЖДЕНИЯ</span><h1 id="races-heading">Расы</h1><p>Расы и игровые виды сгруппированы по источникам. Колонии муравьёв отмечены отдельно и не выдаются за самостоятельные расы.</p></div>
+<div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип рас" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="races" type="button">Официальные D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="races" type="button">Авторские · хоумбрю</button></div></div>
+<div class="source-header"><span class="overline">ДОСТУПНЫЕ ИСТОЧНИКИ</span><span class="muted">Выбери набор</span></div>
+<div class="source-grid" id="races-sources"></div>
+<div aria-live="polite" class="catalog-results" id="races-results"></div>
+</section><section aria-labelledby="journeys-heading" class="view" id="view-journeys">
+<div class="pack-page-banner journey-banner"><span class="eyebrow">МИР ХОЛЭНА / ПАК</span><h1 id="journeys-heading">Путешествия Холэна</h1><p>Города Великого Пакта, магический стимпанк и истории за пределами муравьиных тоннелей.</p></div>
+<div class="announcement"><span class="pulsedot"></span><div>Страница пака открыта для навигации. Игровые персонажи и материалы этого пака ещё не добавлены — их не будем выдумывать.</div></div>
+
+<div aria-label="Материалы пака Путешествия Холэна" class="pack-action-row">
+<button class="btn subtle" data-book-pack="journeys" type="button">▤ Книга игрока · Путешествия Холэна →</button>
+<button class="btn subtle" data-rules-pack="journeys" type="button">≡ Правила Путешествий Холэна →</button>
+</div></section><section aria-labelledby="insects-heading" class="view" id="view-insects">
+<div class="pack-page-banner insects-banner"><span class="eyebrow">МИР НАСЕКОМЫХ / ПАК</span><h1 id="insects-heading">Муравьиная революция</h1><p>Семь специализаций, три колонии, боевые листы и война за подземные тоннели.</p></div><div aria-label="Материалы пака Муравьиная революция" class="pack-action-row">
+<button class="btn subtle" data-book-pack="insects" type="button">▤ Книга игрока · Муравьиная революция →</button>
+<button class="btn subtle" data-rules-pack="insects" type="button">≡ Правила Муравьиной революции →</button>
+</div>
+<div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Все семь интерактивных листов на одной странице.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
+</section><section aria-labelledby="profile-heading" class="view" id="view-profile">
+<div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Локальный профиль этой версии. Он сохраняется только в твоём браузере и пока не является учётной записью.</p></div>
+<div class="profile-layout"><div class="panel profile-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Имя путешественника</h2><p>Так тебя будут видеть в будущих игровых комнатах.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="profile-extras"><div class="panel"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Здесь появятся твои сохранённые персонажи и игровые листы после подключения общей системы персонажей.</p><span class="capsule">Раздел в разработке</span></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Созданные и посещённые комнаты будут отображаться здесь после запуска онлайн-режима.</p><span class="capsule">Раздел в разработке</span></div></div></div>
+</section><section aria-labelledby="squads-heading" class="view" id="view-squads">
+<div class="page-heading"><span class="eyebrow">МИР НАСЕКОМЫХ / БОЕВЫЕ СПЕЦИАЛИЗАЦИИ</span><h1 id="squads-heading">Специализации отрядов</h1><p>Семь утверждённых боевых специализаций «Муравьиной революции». Это правила авторского пака, а не стандартные классы D&amp;D.</p></div>
+<div class="catalog-toolbar">
+<label class="search-wrap"><span class="visually-hidden">Найти отряд</span><span aria-hidden="true">⌕</span><input id="squad-search" placeholder="Поиск по названию или роли" type="search"/></label>
+<div aria-label="Колония" class="filter-group" role="group">
+<button class="filter active" data-filter="all" type="button">Все</button>
+<button class="filter" data-filter="black" type="button">Чёрная</button>
+<button class="filter" data-filter="green" type="button">Зелёная</button>
+</div>
+</div>
+<div class="squad-grid" id="squad-grid"></div>
+<p class="empty-message" hidden="" id="squad-empty">Ничего не найдено. Попробуй другой запрос.</p>
+</section>
+<section aria-labelledby="sheet-heading" class="view" id="view-sheet">
+<div class="sheet-head"><button class="btn subtle" id="sheet-back" type="button">← Назад</button><div><span class="eyebrow">ИНТЕРАКТИВНЫЙ ЛИСТ</span><h1 id="sheet-heading">Лист отряда</h1></div><a class="btn subtle" href="#" id="sheet-popout" rel="noopener" target="_blank">Открыть отдельно ↗</a></div>
+<div class="sheet-note"><span class="connection-dot"></span> Пока это оригинальный HTML внутри платформы. Локальные сохранения остаются в его собственном листе; сетевой синхронизации ещё нет.</div>
+<iframe class="sheet-frame" id="sheet-frame" loading="lazy" title="Интерактивный лист отряда"></iframe>
+</section>
+<section aria-labelledby="bestiary-heading" class="view" id="view-bestiary">
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СУЩЕСТВА</span><h1 id="bestiary-heading">Бестиарий</h1><p>Единый каталог противников и обитателей Холэна. Базу существ добавим на следующем этапе.</p></div>
+<div class="empty-state"><div class="empty-glyph">◈</div><h2>Пока здесь тихо...</h2><p>Мы не будем выдумывать характеристики врагов. Сначала утвердим структуру карточек, а потом перенесём сюда реальные данные.</p><span class="capsule">Запланировано: поиск · фильтры · карточка существа · добавление в бой</span></div>
+</section>
+<section aria-labelledby="rules-heading" class="view" id="view-rules">
+<div class="page-heading"><span class="eyebrow">СПРАВОЧНИК / ИГРОВАЯ СИСТЕМА</span><h1 id="rules-heading">Библиотека правил</h1><p>Выбери игровой пак. Правила основной кампании и «Муравьиной революции» хранятся отдельно.</p></div>
+<div aria-label="Игровой пак" class="rules-pack-selector" role="group">
+<button aria-pressed="true" class="rules-pack-card" data-select-rules="journeys" type="button">
+<span class="rules-pack-symbol">⚙</span><span><strong>Путешествия Холэна</strong><small>D&amp;D 5e14 · Магическое право · Реестр</small></span><span class="rules-pack-arrow">↗</span>
+</button>
+<button aria-pressed="false" class="rules-pack-card" data-select-rules="insects" type="button">
+<span class="rules-pack-symbol insect">♟</span><span><strong>Муравьиная революция</strong><small>Тактические отряды · Авторская система</small></span><span class="rules-pack-arrow">↗</span>
+</button>
+</div>
+<div class="rules-current-heading"><span class="overline">ВЫБРАННЫЙ ПАК</span><h2 id="rules-pack-title">Путешествия Холэна</h2><p id="rules-pack-description"></p></div><section aria-labelledby="player-book-heading" class="player-book panel" id="player-book">
+<div aria-hidden="true" class="player-book-icon">▤</div>
+<div class="player-book-content">
+<span class="overline">БИБЛИОТЕКА / КНИГА ИГРОКА</span>
+<h2 id="player-book-heading">Книга игрока · Путешествия Холэна</h2>
+<p id="player-book-description">Здесь появится книга игрока соответствующего пака после загрузки документа.</p>
+<span class="book-empty-label" hidden>Книга доступна</span>
+<a class="btn primary" id="player-book-link" href="books/velikiy_pakt_holen_1_7.pdf" target="_blank" rel="noopener">Открыть PDF ↗</a>
+</div>
+</section>
+<div class="rules-container" id="rules-container"></div>
+<section aria-labelledby="spell-registry-heading" class="spell-registry panel" id="spell-registry">
+<div class="registry-header"><div><span class="overline">ЕВРАЗИЙСКИЙ РЕЕСТР МАГИИ · 0–3 КРУГ</span><h2 id="spell-registry-heading">Проверка заклинаний</h2><p>Поиск по названию, школе и категории доступа. Справочные статусы из редакции 0.2; окончательное решение принимает ГМ.</p></div><span class="capsule" id="spell-registry-count"></span></div>
+<label class="search-wrap registry-search"><span aria-hidden="true">⌕</span><span class="visually-hidden">Поиск заклинаний</span><input id="spell-search" placeholder="Название, лицензия или школа" type="search"/></label><div aria-label="Фильтры заклинаний" class="multi-filter-toolbar" id="spell-filters">
+<div class="filter-menu-grid" id="spell-filter-groups"></div>
+<button class="btn subtle filter-reset" id="spell-clear" type="button">Сбросить фильтры</button>
+</div>
+<p aria-live="polite" class="filter-counter" id="spell-filter-summary">Найдено: 284 из 284</p>
+<div class="spell-list" id="spell-list"></div>
+<p class="registry-warning">В публичную версию включены только названия, уровни, школы и категории/лицензии. Комментарии и заметки ГМа из мастерских материалов не публикуются.</p>
+</section>
+</section>
+<section aria-labelledby="lore-heading" class="view" id="view-lore"><div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СНАРЯЖЕНИЕ</span>
+<h1 id="lore-heading">Предметы Холэна</h1>
+<p>Каталог обычных и магических предметов для разных игровых паков. Данные появятся после согласования предметов.</p></div>
+<section aria-label="Поиск предметов" class="panel items-panel">
+<div class="registry-header"><div><span class="overline">СПРАВОЧНИК ПРЕДМЕТОВ</span><h2>Поиск и фильтры</h2><p>Можно выбрать несколько значений в каждом фильтре. Пока каталог пуст — предметы не выдумываем.</p></div><span class="capsule" id="item-count">Найдено: 0</span></div>
+<label class="search-wrap registry-search"><span aria-hidden="true">⌕</span><span class="visually-hidden">Название предмета</span><input id="item-search" placeholder="Название или описание предмета" type="search"/></label>
+<div aria-label="Фильтры предметов" class="multi-filter-toolbar"><div class="filter-menu-grid" id="item-filter-groups"></div><button class="btn subtle filter-reset" id="item-clear" type="button">Сбросить фильтры</button></div>
+<p aria-live="polite" class="filter-counter" id="item-filter-summary">Найдено: 0 предметов</p>
+<div class="items-list" id="item-list"></div>
+<div class="empty-state item-empty" id="item-empty"><div class="empty-glyph">◇</div><h2>Предметы ещё не добавлены</h2><p>Поиск, тип предмета, редкость и доступные паки уже готовы. Когда ты передашь список, мы внесём его без переработки интерфейса.</p></div>
+</section></section>
+<section aria-labelledby="rooms-heading" class="view" id="view-rooms">
+  <div class="page-heading"><span class="eyebrow">СОВМЕСТНАЯ ИГРА · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h1 id="rooms-heading">Игровые комнаты</h1><p>Проверка взаимодействий ГМа и двух игроков. Пока синхронизируются только вкладки <strong>этого браузера</strong> — другие устройства подключим позже.</p></div>
+  <div class="online-warning" role="note"><strong>Тестовая среда.</strong> Не онлайн-сервис: доступ по коду работает в рамках одного браузера и одного адреса сайта. Выбор роли здесь не защищён серверной авторизацией.</div>
+  <div class="room-grid" id="room-setup">
+    <form class="panel" id="room-create-form"><span class="pill muted-pill">ШАГ 1 · ВЕДУЩИЙ</span><h2>Создать тестовую комнату</h2><label class="field-label" for="room-create-name">Название комнаты</label><input id="room-create-name" maxlength="72" required value="Операция: Красный тоннель"/><button class="btn primary wide" type="submit">Создать комнату</button></form>
+    <form class="panel" id="room-join-form"><span class="pill muted-pill">ШАГ 2 · УЧАСТНИКИ</span><h2>Присоединиться</h2><p>Открой эту страницу в новой вкладке и введи код, затем выбери свободное место игрока.</p><label class="field-label" for="room-join-code">Код приглашения</label><input id="room-join-code" placeholder="ANT-XXXXX" autocomplete="off" required/><button class="btn subtle wide" type="submit">Открыть комнату</button></form>
+  </div>
+  <section class="panel room-dashboard" id="room-dashboard" hidden>
+    <div class="room-dash-head"><div><span class="overline">КОМНАТА · ТЕСТОВАЯ</span><h2 id="room-active-title">Комната</h2><p id="room-active-code"></p></div><div class="room-head-actions"><button class="btn subtle" id="room-copy-code" type="button">Копировать код</button><button class="btn subtle" id="room-leave" type="button">Выйти</button></div></div>
+    <div class="room-role-bar"><label for="room-role">Роль в этой вкладке</label><select id="room-role"><option value="gm">ГМ</option><option value="p1">Игрок 1 — Пехота</option><option value="p2">Игрок 2 — Санитары</option></select><span class="pill" id="room-role-pill">ГМ</span></div>
+    <div id="room-message" class="room-message" role="status" aria-live="polite"></div>
+    <div class="room-meta" id="room-meta"></div>
+    <h3>Участники и состояние отрядов</h3><div class="room-unit-list" id="room-units"></div>
+    <div class="room-action-panel" id="room-action-panel"></div>
+    <div class="room-feed"><h3>Журнал комнаты</h3><ol id="room-feed"></ol></div>
+  </section>
+</section>
+<section aria-labelledby="gm-heading" class="view" id="view-gm">
+  <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Комната и панель ГМа теперь смотрят на одно локальное состояние. Ходы, заявки игроков, здоровье и журнал обновляются одновременно.</p></div>
+  <div class="online-warning" role="note">Демонстрационная версия. Права ГМа в ней не защищены от изменения в браузере. Для открытого интернета потребуются авторизация и серверные проверки.</div>
+  <div id="gm-no-room" class="panel"><h2 id="gm-no-room-title">Сначала создай комнату</h2><p id="gm-no-room-text">Перейди в «Комнаты», создай тестовую сессию и выбери роль ГМа.</p><button type="button" class="btn primary" data-room-go="rooms">Перейти в комнаты</button></div>
+  <div id="gm-dashboard" class="panel" hidden>
+    <div class="room-dash-head"><div><span class="overline">ВЕДУЩИЙ · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h2 id="gm-room-title">Комната</h2><p id="gm-room-code"></p></div><button class="btn subtle" type="button" data-room-go="rooms">В комнату ↗</button></div>
+    <div class="room-meta" id="gm-turn-summary"></div><button class="btn primary" id="gm-next-turn" type="button">Следующий ход →</button>
+    <h3>Заявки игроков</h3><div class="request-list" id="gm-requests"></div>
+    <h3>Управление отрядами</h3><div class="room-unit-list" id="gm-units"></div>
+    <h3>История решений</h3><ol class="room-feed-list" id="gm-feed"></ol>
+  </div>
+</section>
+</main>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.7</span><span>Без сетевого подключения · 7 исходных листов</span></footer>
+</div>
+</div>
+<div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
+<script src="data.js"></script>
+<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script>
+</body>
+</html>

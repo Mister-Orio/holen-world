@@ -46,7 +46,9 @@ function unitCard(u){
  (hidden?'ОЗ скрыты ГМом':esc(u.hp)+' / '+esc(u.cap)+' ОЗ')+'</span></div>'+
  (hidden?'<p class="online-hp-hidden">Здоровье противника неизвестно</p>':
  '<div class="room-hp-line"><div class="room-hp-fill" style="width:'+Math.min(100,Math.max(0,ratio))+'%"></div></div>')+
- '<small>КД '+esc(u.armor_class)+' · Скорость '+esc(u.speed)+(u.charges?' · Заряды '+esc(u.charges):'')+
+ '<small>КД '+esc(u.armor_class)+' · Скорость '+esc(u.speed)+
+ (u.footprint_w>1||u.footprint_h>1?' · Область '+esc(u.footprint_w)+'×'+esc(u.footprint_h):'')+
+ (u.charges?' · Заряды '+esc(u.charges):'')+
  (u.is_training?' · Тренировочный':'')+'</small></article>';
 }
 function roomView(){
@@ -77,7 +79,7 @@ function roomView(){
   (pending?'<p>Твоя заявка ожидает решения ГМа.</p>':
    '<p>Проверку броска и расчёт урона пока проводит ГМ. Здесь отправляется заявка на применение результата.</p>'+
    (attackTargets.length?'<label class="field-label" for="online-attack-target">Цель атаки</label><select id="online-attack-target" class="room-select">'+
-     attackTargets.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+' · '+u.hp+' ОЗ</option>').join('')+'</select>'+
+     attackTargets.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+(u.hp===null?' · ОЗ скрыты':' · '+u.hp+' ОЗ')+'</option>').join('')+'</select>'+
      '<label class="field-label" for="online-attack-amount">Подтверждённый урон (1–30)</label><input type="number" id="online-attack-amount" min="1" max="30" value="3">'+
      '<button type="button" class="btn primary" data-online-action="send-attack">Запросить атаку</button>':
      '<p>Пока нет живых противников для атаки.</p>')+
@@ -128,10 +130,15 @@ function gmView(){
  '<details class="online-exception"><summary>Исключение ГМа: вернуть погибших</summary><p>Вне обычных правил: восстанавливает полный состав и все ОЗ выбранного отряда, включая уничтоженный. Применяй только осознанно.</p><button class="btn subtle" type="button" data-online-action="force-reinforce">Вернуть полный состав</button></details></section>'+
  '<section class="online-gm-card"><h3>Отдых</h3><p>Короткий отдых возвращает здоровье выживших до текущего предела. Долгий — восстанавливает их до полного состава.</p>'+
  '<div class="online-inline"><button class="btn subtle" data-online-action="rest-short" type="button">Короткий</button><button class="btn primary" data-online-action="rest-long" type="button">Долгий</button></div></section>'+
- '<section class="online-gm-card"><h3>Противники</h3><p>Бестиарий ещё не подключён. Для тестирования можно добавить манекен.</p>'+
+ '<section class="online-gm-card"><h3>Противники из бестиария</h3><p>Выбирай из шести утверждённых существ «Муравьиной революции». Умения и положение на карте пока контролирует ГМ; базовые ОЗ и КД задаёт сервер.</p>'+
+ (s.room.pack_key==='insects'?'<label class="field-label" for="online-best-monster">Существо</label>'+
+ '<select id="online-best-monster" class="room-select">'+(window.HOLEN_BESTIARY||[]).map(m=>
+ '<option value="'+esc(m.id)+'">'+esc(m.name)+' · '+esc(m.footprint_w)+'×'+esc(m.footprint_h)+'</option>').join('')+'</select>'+
+ '<button class="btn primary" type="button" data-online-action="spawn-monster">Добавить в комнату</button>':'<p>Для этого пака бестиарий пока не готов.</p>')+
+ '<p class="online-spawn-note">Размеры 2×2 и 3×1 фиксируются в данных, но автоматическое размещение на тактической карте ещё не готово.</p>'+
  '<button class="btn subtle" type="button" data-online-action="dummy">Добавить тренировочного врага</button></section>'+
  '<section class="online-gm-card"><h3>Управление комнатой</h3><p>Закрытая комната останется доступна для просмотра, но новые игроки присоединиться не смогут.</p>'+
- '<button class="btn subtle" type="button" data-online-action="close">Завершить комнату</button></section></div>'+
+ '<button class="btn online-close-btn" type="button" data-online-action="close">Завершить комнату</button></section></div>'+
  ((s.units||[]).some(u=>u.owner_id===null&&u.hp===0)?
  '<div class="online-defeated"><h3>Побеждённые противники · только для ГМа</h3><p>Их карточки исчезли из комнаты игроков. Обычное лечение не действует на уничтоженных. Чтобы вернуть противника, выбери его целью и явно используй «Исключение ГМа» выше.</p>'+
  (s.units||[]).filter(u=>u.owner_id===null&&u.hp===0).map(u=>'<div class="online-defeated-entry">'+esc(u.name)+'</div>').join('')+'</div>':'')+
@@ -157,6 +164,7 @@ async function refresh(force=false){
   if(activeId){
    snapshot=await rpc('holen_room_snapshot',{p_room:activeId});
    if(!snapshot?.room)throw Error('Комната не найдена.');
+   if(snapshot.room.status==='closed'){setRoom(null);await ownRooms();notice('Комната завершена. Вы вернулись к выбору комнат.');navigate('rooms');paint();return;}
    if(snapshot.room.status==='active'&&currentMember()?.role==='player'&&!snapshot.units?.some(u=>u.owner_id===auth.currentUserId())&&charactersLoadedFor!==activeId){
     characters=await auth.listCharacters(snapshot.room.pack_key);
     charactersLoadedFor=activeId;
@@ -168,6 +176,23 @@ async function refresh(force=false){
   notice('Не удалось синхронизировать комнату: '+(e?.message||'ошибка сети'),true);
   paint();
  }finally{loading=false;lastSnapshot=Date.now();}
+}
+function askRest(kind){
+ return new Promise(resolve=>{
+  const short=kind==='short';
+  const shade=document.createElement('div');shade.className='online-rest-confirm';shade.setAttribute('role','dialog');
+  shade.setAttribute('aria-modal','true');shade.setAttribute('aria-label','Подтвердить отдых');
+  shade.innerHTML='<div class="online-rest-card"><h2>✚ '+(short?'Короткий отдых':'Долгий отдых')+'</h2>'+
+   '<p>'+(short?'Восстановить только ОЗ выживших бойцов до оставшегося максимума? Погибшие не вернутся.':
+   'С разрешения ГМа восстановить здоровье и состав выживших отрядов? Полностью уничтоженные отряды не возвращаются.')+'</p>'+
+   '<div class="online-inline"><button type="button" class="btn primary" data-rest-yes>✚ Подтвердить</button><button type="button" class="btn subtle" data-rest-no>Отмена</button></div></div>';
+  const previous=document.activeElement;
+  function done(ok){document.removeEventListener('keydown',key);shade.remove();previous?.focus?.();resolve(ok);}
+  function key(e){if(e.key==='Escape')done(false);}
+  shade.addEventListener('click',e=>{if(e.target===shade||e.target.closest('[data-rest-no]'))done(false);else if(e.target.closest('[data-rest-yes]'))done(true);});
+  document.addEventListener('keydown',key);document.body.appendChild(shade);
+  shade.querySelector('[data-rest-no]').focus();
+ });
 }
 async function action(fn){
  if(busy)return;busy=true;notice('Выполняем действие…');
@@ -231,15 +256,21 @@ document.addEventListener('click',event=>{
   return action(async()=>rpc('holen_gm_override_reinforce',{p_room:activeId,p_unit:id}));
  }
  if(a==='rest-short'||a==='rest-long'){
-  if(a==='rest-long'&&!confirm('Разрешить долгий отдых выжившим отрядам?'))return;
-  return action(async()=>rpc('holen_gm_rest',{p_room:activeId,p_kind:a==='rest-short'?'short':'long'}));
+  const kind=a==='rest-short'?'short':'long';
+  askRest(kind).then(ok=>{if(ok)action(async()=>rpc('holen_gm_rest',{p_room:activeId,p_kind:kind}));});
+  return;
  }
  if(a==='toggle-enemy-hp')return action(async()=>rpc('holen_gm_enemy_hp_visibility',
     {p_room:activeId,p_hidden:!snapshot?.room?.hide_enemy_hp}));
+ if(a==='spawn-monster'){
+  const id=$('online-best-monster')?.value;
+  if(!id){notice('Выбери существо из бестиария.',true);return;}
+  return action(async()=>rpc('holen_gm_spawn_bestiary',{p_room:activeId,p_monster:id}));
+ }
  if(a==='dummy')return action(async()=>rpc('holen_gm_dummy',{p_room:activeId}));
  if(a==='close'){
   if(!confirm('Завершить комнату? Новые игроки больше не смогут войти.'))return;
-  return action(async()=>rpc('holen_gm_close',{p_room:activeId}));
+  return action(async()=>{await rpc('holen_gm_close',{p_room:activeId});setRoom(null);navigate('rooms');});
  }
 });
 window.addEventListener('holen-auth-changed',()=>{if(!auth.isAuthenticated()){snapshot=null;rooms=[];setRoom(null);}refresh(true);});

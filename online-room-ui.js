@@ -56,6 +56,10 @@ function roomView(){
  const room=s.room,me=currentMember(),gm=me?.role==='gm';
  const units=s.units||[],friends=units.filter(u=>u.owner_id),enemies=units.filter(u=>!u.owner_id && u.hp!==0);
  const self=units.find(u=>u.owner_id===auth.currentUserId());
+ const knownSheet=self && (window.ANT_DATA?.squads||[]).some(t=>t.id===self.template_key);
+ const sheetHref=knownSheet&&self.character_id?
+  'sheets/'+encodeURIComponent(self.template_key)+'.html?room='+encodeURIComponent(room.id)+'&character='+encodeURIComponent(self.character_id)+
+  '#'+encodeURIComponent(room.id)+'-'+encodeURIComponent(self.character_id):'';
  const roster=(s.members||[]).map(m=>{
   const u=units.find(u=>u.owner_id===m.user_id);
   return '<div class="room-player-row"><div class="room-player-marker">'+(m.role==='gm'?'♛':'◇')+'</div>'+
@@ -99,6 +103,7 @@ function roomView(){
  select+
  '<h3>Отряды игроков</h3><div class="room-unit-list">'+(friends.length?friends.map(unitCard).join(''):'<div class="room-empty">Участники ещё не выбрали персонажей.</div>')+'</div>'+
  '<h3>Противники</h3><div class="room-unit-list">'+(enemies.length?enemies.map(unitCard).join(''):'<div class="room-empty">Противников пока нет. Их добавляет только ГМ.</div>')+'</div>'+
+ (sheetHref?'<div class="online-sheet-access"><a class="btn primary" href="'+esc(sheetHref)+'" target="_blank" rel="noopener noreferrer">Открыть свой игровой лист ↗</a><p class="online-spawn-note">Игровые кнопки доступны только владельцу персонажа в активной комнате. Отметки способностей пока сохраняются в этом браузере; здоровье на сервере меняет ГМ.</p></div>':'')+
  actions+
  '<h3>Журнал событий</h3><ol class="online-events">'+(s.events||[]).map(e=>'<li>'+esc(e.message)+'</li>').join('')+'</ol>'+
  (!gm&&room.status==='active'?'<button class="btn subtle" data-online-action="leave" type="button">Покинуть комнату</button>':'')+'</section>';

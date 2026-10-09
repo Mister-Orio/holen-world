@@ -91,7 +91,7 @@ list.addEventListener('submit',async event=>{
  if(!edit)return;
  event.preventDefault();
  if(mutating)return;
- const id=edit.dataset.characterEdit,title=edit.elements.name.value.trim(),btn=edit.querySelector('button[type=submit]');
+ const id=edit.dataset.characterEdit,title=edit.querySelector('input[name="name"]').value.trim(),btn=edit.querySelector('button[type=submit]');
  mutating=true;btn.disabled=true;say('Сохраняем имя…');
  try{await auth.updateCharacterName(id,title);resetEditors();say('Имя персонажа изменено.');await refresh();}
  catch(e){say(e.message||'Не удалось изменить имя.');btn.disabled=false;}

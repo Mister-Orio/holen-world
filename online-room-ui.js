@@ -70,7 +70,7 @@ function roomView(){
   '<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> '+
   '<button type="button" class="btn subtle" data-online-action="profile">Открыть профиль →</button></div>':'';
  const pending=(s.requests||[]).some(r=>r.actor_id===auth.currentUserId());
- const attackTargets=enemies.filter(u=>u.hp>0);
+ const attackTargets=enemies.filter(u=>u.hp===null||u.hp>0);
  const healTargets=friends.filter(u=>u.owner_id!==auth.currentUserId()&&u.hp>0&&u.hp<u.cap);
  const actions=!gm&&self&&self.hp>0&&room.status==='active'?
   '<section class="online-gm-card online-player-actions"><h3>Действия отряда</h3>'+

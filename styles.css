@@ -317,3 +317,50 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
 .gm-command-card .btn{font-size:12px}
 @media(max-width:850px){.gm-command-grid{grid-template-columns:1fr}}
 @media(max-width:450px){.room-player-row{padding:11px 10px;gap:8px}.room-player-marker{width:31px;height:31px}.room-player-row>.pill{font-size:9px}.gm-command-card{padding:15px}}
+
+/* ==============================================================
+   ПРОФИЛЬ v1.0 — карточки сохранённых персонажей, редактор, просмотр.
+   =============================================================== */
+#auth-form[hidden],#profile-auth-actions[hidden],#profile-demo-card[hidden],
+#profile-account-card[hidden],#character-create-form[hidden],
+#character-refresh[hidden]{display:none!important}
+.profile-account-card{align-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.profile-account-card .profile-avatar{margin-bottom:7px}
+.profile-account-card h2{overflow-wrap:anywhere;margin:0}
+.profile-account-email{font-size:13px;color:#b3cbb9;overflow-wrap:anywhere}
+.profile-account-tip{font-size:12px;color:#aac0ae;line-height:1.65}
+.character-collection{display:grid;gap:12px;margin:13px 0 16px}
+.character-entry{border:1px solid #41614f;background:#192c22;border-radius:15px;padding:15px;min-width:0}
+.character-main{display:flex;align-items:center;gap:11px;min-width:0}
+.character-avatar{width:43px;height:43px;display:grid;place-items:center;background:#2e513a;border:1px solid #517c61;border-radius:12px;color:#c7f0d4;font-size:21px;flex:none}
+.character-text{display:flex;flex-direction:column;min-width:0;gap:3px}
+.character-text strong{font-size:15px;color:#edf8ee;overflow-wrap:anywhere}
+.character-text small{font-size:11px;color:#a8c2ae;overflow-wrap:anywhere}
+.character-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.character-controls .btn{font-size:12px;padding:9px 12px;min-height:38px}
+.character-delete-btn{border:1px solid #85534f!important;background:#392625!important;color:#ffc8c2!important}
+.character-delete-btn:hover{background:#53312c!important}
+.character-delete-confirm{border:1px solid #99635c;background:#33221f;border-radius:12px;padding:13px;margin-top:13px}
+.character-delete-confirm strong{font-size:13px}
+.character-delete-confirm p{margin:6px 0 0;font-size:12px;color:#ebc4b9}
+.character-delete-confirm .btn.danger{background:#9f5147;color:#fff}
+.character-details{margin-top:15px;padding:16px;border:1px solid #4d6e56;background:#12231a;border-radius:12px}
+.character-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:15px}
+.character-stat-grid>div{display:flex;flex-direction:column;align-items:center;padding:12px 4px;background:#223d2e;border-radius:10px;min-width:0}
+.character-stat-grid b{font-size:23px;color:#bdeccd}
+.character-stat-grid span{font-size:10px;color:#b5cdbb;text-align:center;line-height:1.4}
+.character-detail-copy{font-size:13px;line-height:1.7;margin:0 0 8px}
+.character-detail-note{font-size:11px!important;color:#a9c4b0!important;line-height:1.6!important;margin:10px 0}
+.character-sheet-link{display:inline-flex;margin-top:5px;font-size:12px;padding:11px 14px}
+.character-inline-form{display:grid;gap:8px;margin-top:15px;padding:13px;background:#14241b;border:1px solid #4a785e;border-radius:12px}
+.character-inline-form label{font-size:12px;color:#c2e9cb;font-weight:700}
+.character-inline-form input{width:100%;min-width:0;padding:12px;background:#102018;color:#f2faee;border:1px solid #597d63;border-radius:10px}
+.character-inline-form .character-controls{margin-top:3px}
+.character-create-form{border-top:1px solid #425a48;margin-top:18px;padding-top:18px}
+.character-create-form h3{font-size:15px;margin:0 0 10px}
+@media(max-width:520px){
+ .character-entry{padding:12px}
+ .character-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .character-controls .btn{flex:1 1 auto}
+ .character-sheet-link{width:100%;justify-content:center}
+}

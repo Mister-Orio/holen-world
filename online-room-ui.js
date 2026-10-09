@@ -121,10 +121,11 @@ function gmView(){
  '<button type="button" class="btn subtle" data-online-action="toggle-enemy-hp">'+
  (s.room.hide_enemy_hp?'Показать здоровье противников':'Скрыть здоровье противников')+'</button></div>'+
  '<h3>Заявки игроков</h3><div class="online-requests">'+requests+'</div>'+
- '<div class="online-grid"><section class="online-gm-card"><h3>Управление здоровьем</h3><label class="field-label" for="online-gm-target">Цель</label>'+
+ '<div class="online-grid"><section class="online-gm-card"><h3>Управление здоровьем</h3><p>Обычное лечение не возвращает погибших муравьёв. Пример: 7/8 +3 → 8/8, а не 16/16. Уничтоженный отряд нельзя вылечить.</p><label class="field-label" for="online-gm-target">Цель</label>'+
  '<select id="online-gm-target" class="room-select">'+items+'</select>'+
  '<label class="field-label" for="online-gm-amount">Количество ОЗ</label><input type="number" id="online-gm-amount" min="1" max="9999" value="3">'+
- '<div class="online-inline"><button class="btn subtle" type="button" data-online-action="damage">Нанести урон</button><button class="btn primary" type="button" data-online-action="heal">Восстановить</button></div></section>'+
+ '<div class="online-inline"><button class="btn subtle" type="button" data-online-action="damage">Нанести урон</button><button class="btn primary" type="button" data-online-action="heal">Лечить выживших</button></div>'+
+ '<details class="online-exception"><summary>Исключение ГМа: вернуть погибших</summary><p>Вне обычных правил: восстанавливает полный состав и все ОЗ выбранного отряда, включая уничтоженный. Применяй только осознанно.</p><button class="btn subtle" type="button" data-online-action="force-reinforce">Вернуть полный состав</button></details></section>'+
  '<section class="online-gm-card"><h3>Отдых</h3><p>Короткий отдых возвращает здоровье выживших до текущего предела. Долгий — восстанавливает их до полного состава.</p>'+
  '<div class="online-inline"><button class="btn subtle" data-online-action="rest-short" type="button">Короткий</button><button class="btn primary" data-online-action="rest-long" type="button">Долгий</button></div></section>'+
  '<section class="online-gm-card"><h3>Противники</h3><p>Бестиарий ещё не подключён. Для тестирования можно добавить манекен.</p>'+
@@ -132,7 +133,7 @@ function gmView(){
  '<section class="online-gm-card"><h3>Управление комнатой</h3><p>Закрытая комната останется доступна для просмотра, но новые игроки присоединиться не смогут.</p>'+
  '<button class="btn subtle" type="button" data-online-action="close">Завершить комнату</button></section></div>'+
  ((s.units||[]).some(u=>u.owner_id===null&&u.hp===0)?
- '<div class="online-defeated"><h3>Побеждённые противники · только для ГМа</h3><p>Их карточки исчезли из комнаты игроков. Записи сохранены, и ты можешь вернуть их через ручное восстановление ОЗ.</p>'+
+ '<div class="online-defeated"><h3>Побеждённые противники · только для ГМа</h3><p>Их карточки исчезли из комнаты игроков. Обычное лечение не действует на уничтоженных. Чтобы вернуть противника, выбери его целью и явно используй «Исключение ГМа» выше.</p>'+
  (s.units||[]).filter(u=>u.owner_id===null&&u.hp===0).map(u=>'<div class="online-defeated-entry">'+esc(u.name)+'</div>').join('')+'</div>':'')+
  '<button class="btn subtle" type="button" data-online-action="rooms">← В комнату</button></section>';
 }
@@ -221,6 +222,13 @@ document.addEventListener('click',event=>{
   const id=$('online-gm-target')?.value,amount=Number($('online-gm-amount')?.value);
   if(!id||!Number.isInteger(amount)||amount<1||amount>9999){notice('Выбери цель и целое количество ОЗ от 1 до 9999.',true);return;}
   return action(async()=>rpc('holen_gm_adjust',{p_room:activeId,p_unit:id,p_delta:a==='damage'?-amount:amount}));
+ }
+ if(a==='force-reinforce'){
+  const id=$('online-gm-target')?.value;
+  if(!id){notice('Выбери отряд для исключения ГМа.',true);return;}
+  const selected=snapshot?.units?.find(u=>u.id===id);
+  if(!confirm('ИСКЛЮЧЕНИЕ ИЗ ПРАВИЛ: полностью восстановить состав и здоровье «'+(selected?.name||'отряда')+'»? Погибшие бойцы вернутся.'))return;
+  return action(async()=>rpc('holen_gm_override_reinforce',{p_room:activeId,p_unit:id}));
  }
  if(a==='rest-short'||a==='rest-long'){
   if(a==='rest-long'&&!confirm('Разрешить долгий отдых выжившим отрядам?'))return;

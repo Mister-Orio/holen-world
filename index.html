@@ -7,7 +7,7 @@
 <meta content="#0d1615" name="theme-color"/>
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
-<link href="styles.css?v=0101" rel="stylesheet"/>
+<link href="styles.css?v=0102" rel="stylesheet"/>
 </head>
 <body>
 <!-- ШАБЛОН ПЛАТФОРМЫ — навигация общая для всех разделов -->
@@ -249,11 +249,11 @@
     <div class="room-meta" id="gm-turn-summary"></div><button class="btn primary" id="gm-next-turn" type="button">Следующий ход →</button>
     <h3>Заявки игроков</h3><div class="request-list" id="gm-requests"></div>
     <div class="gm-command-grid">
- <section class="gm-command-card"><h3>✚ Ручное восстановление здоровья</h3><p>Любое целое количество ОЗ; значение не превысит базовый максимум отряда. При необходимости ГМ может вернуть павший отряд.</p>
+ <section class="gm-command-card"><h3>✚ Ручное восстановление здоровья</h3><p>Обычное лечение не превышает максимум выживших бойцов и не возвращает погибших. Уничтоженный отряд не лечится.</p>
  <label for="gm-target">Отряд</label><select id="gm-target" class="room-select"></select>
  <label for="gm-heal-amount">Восстановить ОЗ</label><input id="gm-heal-amount" type="number" min="1" max="9999" value="3">
  <button class="btn primary" id="gm-heal-btn" type="button">Восстановить</button></section>
- <section class="gm-command-card"><h3>☾ Отдых отрядов</h3><p>Короткий отдых лечит только выживших до текущего предела. Долгий отдых — с разрешения ГМа — возвращает павших и заряды.</p>
+ <section class="gm-command-card"><h3>☾ Отдых отрядов</h3><p>Короткий отдых лечит выживших до текущего предела. Долгий с разрешения ГМа пополняет только сохранившиеся отряды и возвращает ресурсы, но не воскрешает уничтоженные.</p>
  <div class="room-unit-actions"><button class="btn subtle" id="gm-short-rest" type="button">Короткий отдых</button><button class="btn subtle" id="gm-long-rest" type="button">Долгий отдых</button></div></section>
  <section class="gm-command-card"><h3>⚔ Добавить противника</h3><p>Бестиарий под конкретный пак ещё готовится. Сейчас доступен только явно обозначенный тренировочный противник.</p>
  <button class="btn subtle" id="gm-add-training" type="button">Добавить тренировочного врага</button></section>
@@ -263,11 +263,11 @@
   </details>
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.10.1</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.10.2</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
 <script src="data.js"></script>
-<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script><script src="online-room-ui.js?v=0101"></script>
+<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js?v=0102"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script><script src="online-room-ui.js?v=0102"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button>
 <div class="breadcrumb"><span>ХОЛЭН</span><span class="crumb-sep">/</span><strong id="breadcrumb-title">Главная</strong></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.7</span><span class="avatar" title="Профиль появится позже">ГМ</span></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.9</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden="hidden" id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" title="Вернуться к предыдущему разделу" type="button">← Назад</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -92,8 +92,62 @@
 </div>
 <div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Все семь интерактивных листов на одной странице.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
 </section><section aria-labelledby="profile-heading" class="view" id="view-profile">
-<div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Локальный профиль этой версии. Он сохраняется только в твоём браузере и пока не является учётной записью.</p></div>
-<div class="profile-layout"><div class="panel profile-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Имя путешественника</h2><p>Так тебя будут видеть в будущих игровых комнатах.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="profile-extras"><div class="panel"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Здесь появятся твои сохранённые персонажи и игровые листы после подключения общей системы персонажей.</p><span class="capsule">Раздел в разработке</span></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Созданные и посещённые комнаты будут отображаться здесь после запуска онлайн-режима.</p><span class="capsule">Раздел в разработке</span></div></div></div>
+<div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт доступен на разных устройствах. Игровые комнаты пока находятся в локальном тестовом режиме.</p></div>
+<div class="profile-auth-actions"><button class="btn primary" type="button" data-open-auth="register">Создать аккаунт</button><button class="btn subtle" type="button" data-open-auth="login">Войти</button></div><p class="auth-profile-note" id="profile-auth-info">Проверяем авторизацию…</p><div class="profile-layout"><div class="panel profile-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Имя путешественника</h2><p>Так тебя будут видеть в будущих игровых комнатах.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="profile-extras"><div class="panel"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Здесь появятся твои сохранённые персонажи и игровые листы после подключения общей системы персонажей.</p><span class="capsule">Раздел в разработке</span></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Созданные и посещённые комнаты будут отображаться здесь после запуска онлайн-режима.</p><span class="capsule">Раздел в разработке</span></div></div></div>
+</section>
+<!-- Личный кабинет: серверная авторизация по почте через Supabase -->
+<section class="view" id="view-auth" aria-labelledby="auth-title">
+ <div class="auth-layout">
+  <aside class="auth-promo">
+   <div class="auth-promo-content">
+    <span class="eyebrow">МИР ХОЛЭНА · ЛИЧНЫЙ КАБИНЕТ</span>
+    <div class="auth-sigil" aria-hidden="true">◇</div>
+    <h1>Твоя история<br>начинается здесь.</h1>
+    <p>Единый аккаунт для приключений Холэна. Ник, персонажи и будущие игровые комнаты — в одном месте.</p>
+    <div class="auth-benefits"><span>✧ Постоянный игровой профиль</span><span>⌘ Персонажи для разных игровых паков</span><span>◇ Подтверждение почты для безопасности</span></div>
+   </div>
+  </aside>
+  <div class="panel auth-card">
+    <span class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</span>
+    <h2 id="auth-title">Создать аккаунт</h2>
+    <p id="auth-subtitle" class="auth-subtitle">Игровой ник, почта и пароль. Сначала подтвердите адрес электронной почты.</p>
+    <div class="auth-session" id="auth-session" hidden>
+      <strong id="auth-session-name"></strong><span id="auth-session-email"></span>
+      <button class="btn subtle" id="auth-logout" type="button">Выйти из аккаунта</button>
+    </div>
+    <div class="auth-preview-note" role="note">Аккаунты работают через Supabase. <strong>Игровые комнаты пока остаются локальной демонстрацией.</strong> Для публичной рассылки писем понадобится подключить внешний SMTP.</div>
+    <form id="auth-form" novalidate>
+      <div class="auth-field" id="auth-name-field">
+        <label for="auth-username">Игровой ник *</label>
+        <input id="auth-username" autocomplete="nickname" maxlength="24" minlength="3" placeholder="Например, KoboldSmith" spellcheck="false">
+        <small>3–24 символа: буквы, цифры, _ и -. Ник будет виден другим игрокам.</small>
+      </div>
+      <div class="auth-field" id="auth-email-field">
+        <label for="auth-email">Электронная почта *</label>
+        <input id="auth-email" type="email" autocomplete="email" required placeholder="example@mail.ru" autocapitalize="none">
+        <small>Используется для входа, подтверждения и восстановления доступа. Игроки её не видят.</small>
+      </div>
+      <div class="auth-field" id="auth-password-field">
+        <label for="auth-password">Пароль *</label>
+        <div class="auth-password-field"><input id="auth-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Не менее 12 символов"><button type="button" class="auth-password-toggle" data-password-toggle="auth-password" aria-label="Показать пароль" aria-pressed="false">◉</button></div>
+      </div>
+      <div class="auth-field" id="auth-confirm-field">
+        <label for="auth-confirm">Повторите пароль *</label>
+        <div class="auth-password-field"><input id="auth-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Повторите пароль"><button type="button" class="auth-password-toggle" data-password-toggle="auth-confirm" aria-label="Показать пароль" aria-pressed="false">◉</button></div>
+      </div>
+      <div class="auth-response" id="auth-response" role="status" aria-live="polite" hidden></div>
+      <button type="submit" id="auth-submit" class="btn primary wide">Создать аккаунт</button>
+      <div class="auth-actions" aria-label="Действия с аккаунтом">
+        <button id="auth-register-btn" class="btn subtle" type="button">Зарегистрироваться</button>
+        <button id="auth-login-btn" class="btn subtle" type="button">Войти</button>
+        <button id="auth-forgot-btn" class="auth-forgot" type="button">Забыли пароль?</button>
+      </div>
+      <div id="auth-reset-help" hidden><p class="auth-subtitle">Восстановление работает только после настройки почтовой отправки.</p></div>
+      <button id="auth-back-login" type="button" class="btn subtle" hidden>← Вернуться ко входу</button>
+    </form>
+    <p class="auth-bottom-meta">Пароли обрабатывает сервер Supabase Auth. На сайте не хранится собственная база паролей.</p>
+  </div>
+ </div>
 </section><section aria-labelledby="squads-heading" class="view" id="view-squads">
 <div class="page-heading"><span class="eyebrow">МИР НАСЕКОМЫХ / БОЕВЫЕ СПЕЦИАЛИЗАЦИИ</span><h1 id="squads-heading">Специализации отрядов</h1><p>Семь утверждённых боевых специализаций «Муравьиной революции». Это правила авторского пака, а не стандартные классы D&amp;D.</p></div>
 <div class="catalog-toolbar">
@@ -189,11 +243,11 @@
   </div>
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.7</span><span>Без сетевого подключения · 7 исходных листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.9</span><span>Без сетевого подключения · 7 исходных листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
 <script src="data.js"></script>
-<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script>
+<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script>
 </body>
 </html>

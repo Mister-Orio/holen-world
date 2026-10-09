@@ -364,3 +364,43 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
  .character-controls .btn{flex:1 1 auto}
  .character-sheet-link{width:100%;justify-content:center}
 }
+
+/* Онлайн-комнаты v0.10 · сначала мобильная читаемость */
+.online-room-root,.online-gm-root{margin:15px 0 28px}
+.online-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:16px 0}
+.online-card,.online-intro,.online-session{min-width:0}
+.online-card label{display:block;margin-bottom:7px}
+.online-card input{width:100%;min-width:0;margin-bottom:15px;padding:12px 13px;background:#12231b;border:1px solid #536958;border-radius:10px;color:#ecf6eb}
+.online-card h2{font-size:20px}
+.online-card p{color:#b7cbba}
+.online-myrooms{margin:24px 0}.online-myrooms h3{margin:0 0 14px}
+.online-room-pick{display:flex;flex-direction:column;text-align:left;gap:3px;background:#193026;color:#e6f6ed;border:1px solid #52715a;border-radius:12px;padding:14px 17px;margin:8px 0;width:100%;cursor:pointer}
+.online-room-pick:hover{background:#234532}.online-room-pick small{color:#aec5b4}
+.online-session h3{font-size:17px;margin:20px 0 10px}
+.online-status{font-size:12px;color:#98d9a9;margin:0 0 8px;min-height:10px;overflow-wrap:anywhere}
+.online-status.is-error{color:#ffb0a7}
+.online-session .room-dash-head p{margin:7px 0}
+.online-live-note{padding:11px;background:#213b2b;border-radius:10px;color:#aee4bb;font-size:12px}
+.online-picker{background:#1a3126;border:1px solid #456c55;border-radius:13px;margin:19px 0;padding:18px}
+.online-character-options{display:grid;gap:9px;margin:15px 0}
+.online-character-options button{text-align:left;white-space:normal}
+.online-unit{border:1px solid #507159;border-radius:13px;padding:14px 16px;background:#162a20}
+.online-unit-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.online-unit-head strong{overflow-wrap:anywhere}
+.online-unit-head span{color:#aee3c0;font-size:13px}
+.online-unit small{display:block;color:#afc6b4;margin-top:7px}
+.online-gm-card{background:#182f23;border:1px solid #4a6b54;border-radius:13px;padding:19px;min-width:0}
+.online-gm-card h3{margin:0 0 9px}.online-gm-card p{font-size:12px;color:#b8cbbb;line-height:1.6}
+.online-gm-card label{display:block;font-size:12px;margin:12px 0 6px}
+.online-gm-card input{width:100%;background:#0f2119;color:#e9f6ed;border:1px solid #58715e;border-radius:9px;padding:12px;min-width:0}
+.online-inline{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.online-inline button{flex:1 1 130px}
+.online-events{display:grid;gap:9px;list-style:none;padding:0;margin:7px 0 20px}
+.online-events li{border-left:3px solid #689874;background:#1c3326;border-radius:5px;padding:9px 12px;font-size:12px;color:#cbe1d1}
+.legacy-room-details{margin:25px 0;border:1px dashed #5b6e5a;border-radius:13px;padding:13px;background:#131f19}
+.legacy-room-details>summary{color:#adbdb0;font-size:12px;cursor:pointer}
+.legacy-room-details[open]>summary{margin-bottom:17px}
+.auth-policy{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border:1px solid #60745e;border-radius:11px;margin:11px 0;color:#bfdac7;font-size:12px}
+.auth-policy input{width:17px;height:17px;flex:none;accent-color:#6ed19c;margin-top:2px}
+.auth-policy a{text-decoration:underline;color:#b9ffcf}
+.auth-policy[hidden]{display:none!important}
+@media(max-width:720px){.online-grid{grid-template-columns:1fr}.online-gm-card{padding:15px}.online-session{padding:15px}}

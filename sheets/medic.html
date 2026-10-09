@@ -1401,6 +1401,7 @@ button.quiet:hover {
     Муравьиная революция · Холэн · Чёрная колония · Санитары · Интерфейс v1.2
    </div>
 </main>
+<script src="../sheet-access.js"></script>
 <script>
    "use strict";
 
@@ -1497,6 +1498,7 @@ function startingState() {
 }
 let state = startingState();
 function loadState() {
+    if(!window.HOLEN_SHEET_EDITABLE)return;
     try {
         const saved = JSON.parse(localStorage.getItem(storageKey()) || "null");
         if (!saved || saved.rulesSignature !== RULES_SIGNATURE) return;
@@ -1512,6 +1514,7 @@ function loadState() {
     } catch (error) { /* При запрете localStorage лист остаётся рабочим */ }
 }
 function saveState() {
+    if(!window.HOLEN_SHEET_EDITABLE)return;
     try { localStorage.setItem(storageKey(), JSON.stringify({...state,rulesSignature:RULES_SIGNATURE})); }
     catch (error) { /* Доступ к хранилищу может быть отключён */ }
 }
@@ -1871,6 +1874,10 @@ window.addEventListener("hashchange",()=>{
 //  9. ЗАПУСК
 // ================================================================
 loadState();updateRuleLabels();showCurrentSquad();render();
-  </script>
+  
+window.addEventListener('holen-sheet-authorized',()=>{
+    state=startingState();loadState();showCurrentSquad();render();
+});
+</script>
 </body>
 </html>

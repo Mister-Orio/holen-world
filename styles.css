@@ -618,3 +618,6 @@ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
 .creature-nav-arrow{width:24px;height:24px;flex:0 0 24px}
 .creature-sibling-prev .creature-nav-arrow{transform:rotate(180deg)}
 .creature-sibling-next{margin-left:auto}
+
+.best-tile-neutral .best-tile-image{background:radial-gradient(circle at 28% 25%,#596469,#29383d 68%,#1b292e);border-color:#71858d}
+.best-tile-neutral .best-type-icon{color:#c6d6de}

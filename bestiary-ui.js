@@ -5,11 +5,12 @@ const root=document.getElementById('bestiary-app');
 if(!root)return;
 const monsters=window.HOLEN_BESTIARY||[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-const factions={red:'Красная колония',fungal:'Независимый кордицепс'};
+const factions={red:'Красная колония',fungal:'Независимый кордицепс',neutral:'Нейтральные'};
+let pack=location.hash==='#bestiary-journeys'?'journeys':'insects';
 const types=new Set(['ant','infected-ant','beetle','worm']);
 const context=new URLSearchParams(location.search);
 let keyword=(context.get('q')||'').toLocaleLowerCase('ru').trimStart();
-let faction=['red','fungal'].includes(context.get('faction'))?context.get('faction'):'all';
+let faction=['red','fungal','neutral'].includes(context.get('faction'))?context.get('faction'):'all';
 function card(x){
  const query=new URLSearchParams({id:x.id});
  if(keyword)query.set('q',keyword);
@@ -22,17 +23,19 @@ function card(x){
   '<span class="library-cover-title best-tile-name">'+esc(x.name)+'</span></a>';
 }
 function render(){
- const results=monsters.filter(x=>(faction==='all'||x.faction===faction)&&
+ const packMonsters=monsters.filter(x=>x.pack_key===pack);
+ const results=packMonsters.filter(x=>(faction==='all'||x.faction===faction)&&
  (x.name+' '+x.role+' '+x.description+' '+(factions[x.faction]||'')).toLocaleLowerCase('ru').includes(keyword));
  const searchFocus=document.activeElement?.id==='best-search';
  const position=searchFocus?document.activeElement.selectionStart:0;
  root.innerHTML='<div class="bestiary-toolbar"><label for="best-search">Поиск по существам<input id="best-search" type="search" autocomplete="off" value="'+esc(keyword)+'" placeholder="Название, фракция или роль…"></label>'+
  '<label for="best-faction">Фракция<select id="best-faction"><option value="all">Все фракции</option>'+
  '<option value="red" '+(faction==='red'?'selected':'')+'>Красная колония</option>'+
- '<option value="fungal" '+(faction==='fungal'?'selected':'')+'>Независимый кордицепс</option></select></label>'+
- '<span class="best-count" role="status">Существ: '+results.length+' из '+monsters.length+'</span></div>'+
+ '<option value="fungal" '+(faction==='fungal'?'selected':'')+'>Независимый кордицепс</option>'+
+ '<option value="neutral" '+(faction==='neutral'?'selected':'')+'>Нейтральные</option></select></label>'+
+ '<span class="best-count" role="status">Существ: '+results.length+' из '+packMonsters.length+'</span></div>'+
  '<div class="library-cover-grid bestiary-compact-grid">'+results.map(card).join('')+'</div>'+
- (results.length?'':'<p class="room-empty">По запросу ничего не найдено.</p>');
+ (results.length?'':'<p class="room-empty">'+(packMonsters.length?'По запросу ничего не найдено.':'Существа этого пака ещё не добавлены.')+'</p>');
  if(searchFocus){const field=root.querySelector('#best-search');field?.focus();field?.setSelectionRange(position,position);}
 }
 root.addEventListener('input',e=>{
@@ -40,6 +43,11 @@ root.addEventListener('input',e=>{
 });
 root.addEventListener('change',e=>{
  if(e.target?.id==='best-faction'){faction=e.target.value;render();}
+});
+window.addEventListener('holen:library-pack',e=>{
+ if(e.detail?.library!=='bestiary')return;
+ if(pack!==e.detail.pack){pack=e.detail.pack;keyword='';faction='all';}
+ render();
 });
 render();
 })();

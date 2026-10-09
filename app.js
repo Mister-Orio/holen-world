@@ -10,8 +10,15 @@
 
 const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','bestiary','rules','lore','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Мир Холэна',rooms:'Комнаты',gm:'Панель ГМа'};
+const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
+const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
+const LIBRARY_PACK_VIEWS={
+ 'bestiary-journeys':{library:'bestiary',pack:'journeys'},
+ 'bestiary-insects':{library:'bestiary',pack:'insects'},
+ 'lore-journeys':{library:'lore',pack:'journeys'},
+ 'lore-insects':{library:'lore',pack:'insects'}
+};
+const PACK_TITLES={journeys:'Путешествия Холэна',insects:'Муравьиная революция'};
 const COLONY_LABEL = {black:'Чёрная колония',green:'Зелёная колония'};
 
 // В интерфейс нельзя подставлять сырой текст пользователя через innerHTML.
@@ -38,8 +45,10 @@ function closeMenu() {
 function navigate(name, {push=true}={}) {
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
+  const libraryPack=LIBRARY_PACK_VIEWS[view];
   currentView=view;
   if(view==='home')navigationTrail=['home'];
+  else if(libraryPack)navigationTrail=['home',libraryPack.library,view];
   else if(history.state?.trail && !push && history.state.view===view)navigationTrail=history.state.trail;
   else if(navigationTrail.includes(view))navigationTrail=navigationTrail.slice(0,navigationTrail.indexOf(view)+1);
   else if(view==='squads')navigationTrail=['home','insects','squads'];
@@ -48,9 +57,14 @@ function navigate(name, {push=true}={}) {
     navigationTrail=['home',previous,view];
   else navigationTrail=['home',view];
   updateBreadcrumb();
-  document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${view}`));
-  document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.getAttribute('data-view') === view));
+  document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${libraryPack?libraryPack.library+'-catalog':view}`));
+  document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.getAttribute('data-view') === (libraryPack?.library||view)));
   if(push && window.location.hash !== `#${view}`) history.pushState({view,from:previous,trail:[...navigationTrail],inApp:true},'',`#${view}`);
+  if(libraryPack){
+    $(libraryPack.library+'-pack-heading').textContent=PACK_TITLES[libraryPack.pack];
+    if(libraryPack.library==='lore'){currentItemPack=libraryPack.pack;renderItems();}
+    window.dispatchEvent(new CustomEvent('holen:library-pack',{detail:libraryPack}));
+  }
   $('page-back-strip').hidden=view==='home';
   closeMenu();
   if(view==='sheet' && !$('sheet-frame').getAttribute('src')) return navigate('squads');
@@ -147,6 +161,7 @@ const SPELL_FACETS = [
 ];
 const SPELL_FILTERS = Object.fromEntries(SPELL_FACETS.map(f=>[f.key,new Set()]));
 
+let currentItemPack='journeys';
 const ITEM_PACKS = [
   {id:'journeys', name:'Путешествия Холэна'},
   {id:'insects', name:'Муравьиная революция'}
@@ -156,8 +171,7 @@ const ITEM_FACETS = [
     {value:'true', label:'Магический'}, {value:'false', label:'Обычный'}]},
   {key:'rarity',label:'Редкость',options:[
     'Без редкости','Обычный','Необычный','Редкий','Очень редкий','Легендарный','Артефакт'
-  ].map(x=>({value:x,label:x}))},
-  {key:'packs',label:'Поддерживаемые паки',options:ITEM_PACKS.map(x=>({value:x.id,label:x.name}))}
+  ].map(x=>({value:x,label:x}))}
 ];
 const ITEM_FILTERS = Object.fromEntries(ITEM_FACETS.map(f=>[f.key,new Set()]));
 
@@ -211,7 +225,7 @@ function renderSpells(){
 }
 function renderItems() {
   const q=$('item-search').value.trim().toLocaleLowerCase('ru');
-  const all=window.HOLEN_ITEMS||[];
+  const all=(window.HOLEN_ITEMS||[]).filter(item=>Array.isArray(item.packs)&&item.packs.includes(currentItemPack));
   const list=all.filter(item=>passFacets(item,ITEM_FILTERS)&&
     `${item.name||''} ${item.description||''}`.toLocaleLowerCase('ru').includes(q));
   $('item-count').textContent=`Найдено: ${list.length}`;

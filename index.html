@@ -7,7 +7,7 @@
 <meta content="#0d1615" name="theme-color"/>
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
-<link href="styles.css?v=0114" rel="stylesheet"/>
+<link href="styles.css?v=0115" rel="stylesheet"/>
 </head>
 <body>
 <!-- ШАБЛОН ПЛАТФОРМЫ — навигация общая для всех разделов -->
@@ -18,8 +18,8 @@
 <nav class="side-nav">
 <a class="nav-link active" data-view="home" href="#home"><span class="nav-icon">⌂</span> Главная</a>
 <a class="nav-link" data-view="bestiary" href="#bestiary"><span class="nav-icon">◈</span> Бестиарий</a>
-<a class="nav-link" data-view="rules" href="#rules"><span class="nav-icon">≡</span> Правила</a>
 <a class="nav-link" data-view="lore" href="#lore"><span class="nav-icon">◇</span> Предметы Холэна</a>
+<a class="nav-link" data-view="rules" href="#rules"><span class="nav-icon">≡</span> Правила</a>
 <a class="nav-link" data-view="profile" href="#profile"><span class="nav-icon">◉</span> Профиль</a></nav>
 <p class="sidebar-caption">ИГРА</p>
 <nav class="side-nav">
@@ -35,7 +35,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.4</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.5</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -170,9 +170,15 @@
 <iframe class="sheet-frame" id="sheet-frame" loading="lazy" title="Интерактивный лист отряда"></iframe>
 </section>
 <section aria-labelledby="bestiary-heading" class="view" id="view-bestiary">
-<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СУЩЕСТВА</span><h1 id="bestiary-heading">Бестиарий Холэна</h1><p>Выбери карточку существа: полный лист с характеристиками и способностями откроется на отдельной странице. Поиск и фильтры помогут найти нужного противника.</p></div>
-<div id="bestiary-app"></div>
-</section>
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ИГРОВЫЕ ПАКИ</span><h1 id="bestiary-heading">Бестиарий Холэна</h1><p>Выбери игровой пак, чтобы открыть его каталог.</p></div>
+<div class="rules-pack-selector" aria-label="Выбор игрового пака">
+<button class="rules-pack-card" data-go="bestiary-journeys" type="button"><span class="rules-pack-symbol" aria-hidden="true">⚙</span><span><strong>Путешествия Холэна</strong><small>Мир Великого Пакта · D&amp;D</small></span><span class="rules-pack-arrow" aria-hidden="true">↗</span></button>
+<button class="rules-pack-card" data-go="bestiary-insects" type="button"><span class="rules-pack-symbol insect" aria-hidden="true">♟</span><span><strong>Муравьиная революция</strong><small>Подземные колонии · Тактические отряды</small></span><span class="rules-pack-arrow" aria-hidden="true">↗</span></button>
+</div></section>
+<section aria-labelledby="bestiary-pack-heading" class="view" id="view-bestiary-catalog">
+<div class="page-heading"><span class="eyebrow">БЕСТИАРИЙ / ПАК</span><h1 id="bestiary-pack-heading">Муравьиная революция</h1><p>Выбери карточку существа: полный лист откроется на отдельной странице.</p></div>
+<button class="btn subtle" data-go="bestiary" type="button">← Выбрать другой пак</button>
+<div id="bestiary-app"></div></section>
 <section aria-labelledby="rules-heading" class="view" id="view-rules">
 <div class="page-heading"><span class="eyebrow">СПРАВОЧНИК / ИГРОВАЯ СИСТЕМА</span><h1 id="rules-heading">Библиотека правил</h1><p>Выбери игровой пак. Правила основной кампании и «Муравьиной революции» хранятся отдельно.</p></div>
 <div aria-label="Игровой пак" class="rules-pack-selector" role="group">
@@ -205,16 +211,22 @@
 <p class="registry-warning">В публичную версию включены только названия, уровни, школы и категории/лицензии. Комментарии и заметки ГМа из мастерских материалов не публикуются.</p>
 </section>
 </section>
-<section aria-labelledby="lore-heading" class="view" id="view-lore"><div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СНАРЯЖЕНИЕ</span>
-<h1 id="lore-heading">Предметы Холэна</h1>
-<p>Каталог обычных и магических предметов для разных игровых паков. Данные появятся после согласования предметов.</p></div>
+<section aria-labelledby="lore-heading" class="view" id="view-lore">
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ИГРОВЫЕ ПАКИ</span><h1 id="lore-heading">Предметы Холэна</h1><p>Выбери игровой пак, чтобы открыть его каталог.</p></div>
+<div class="rules-pack-selector" aria-label="Выбор игрового пака">
+<button class="rules-pack-card" data-go="lore-journeys" type="button"><span class="rules-pack-symbol" aria-hidden="true">⚙</span><span><strong>Путешествия Холэна</strong><small>Мир Великого Пакта · D&amp;D</small></span><span class="rules-pack-arrow" aria-hidden="true">↗</span></button>
+<button class="rules-pack-card" data-go="lore-insects" type="button"><span class="rules-pack-symbol insect" aria-hidden="true">♟</span><span><strong>Муравьиная революция</strong><small>Подземные колонии · Тактические отряды</small></span><span class="rules-pack-arrow" aria-hidden="true">↗</span></button>
+</div></section>
+<section aria-labelledby="lore-pack-heading" class="view" id="view-lore-catalog">
+<div class="page-heading"><span class="eyebrow">ПРЕДМЕТЫ / ПАК</span><h1 id="lore-pack-heading">Путешествия Холэна</h1><p>Обычные и магические предметы выбранного пака.</p></div>
+<button class="btn subtle" data-go="lore" type="button">← Выбрать другой пак</button>
 <section aria-label="Поиск предметов" class="panel items-panel">
 <div class="registry-header"><div><span class="overline">СПРАВОЧНИК ПРЕДМЕТОВ</span><h2>Поиск и фильтры</h2><p>Можно выбрать несколько значений в каждом фильтре. Пока каталог пуст — предметы не выдумываем.</p></div><span class="capsule" id="item-count">Найдено: 0</span></div>
 <label class="search-wrap registry-search"><span aria-hidden="true">⌕</span><span class="visually-hidden">Название предмета</span><input id="item-search" placeholder="Название или описание предмета" type="search"/></label>
 <div aria-label="Фильтры предметов" class="multi-filter-toolbar"><div class="filter-menu-grid" id="item-filter-groups"></div><button class="btn subtle filter-reset" id="item-clear" type="button">Сбросить фильтры</button></div>
 <p aria-live="polite" class="filter-counter" id="item-filter-summary">Найдено: 0 предметов</p>
 <div class="items-list" id="item-list"></div>
-<div class="empty-state item-empty" id="item-empty"><div class="empty-glyph">◇</div><h2>Предметы ещё не добавлены</h2><p>Поиск, тип предмета, редкость и доступные паки уже готовы. Когда ты передашь список, мы внесём его без переработки интерфейса.</p></div>
+<div class="empty-state item-empty" id="item-empty"><div class="empty-glyph">◇</div><h2>Предметы ещё не добавлены</h2><p>Для этого пака пока нет утверждённых предметов. Каталог будет заполнен после согласования списка.</p></div>
 </section></section>
 <section aria-labelledby="rooms-heading" class="view" id="view-rooms">
   <div class="page-heading"><span class="eyebrow">СОВМЕСТНАЯ ИГРА · ОНЛАЙН-АЛЬФА</span><h1 id="rooms-heading">Игровые комнаты</h1><p>Подключайся с разных устройств: состав участников, выбор персонажей и решения ГМа теперь сохраняются на сервере. Онлайн-режим проходит тестирование.</p></div>
@@ -229,11 +241,11 @@
   
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.4</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.5</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0113"></script>
-<script src="catalog-data.js?v=0110"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0110"></script><script src="bestiary-ui.js?v=0114"></script><script src="auth-ui.js?v=0110"></script><script src="character-ui.js?v=0110"></script><script src="online-room-ui.js?v=0110"></script>
+<script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0115"></script>
+<script src="catalog-data.js?v=0110"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0115"></script><script src="bestiary-ui.js?v=0115"></script><script src="auth-ui.js?v=0110"></script><script src="character-ui.js?v=0110"></script><script src="online-room-ui.js?v=0110"></script>
 </body>
 </html>

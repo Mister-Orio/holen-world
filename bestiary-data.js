@@ -155,7 +155,7 @@ window.HOLEN_BESTIARY = [
     "id": "bombardier",
     "pack_key": "insects",
     "name": "Жук-бомбардир",
-    "faction": "red",
+    "faction": "neutral",
     "creature_size": "Средний",
     "role": "Стрелок",
     "hp": 10,
@@ -168,7 +168,7 @@ window.HOLEN_BESTIARY = [
     "range_cells": 3,
     "footprint_w": 1,
     "footprint_h": 1,
-    "description": "Союзный Красным жук со струёй из задней части брюшка.",
+    "description": "Нейтральный жук со струёй из задней части брюшка.",
     "abilities": [
       {
         "name": "Жвалы",
@@ -202,7 +202,7 @@ window.HOLEN_BESTIARY = [
     "id": "burrow-worm",
     "pack_key": "insects",
     "name": "Норный червь",
-    "faction": "red",
+    "faction": "neutral",
     "creature_size": "Огромный",
     "role": "Засадник",
     "hp": 22,

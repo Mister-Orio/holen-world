@@ -541,3 +541,70 @@ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
 @media(max-width:850px){.creature-content{grid-template-columns:1fr}.creature-aside{grid-row:1}.creature-art-panel{max-width:290px;margin:0 auto}.creature-art-caption{text-align:center}.creature-art-placeholder{min-height:0}}
 @media(max-width:500px){.creature-shell{padding:0 14px}.creature-topbar{padding:15px 0}.creature-main{padding-top:10px}.creature-panel{padding:15px}.creature-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.creature-modifiers{grid-template-columns:repeat(2,minmax(0,1fr))}.creature-sheet-head h1{font-size:30px}.creature-art-panel{max-width:240px}.creature-backbar .btn{flex:1;text-align:center}}
 @media print{.creature-backbar,.creature-topbar,.creature-footer,.creature-siblings{display:none!important}.creature-shell{max-width:none;padding:0}.creature-content{grid-template-columns:1fr 220px;gap:12px}.creature-panel,.creature-art-panel{break-inside:avoid}}
+
+/* ================================================================
+   ЕДИНЫЙ СТАНДАРТ ОБЛОЖЕК: бестиарий сейчас, предметы — при наполнении.
+   Класс library-cover-* переиспользуется для всех публичных каталогов.
+   Не путать с боевым footprint 1x1, 3x1 или 2x2 — это только UI.
+   ================================================================ */
+:root{
+  --library-cover-card-width:154px;
+  --library-cover-card-height:212px;
+  --library-cover-radius:13px;
+}
+.library-cover-grid,.bestiary-compact-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(122px,var(--library-cover-card-width)));
+  gap:13px;
+  align-items:stretch;
+  margin:17px 0 30px;
+}
+.library-cover-tile,.best-tile{
+  width:100%;
+  height:var(--library-cover-card-height);
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  padding:9px 9px 12px;
+  border-radius:var(--library-cover-radius);
+}
+.library-cover-image,.best-tile-image{
+  display:grid;
+  place-items:center;
+  width:100%;
+  aspect-ratio:1/1;
+  flex:0 0 auto;
+  overflow:hidden;
+  border-radius:10px;
+}
+.library-cover-image img,.best-tile-image img{
+  display:block;
+  width:100%;
+  height:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  object-position:center;
+}
+.library-cover-title,.best-tile-name{
+  flex:1;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  line-clamp:3;
+  overflow:hidden;
+  text-align:center;
+  align-content:center;
+  font-size:12px;
+  line-height:1.3;
+}
+@media(max-width:420px){
+  :root{--library-cover-card-height:177px}
+  .library-cover-grid,.bestiary-compact-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+  }
+  .library-cover-tile,.best-tile{padding:7px 7px 10px;gap:7px}
+  .library-cover-title,.best-tile-name{font-size:11px}
+}

@@ -37,11 +37,12 @@ function assertGm(){if(actor()!=='gm')throw Error('Действие доступ
 function assertPlayer(role){if(actor()!==role)throw Error('Переключись на соответствующего игрока.');}
 function unit(s,id){const u=s.units.find(x=>x.id===id);if(!u)throw Error('Отряд не выбран или не найден.');return u;}
 function squadTemplates(){return window.ANT_DATA?.squads||[];}
-function chooseCharacter(templateId){
+function chooseCharacter(templateId,customName=''){
  const role=actor();if(!['p1','p2'].includes(role))throw Error('Сначала выбери место игрока.');
  const t=squadTemplates().find(x=>x.id===templateId);if(!t)throw Error('Эта специализация недоступна в текущем паке.');
  return transact(s=>{
-  const value={id:role,name:t.name,owner:role,templateId:t.id,max:t.hp,hp:t.hp,cap:t.hp,per:t.hp/t.number,ac:t.ac};
+  const safeName=clean(customName,72);
+  const value={id:role,name:safeName?(safeName+' · '+t.name):t.name,owner:role,templateId:t.id,max:t.hp,hp:t.hp,cap:t.hp,per:t.hp/t.number,ac:t.ac};
   if(t.id==='medic')value.charges=4;
   const ix=s.units.findIndex(x=>x.id===role);
   if(ix<0)s.units.push(value);else s.units[ix]=value;

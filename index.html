@@ -222,28 +222,37 @@
   </div>
   <section class="panel room-dashboard" id="room-dashboard" hidden>
     <div class="room-dash-head"><div><span class="overline">КОМНАТА · ТЕСТОВАЯ</span><h2 id="room-active-title">Комната</h2><p id="room-active-code"></p></div><div class="room-head-actions"><button class="btn subtle" id="room-copy-code" type="button">Копировать код</button><button class="btn subtle" id="room-leave" type="button">Выйти</button></div></div>
-    <div class="room-role-bar"><label for="room-role">Роль в этой вкладке</label><select id="room-role"><option value="gm">ГМ</option><option value="p1">Игрок 1 — Пехота</option><option value="p2">Игрок 2 — Санитары</option></select><span class="pill" id="room-role-pill">ГМ</span></div>
+    <div class="room-role-bar"><label for="room-role">Роль в этой вкладке (только для локальной демонстрации)</label><select id="room-role"><option value="gm">ГМ</option><option value="p1">Игрок 1</option><option value="p2">Игрок 2</option></select><span class="pill" id="room-role-pill">ГМ</span></div>
     <div id="room-message" class="room-message" role="status" aria-live="polite"></div>
     <div class="room-meta" id="room-meta"></div>
-    <h3>Участники и состояние отрядов</h3><div class="room-unit-list" id="room-units"></div>
+    <div id="room-units"></div>
     <div class="room-action-panel" id="room-action-panel"></div>
     <div class="room-feed"><h3>Журнал комнаты</h3><ol id="room-feed"></ol></div>
   </section>
 </section>
 <section aria-labelledby="gm-heading" class="view" id="view-gm">
-  <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Комната и панель ГМа теперь смотрят на одно локальное состояние. Ходы, заявки игроков, здоровье и журнал обновляются одновременно.</p></div>
+  <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Рубка ведущего: лечение, отдых, добавление противников и подтверждение действий. Сейчас всё работает только в локальном прототипе.</p></div>
   <div class="online-warning" role="note">Демонстрационная версия. Права ГМа в ней не защищены от изменения в браузере. Для открытого интернета потребуются авторизация и серверные проверки.</div>
   <div id="gm-no-room" class="panel"><h2 id="gm-no-room-title">Сначала создай комнату</h2><p id="gm-no-room-text">Перейди в «Комнаты», создай тестовую сессию и выбери роль ГМа.</p><button type="button" class="btn primary" data-room-go="rooms">Перейти в комнаты</button></div>
   <div id="gm-dashboard" class="panel" hidden>
     <div class="room-dash-head"><div><span class="overline">ВЕДУЩИЙ · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h2 id="gm-room-title">Комната</h2><p id="gm-room-code"></p></div><button class="btn subtle" type="button" data-room-go="rooms">В комнату ↗</button></div>
     <div class="room-meta" id="gm-turn-summary"></div><button class="btn primary" id="gm-next-turn" type="button">Следующий ход →</button>
     <h3>Заявки игроков</h3><div class="request-list" id="gm-requests"></div>
-    <h3>Управление отрядами</h3><div class="room-unit-list" id="gm-units"></div>
+    <div class="gm-command-grid">
+ <section class="gm-command-card"><h3>✚ Ручное восстановление здоровья</h3><p>Любое целое количество ОЗ; значение не превысит базовый максимум отряда. При необходимости ГМ может вернуть павший отряд.</p>
+ <label for="gm-target">Отряд</label><select id="gm-target" class="room-select"></select>
+ <label for="gm-heal-amount">Восстановить ОЗ</label><input id="gm-heal-amount" type="number" min="1" max="9999" value="3">
+ <button class="btn primary" id="gm-heal-btn" type="button">Восстановить</button></section>
+ <section class="gm-command-card"><h3>☾ Отдых отрядов</h3><p>Короткий отдых лечит только выживших до текущего предела. Долгий отдых — с разрешения ГМа — возвращает павших и заряды.</p>
+ <div class="room-unit-actions"><button class="btn subtle" id="gm-short-rest" type="button">Короткий отдых</button><button class="btn subtle" id="gm-long-rest" type="button">Долгий отдых</button></div></section>
+ <section class="gm-command-card"><h3>⚔ Добавить противника</h3><p>Бестиарий под конкретный пак ещё готовится. Сейчас доступен только явно обозначенный тренировочный противник.</p>
+ <button class="btn subtle" id="gm-add-training" type="button">Добавить тренировочного врага</button></section>
+ </div><h3>Игроки и противники</h3><div id="gm-units"></div>
     <h3>История решений</h3><ol class="room-feed-list" id="gm-feed"></ol>
   </div>
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.9</span><span>Без сетевого подключения · 7 исходных листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.9</span><span>Аккаунты: Supabase · Комнаты: локальный прототип · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>

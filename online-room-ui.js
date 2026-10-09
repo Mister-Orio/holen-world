@@ -40,16 +40,19 @@ function lobby(){
  '<button class="btn primary wide" type="submit">Войти в комнату</button></form></div>'+roomChoices();
 }
 function unitCard(u){
- const ratio=u.cap?Math.round(100*u.hp/u.cap):0;
- return '<article class="online-unit"><div class="online-unit-head"><strong>'+esc(u.name)+'</strong><span>'+esc(u.hp)+' / '+esc(u.cap)+' ОЗ</span></div>'+
- '<div class="room-hp-line"><div class="room-hp-fill" style="width:'+Math.min(100,Math.max(0,ratio))+'%"></div></div>'+
+ const hidden=u.owner_id===null && (u.hp===null || u.hp===undefined);
+ const ratio=!hidden && u.cap?Math.round(100*u.hp/u.cap):0;
+ return '<article class="online-unit"><div class="online-unit-head"><strong>'+esc(u.name)+'</strong><span>'+
+ (hidden?'ОЗ скрыты ГМом':esc(u.hp)+' / '+esc(u.cap)+' ОЗ')+'</span></div>'+
+ (hidden?'<p class="online-hp-hidden">Здоровье противника неизвестно</p>':
+ '<div class="room-hp-line"><div class="room-hp-fill" style="width:'+Math.min(100,Math.max(0,ratio))+'%"></div></div>')+
  '<small>КД '+esc(u.armor_class)+' · Скорость '+esc(u.speed)+(u.charges?' · Заряды '+esc(u.charges):'')+
  (u.is_training?' · Тренировочный':'')+'</small></article>';
 }
 function roomView(){
  const s=snapshot;if(!s?.room)return '<p class="room-empty">Загружаем комнату…</p>';
  const room=s.room,me=currentMember(),gm=me?.role==='gm';
- const units=s.units||[],friends=units.filter(u=>u.owner_id),enemies=units.filter(u=>!u.owner_id);
+ const units=s.units||[],friends=units.filter(u=>u.owner_id),enemies=units.filter(u=>!u.owner_id && u.hp!==0);
  const self=units.find(u=>u.owner_id===auth.currentUserId());
  const roster=(s.members||[]).map(m=>{
   const u=units.find(u=>u.owner_id===m.user_id);
@@ -88,7 +91,7 @@ function roomView(){
  '<p>Код приглашения: <strong>'+esc(room.invite_code)+'</strong></p></div>'+
  '<div class="room-head-actions"><button class="btn subtle" type="button" data-online-action="copy">Копировать код</button>'+
  '<button class="btn subtle" type="button" data-online-action="back">К списку комнат</button></div></div>'+
- '<p class="online-live-note">Участников: '+s.members.length+' / 8 · Обновление каждые 6 секунд · '+(room.status==='active'?'Комната активна':'Комната закрыта')+'</p>'+
+ '<p class="online-live-note">Участников: '+s.members.length+' / 8 · Обновление каждые 6 секунд · '+(room.status==='active'?'Комната активна':'Комната закрыта')+(room.hide_enemy_hp?' · ОЗ противников скрыты для игроков':'')+'</p>'+
  '<h3>Участники</h3><div class="room-roster">'+roster+'</div>'+
  (gm?'<button type="button" class="btn primary" data-online-action="gm">Открыть рубку ГМа →</button>':'')+
  select+
@@ -114,6 +117,9 @@ function gmView(){
  }).join('')||'<p class="room-empty">Заявок нет.</p>';
  return '<section class="panel online-session"><span class="overline">ОНЛАЙН · ПРАВА ГМа ПРОВЕРЯЕТ СЕРВЕР</span><h2>'+esc(s.room.name)+'</h2>'+
  '<p>Комната '+esc(s.room.invite_code)+' · '+esc(packLabel(s.room.pack_key))+'</p>'+
+ '<div class="online-gm-visibility"><strong>Здоровье врагов для игроков:</strong> '+(s.room.hide_enemy_hp?'скрыто':'видно')+
+ '<button type="button" class="btn subtle" data-online-action="toggle-enemy-hp">'+
+ (s.room.hide_enemy_hp?'Показать здоровье противников':'Скрыть здоровье противников')+'</button></div>'+
  '<h3>Заявки игроков</h3><div class="online-requests">'+requests+'</div>'+
  '<div class="online-grid"><section class="online-gm-card"><h3>Управление здоровьем</h3><label class="field-label" for="online-gm-target">Цель</label>'+
  '<select id="online-gm-target" class="room-select">'+items+'</select>'+
@@ -125,6 +131,9 @@ function gmView(){
  '<button class="btn subtle" type="button" data-online-action="dummy">Добавить тренировочного врага</button></section>'+
  '<section class="online-gm-card"><h3>Управление комнатой</h3><p>Закрытая комната останется доступна для просмотра, но новые игроки присоединиться не смогут.</p>'+
  '<button class="btn subtle" type="button" data-online-action="close">Завершить комнату</button></section></div>'+
+ ((s.units||[]).some(u=>u.owner_id===null&&u.hp===0)?
+ '<div class="online-defeated"><h3>Побеждённые противники · только для ГМа</h3><p>Их карточки исчезли из комнаты игроков. Записи сохранены, и ты можешь вернуть их через ручное восстановление ОЗ.</p>'+
+ (s.units||[]).filter(u=>u.owner_id===null&&u.hp===0).map(u=>'<div class="online-defeated-entry">'+esc(u.name)+'</div>').join('')+'</div>':'')+
  '<button class="btn subtle" type="button" data-online-action="rooms">← В комнату</button></section>';
 }
 function paint(){
@@ -217,6 +226,8 @@ document.addEventListener('click',event=>{
   if(a==='rest-long'&&!confirm('Разрешить долгий отдых выжившим отрядам?'))return;
   return action(async()=>rpc('holen_gm_rest',{p_room:activeId,p_kind:a==='rest-short'?'short':'long'}));
  }
+ if(a==='toggle-enemy-hp')return action(async()=>rpc('holen_gm_enemy_hp_visibility',
+    {p_room:activeId,p_hidden:!snapshot?.room?.hide_enemy_hp}));
  if(a==='dummy')return action(async()=>rpc('holen_gm_dummy',{p_room:activeId}));
  if(a==='close'){
   if(!confirm('Завершить комнату? Новые игроки больше не смогут войти.'))return;

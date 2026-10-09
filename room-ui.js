@@ -7,6 +7,7 @@
 const e=window.HolenRoom,$=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const roleNames={gm:'ГМ',p1:'Игрок 1',p2:'Игрок 2'};
+let savedCharacters=[];
 const actorNames={...roleNames};
 function notify(t){$('room-message').textContent=t||'';}
 function safe(fn){try{fn();notify('');}catch(err){notify(err?.message||String(err));}}
@@ -43,7 +44,7 @@ function playerAction(s,role){
  if(role==='gm')return '<h3>Рубка ведущего</h3><p>Заявки, отдых, враги и ручное изменение здоровья доступны в разделе «Панель ГМа».</p><button class="btn primary" type="button" data-room-go="gm">Открыть рубку ГМа →</button>';
  const self=unit(s,role);
  if(!self){
-   return '<h3>Выбери персонажа</h3><p>В этой комнате используется пак «Муравьиная революция». Доступны семь специализаций из его каталога.</p><label class="field-label" for="room-template">Специализация отряда</label><select id="room-template" class="room-select">'+e.squadTemplates().map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('')+'</select> <button id="room-choose-character" class="btn primary" type="button">Выбрать отряд</button><p class="room-note">Сохранённые персонажи аккаунта будут подключены к выбору после интеграции онлайн-комнат.</p>';
+   return '<h3>Выбери персонажа</h3><p>В этой комнате используется пак «Муравьиная революция». Доступны семь специализаций из его каталога.</p><label class="field-label" for="room-template">Специализация отряда</label><select id="room-template" class="room-select">'+e.squadTemplates().map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('')+'</select> <button id="room-choose-character" class="btn primary" type="button">Выбрать шаблон</button><div class="room-saved-box"><h4>Мои персонажи этого пака</h4><button id="room-load-saved" class="btn subtle" type="button">Показать сохранённых</button><div id="room-saved-list"></div></div><p class="room-note">Выбор пока сохраняется в локальной комнате этого браузера, а не в сетевой сессии.</p>';
  }
  const hasEnemy=s.units.some(u=>u.owner==='gm'&&u.hp>0);
  const hasRequest=s.requests.some(r=>r.actor===role&&r.status==='pending');
@@ -88,6 +89,21 @@ function onClick(ev){
  if(b.dataset.approve){safe(()=>e.decideRequest(b.dataset.approve,true));return;}
  if(b.dataset.decline){safe(()=>e.decideRequest(b.dataset.decline,false));return;}
  if(b.dataset.damage){safe(()=>e.gmDamage(b.dataset.damage,Number(b.dataset.value)));return;}
+ if(b.id==='room-load-saved'){
+  $('room-saved-list').textContent='Загружаем…';
+  window.HOLEN_AUTH_UI?.listCharacters('insects').then(list=>{
+    savedCharacters=list;
+    const box=$('room-saved-list');if(!box)return;
+    const usable=list.filter(c=>(window.ANT_DATA?.squads||[]).some(t=>t.id===c.sheet_data?.templateId));
+    box.innerHTML=usable.length?usable.map(c=>'<button class="btn subtle room-saved-choice" type="button" data-saved-char="'+esc(c.id)+'">'+esc(c.name)+' · '+esc((window.ANT_DATA.squads.find(t=>t.id===c.sheet_data.templateId)||{}).name)+'</button>').join(''):'<p class="room-note">Нет персонажей для этого пака. Создай их в своём профиле.</p>';
+  }).catch(err=>{if($('room-saved-list'))$('room-saved-list').textContent=err.message||'Не получилось загрузить список.';});
+  return;
+ }
+ if(b.dataset.savedChar){
+  const c=savedCharacters.find(x=>x.id===b.dataset.savedChar);
+  if(c)safe(()=>e.chooseCharacter(c.sheet_data.templateId,c.name));
+  return;
+ }
  if(b.id==='room-choose-character'){safe(()=>e.chooseCharacter($('room-template').value));return;}
  if(b.id==='room-request-attack'){safe(()=>e.submitRequest('attack',Number($('room-attack-damage').value)));return;}
  if(b.id==='room-request-heal'){safe(()=>e.submitRequest('heal'));return;}

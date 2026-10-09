@@ -42,11 +42,27 @@ async function verify(){
  const state=await snapRes.json();
  const type=location.pathname.match(/\/sheets\/([a-z-]+)\.html$/i)?.[1];
  const owned=state?.units?.find(u=>u.owner_id===user.id&&u.character_id===char&&u.template_key===type);
- if(!owned||state.room?.status!=='active'||state.room?.pack_key!=='insects')return;
- window.HOLEN_SHEET_EDITABLE=true;
- document.body.classList.remove('holen-sheet-readonly');
- banner.innerHTML='<strong>Игровой режим подтверждён.</strong> Действия доступны, но пока сохраняются только в этом браузере. Здоровье на сервере комнаты меняет ГМ.';
- window.dispatchEvent(new Event('holen-sheet-authorized'));
+ if(!owned||state.room?.status!=='active'||state.room?.pack_key!=='insects')return false;
+ if(!window.HOLEN_SHEET_EDITABLE){
+  window.HOLEN_SHEET_EDITABLE=true;
+  document.body.classList.remove('holen-sheet-readonly');
+  banner.innerHTML='<strong>Игровой режим подтверждён.</strong> Способности доступны, но пока сохраняются только в этом браузере. Здоровье на сервере меняет ГМ.';
+  window.dispatchEvent(new Event('holen-sheet-authorized'));
+ }
+ return true;
 }
-verify().catch(()=>{banner.innerHTML='<strong>Справочный режим.</strong> Не удалось подтвердить доступ к активной комнате. Ничего не будет изменено.';});
+function lock(){
+ if(window.HOLEN_SHEET_EDITABLE){
+  window.HOLEN_SHEET_EDITABLE=false;
+  document.body.classList.add('holen-sheet-readonly');
+ }
+ banner.innerHTML='<strong>Справочный режим.</strong> Действия отключены: требуется доступ владельца к активной комнате.';
+}
+async function check(){
+ try{if(!await verify())lock();}
+ catch(_){lock();}
+}
+check();
+setInterval(()=>{if(!document.hidden)check();},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
 })();

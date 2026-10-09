@@ -14,9 +14,9 @@ function card(x){
  const cover=imagePath(x.images?.cover);
  const icon=cover?'<img src="'+esc(cover)+'" loading="lazy" decoding="async" width="128" height="128" alt="">':
  '<span class="best-tile-symbol" aria-hidden="true">'+esc(symbols[x.id]||'◇')+'</span>';
- return '<a class="best-tile best-tile-'+esc(x.faction)+'" href="'+url+'" aria-label="Открыть лист: '+esc(x.name)+'">'+
-  '<span class="best-tile-image">'+icon+'</span>'+
-  '<span class="best-tile-name">'+esc(x.name)+'</span></a>';
+ return '<a class="library-cover-tile best-tile best-tile-'+esc(x.faction)+'" href="'+url+'" aria-label="Открыть лист: '+esc(x.name)+'">'+
+  '<span class="library-cover-image best-tile-image">'+icon+'</span>'+
+  '<span class="library-cover-title best-tile-name">'+esc(x.name)+'</span></a>';
 }
 function render(){
  const results=monsters.filter(x=>(faction==='all'||x.faction===faction)&&
@@ -28,7 +28,7 @@ function render(){
  '<option value="red" '+(faction==='red'?'selected':'')+'>Красная колония</option>'+
  '<option value="fungal" '+(faction==='fungal'?'selected':'')+'>Независимый кордицепс</option></select></label>'+
  '<span class="best-count" role="status">Существ: '+results.length+' из '+monsters.length+'</span></div>'+
- '<div class="bestiary-compact-grid">'+results.map(card).join('')+'</div>'+
+ '<div class="library-cover-grid bestiary-compact-grid">'+results.map(card).join('')+'</div>'+
  (results.length?'':'<p class="room-empty">По запросу ничего не найдено.</p>');
  if(searchFocus){const field=root.querySelector('#best-search');field?.focus();field?.setSelectionRange(position,position);}
 }

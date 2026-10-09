@@ -8,7 +8,6 @@
    Сетевая часть НЕ подключена: это автономный прототип.
    ================================================================ */
 
-const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
 const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
 const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',backgrounds:'Предыстории',feats:'Черты',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
@@ -42,7 +41,9 @@ function closeMenu() {
   $('mobile-scrim').hidden = true;
   $('menu-toggle').setAttribute('aria-expanded','false');
 }
-function navigate(name, {push=true}={}) {
+let navigationEpoch=0;
+async function navigate(name, {push=true}={}) {
+  const token=++navigationEpoch;
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
   const libraryPack=LIBRARY_PACK_VIEWS[view];
@@ -64,14 +65,23 @@ function navigate(name, {push=true}={}) {
   if(push && window.location.hash !== `#${view}`) history.pushState({view,from:previous,trail:[...navigationTrail],inApp:true},'',`#${view}`);
   if(libraryPack){
     $(libraryPack.library+'-pack-heading').textContent=PACK_TITLES[libraryPack.pack];
-    if(libraryPack.library==='lore'){currentItemPack=libraryPack.pack;renderItems();}
-    window.dispatchEvent(new CustomEvent('holen:library-pack',{detail:libraryPack}));
+
   }
   $('page-back-strip').hidden=view==='home';
   closeMenu();
   if(view==='sheet' && !$('sheet-frame').getAttribute('src')) return navigate('squads');
-  window.dispatchEvent(new CustomEvent('holen-navigated',{detail:{view}}));
   window.scrollTo({top:0,behavior:'instant'});
+  const root=document.querySelector('.view.active'),finish=window.HOLEN_FEATURES.loading(root,view);
+  try{await window.HOLEN_FEATURES.forView(view);finish();}catch(error){finish(error);return;}
+  if(token!==navigationEpoch)return;
+  if(view==='squads')renderSquads();
+  if(view==='rules'){initRuleFilters();renderRules();}
+  if(['classes','races'].includes(view)){initCatalogState();renderCatalog(view);}
+  if(libraryPack){
+    if(libraryPack.library==='lore'){currentItemPack=libraryPack.pack;initItemFilters();renderItems();}
+    window.dispatchEvent(new CustomEvent('holen:library-pack',{detail:libraryPack}));
+  }
+  window.dispatchEvent(new CustomEvent('holen-navigated',{detail:{view}}));
 }
 
 // Кнопка «Назад» повторяет браузерную историю; при прямом открытии страницы — главная.
@@ -86,7 +96,7 @@ let squadFilter='all';
 let sheetOrigin='squads';
 function renderSquads() {
   const query=$('squad-search').value.toLocaleLowerCase('ru').trim();
-  const list=DATA.squads.filter(s=>(squadFilter==='all'||s.colony===squadFilter) && `${s.name} ${s.role} ${s.short}`.toLocaleLowerCase('ru').includes(query));
+  const list=window.ANT_DATA.squads.filter(s=>(squadFilter==='all'||s.colony===squadFilter) && `${s.name} ${s.role} ${s.short}`.toLocaleLowerCase('ru').includes(query));
   $('squad-grid').innerHTML=list.map(s=>`
     <article class="squad-card">
       <div class="card-top"><span class="squad-symbol ${s.colony==='green'?'green':''}" aria-hidden="true">${escapeHtml(s.icon)}</span><span class="colony-label ${s.colony==='green'?'green':''}">${escapeHtml(COLONY_LABEL[s.colony])}</span></div>
@@ -99,7 +109,7 @@ function renderSquads() {
 }
 function openSheet(id) {
   sheetOrigin=currentView || 'squads'; // Откуда открыли: каталог пака или общий каталог классов
-  const sheet=DATA.squads.find(s=>s.id===id);
+  const sheet=window.ANT_DATA.squads.find(s=>s.id===id);
   if(!sheet) return;
   const address=`sheets/${sheet.id}.html`;
   $('sheet-heading').textContent=sheet.name;
@@ -110,23 +120,22 @@ function openSheet(id) {
 }
 
 // 04. БИБЛИОТЕКА ПРАВИЛ: один пакет — свой справочник.
-// Важно: глобальный DATA.rules предназначен только для «Муравьиной революции».
+// Важно: глобальный window.ANT_DATA.rules предназначен только для «Муравьиной революции».
 let currentRulesPack='journeys';
 const RULEPACKS={
   journeys:{title:'Путешествия Холэна',description:'Книга «Великий пакт», редакция 1.7. D&D 5e (2014) с законами и лицензиями Холэна; доступна полная версия исходного документа.'},
   insects:{title:'Муравьиная революция',description:'Утверждённые общие правила отрядного варгейма: один жетон, потери, отдых и резервы. Не путать с обычной D&D.'}
 };
-function openRules(pack, {focusBook=false}={}) {
+async function openRules(pack, {focusBook=false}={}) {
   currentRulesPack=RULEPACKS[pack]?pack:'journeys';
-  renderRules();
-  navigate('rules');
-  if (focusBook) {
+  await navigate('rules');
+  if (currentView==='rules' && focusBook) {
     // Не открываем несуществующий файл, а переводим к месту будущей книги.
     $('player-book').scrollIntoView({behavior:'smooth',block:'center'});
   }
 }
 function renderRules() {
-  const source=currentRulesPack==='insects'?DATA.rules:window.HOLEN_RULES_DATA.journeys;
+  const source=currentRulesPack==='insects'?window.ANT_DATA.rules:window.HOLEN_RULES_DATA.journeys;
   $('rules-container').innerHTML = source.map((rule,i)=>`
     <details class="rule-block" ${i===0?'open':''}>
       <summary>${String(i+1).padStart(2,'0')} · ${escapeHtml(rule.title)}</summary>
@@ -238,13 +247,17 @@ function renderItems() {
   if(all.length&&!list.length) $('item-list').innerHTML='<p class="muted">Нет предметов по выбранным условиям.</p>';
   if(list.length>60) $('item-list').insertAdjacentHTML('beforeend',`<p class="tiny-note">Показаны первые 60 из ${list.length}.</p>`);
 }
-function initLibraryFilters(){
+let ruleFiltersReady=false,itemFiltersReady=false;
+function initRuleFilters(){
+  if(ruleFiltersReady)return;ruleFiltersReady=true;
   mountFacetControls('spell-filter-groups',SPELL_FACETS,SPELL_FILTERS,window.HOLEN_RULES_DATA.spells,renderSpells);
+  $('spell-clear').addEventListener('click',()=>{$('spell-search').value='';resetFacets(SPELL_FILTERS,'spell-filter-groups',renderSpells);});
+}
+function initItemFilters(){
+  if(itemFiltersReady)return;itemFiltersReady=true;
   mountFacetControls('item-filter-groups',ITEM_FACETS,ITEM_FILTERS,window.HOLEN_ITEMS||[],renderItems);
-  $('spell-clear').addEventListener('click',()=>{ $('spell-search').value='';resetFacets(SPELL_FILTERS,'spell-filter-groups',renderSpells); });
-  $('item-clear').addEventListener('click',()=>{ $('item-search').value='';resetFacets(ITEM_FILTERS,'item-filter-groups',renderItems); });
+  $('item-clear').addEventListener('click',()=>{$('item-search').value='';resetFacets(ITEM_FILTERS,'item-filter-groups',renderItems);});
   $('item-search').addEventListener('input',renderItems);
-  renderSpells();renderItems();
 }
 
 // 05. КОМНАТЫ И ПАНЕЛЬ ГМа — см. room-engine.js и room-ui.js.
@@ -253,13 +266,13 @@ function initLibraryFilters(){
 // 06. КЛАССЫ И РАСЫ: ИСТОЧНИКИ, КАТАЛОГ, ИКОНКИ
 // Данные лежат в catalog-data.js: здесь только логика отображения.
 // ================================================================
-const CATALOG = window.HOLEN_CATALOG;
 const catalogState = {
   classes:{category:'official', source:'dnd2014'},
   races:{category:'official', source:'dnd2014'}
 };
 const requestedSource=new URLSearchParams(location.search).get('source');
-for(const type of ['classes','races'])if(CATALOG[type].official.some(x=>x.id===requestedSource))catalogState[type].source=requestedSource;
+let catalogStateReady=false;
+function initCatalogState(){if(catalogStateReady)return;catalogStateReady=true;for(const type of ['classes','races'])if(window.HOLEN_CATALOG[type].official.some(x=>x.id===requestedSource))catalogState[type].source=requestedSource;}
 const SOURCE_ICONS = {
   book:'<path d="M12 7c-3.6-2-6.6-2.4-9-1v13c2.4-1.4 5.4-1 9 1 3.6-2 6.6-2.4 9-1V6c-2.4-1.4-5.4-1-9 1Z"/><path d="M12 7v13"/>',
   bug:'<path d="M8 6c0-2 1.5-3 4-3s4 1 4 3M8 10c0-2.5 1.5-4 4-4s4 1.5 4 4v4c0 3-1.5 5-4 5s-4-2-4-5v-4Z"/><path d="M12 6v13M8 10 4 8M16 10l4-2M8 14l-4 2M16 14l4 2M8 17l-3 4M16 17l3 4"/>'
@@ -271,13 +284,12 @@ function showCatalog(type, category='homebrew') {
   const state=catalogState[type];
   if(!state) return;
   state.category=category;
-  state.source=CATALOG[type][category][0]?.id||null;
-  renderCatalog(type);
+  state.source=null;
   navigate(type);
 }
 function renderCatalog(type) {
   const state=catalogState[type];
-  const sources=CATALOG[type][state.category];
+  const sources=window.HOLEN_CATALOG[type][state.category];
   if(!sources.some(x=>x.id===state.source)) state.source=sources[0]?.id||null;
   document.querySelectorAll(`[data-kind="${type}"][data-category]`).forEach(btn=>{
     const active=btn.dataset.category===state.category;
@@ -295,7 +307,7 @@ function renderCatalog(type) {
   if(!selected) {results.innerHTML='';return;}
   let items=[];
   if(selected.squadIds) {
-    items=selected.squadIds.map(id=>DATA.squads.find(s=>s.id===id)).filter(Boolean).map(s=>`
+    items=selected.squadIds.map(id=>window.ANT_DATA.squads.find(s=>s.id===id)).filter(Boolean).map(s=>`
       <article class="catalog-item sheet-list-item"><span class="catalog-item-symbol" aria-hidden="true">${escapeHtml(s.icon)}</span><div class="catalog-item-content"><strong>${escapeHtml(s.name)}</strong><small>${escapeHtml(s.role)} · ${escapeHtml(COLONY_LABEL[s.colony])}</small></div><button type="button" class="catalog-action" data-sheet="${escapeHtml(s.id)}">Лист ↗</button></article>`);
   } else {
     items=selected.items.map(item=>{
@@ -354,7 +366,7 @@ $('spell-search').addEventListener('input',renderSpells);
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
 document.querySelectorAll('[data-pack]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.pack)));
 document.querySelectorAll('[data-show-catalog]').forEach(b=>b.addEventListener('click',()=>showCatalog(b.dataset.showCatalog,'homebrew')));
-document.querySelectorAll('[data-kind][data-category]').forEach(b=>b.addEventListener('click',()=>{const st=catalogState[b.dataset.kind];st.category=b.dataset.category;st.source=CATALOG[b.dataset.kind][st.category][0]?.id||null;renderCatalog(b.dataset.kind);}));
+document.querySelectorAll('[data-kind][data-category]').forEach(b=>b.addEventListener('click',()=>{const st=catalogState[b.dataset.kind];st.category=b.dataset.category;st.source=window.HOLEN_CATALOG[b.dataset.kind][st.category][0]?.id||null;renderCatalog(b.dataset.kind);}));
 document.querySelectorAll('[data-view]').forEach(a=>a.addEventListener('click',(e)=>{e.preventDefault();navigate(a.dataset.view);}));
 $('squad-search').addEventListener('input',renderSquads);
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
@@ -370,7 +382,7 @@ window.addEventListener('popstate',()=>navigate(window.location.hash.slice(1),{p
 // popstate covers browser back and forward without duplicate handlers
 
 // 07. ЗАПУСК
-renderSquads();initLibraryFilters();renderRules();renderCatalog('classes');renderCatalog('races');initProfile();
+initProfile();
 navigate(window.location.hash.slice(1)||'home',{push:false});
 // Начальная точка локальной навигации, не уводящая «Назад» в чужую вкладку.
 if(!history.state?.inApp) history.replaceState({view:currentView,from:null,inApp:true},'',window.location.href);

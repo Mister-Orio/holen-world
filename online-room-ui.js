@@ -167,6 +167,7 @@ async function ownRooms(){
  rooms=Array.isArray(v)?v:[];
 }
 async function refresh(force=false){
+ if(!['#rooms','#gm'].includes(location.hash))return;
  if(loading||!auth.isAuthenticated()){if(!auth.isAuthenticated()){snapshot=null;rooms=[];paint();}return;}
  if(!force&&document.hidden)return;
  loading=true;
@@ -297,5 +298,6 @@ document.addEventListener('click',event=>{
 window.addEventListener('holen-auth-changed',()=>{if(!auth.isAuthenticated()){snapshot=null;rooms=[];setRoom(null);}refresh(true);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastSnapshot>4000)refresh(true);});
 setInterval(()=>{if(auth.isAuthenticated()&&activeId&&(location.hash==='#rooms'||location.hash==='#gm'))refresh();},6000);
-paint();if(auth.isAuthenticated())refresh(true);
+window.addEventListener('holen-navigated',e=>{if(['rooms','gm'].includes(e.detail?.view))refresh(true);});
+paint();
 })();

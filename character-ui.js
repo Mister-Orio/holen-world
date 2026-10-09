@@ -58,6 +58,7 @@ function render(){
 }
 async function refresh(){
  const current=++version;
+ if(!document.getElementById('view-profile').classList.contains('active')){if(!auth.isAuthenticated())chars=[];return;}
  if(!auth.isAuthenticated()){chars=[];render();return;}
  list.innerHTML='<p class="room-empty">Загружаем персонажей…</p>';
  try{
@@ -115,5 +116,6 @@ form.addEventListener('submit',async event=>{
 });
 $('character-refresh').addEventListener('click',refresh);
 addEventListener('holen-auth-changed',()=>{resetEditors();expandedId=null;refresh();});
-templates();refresh();
+window.addEventListener('holen-navigated',e=>{if(e.detail?.view==='profile')refresh();});
+templates();
 })();

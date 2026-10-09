@@ -207,5 +207,5 @@ window.addEventListener('holen-auth-changed',()=>{
  load();
 });
 window.addEventListener('holen-navigated',e=>{if(e.detail?.view==='dnd-sheet'&&characterId&&loadedId!==characterId)load();});
-restoreDraft();draw();load();
+restoreDraft();draw();
 })();

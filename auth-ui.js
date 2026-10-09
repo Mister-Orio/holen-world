@@ -44,6 +44,7 @@ async function loadProfile(){
 }
 function renderSession(data){
  authenticated=!!data;
+ window.__holen_current_user_id=data?.user?.id||null;
  const note=$('auth-session'),profile=$('profile-auth-info'),top=$('top-auth-open');
  $('auth-form').hidden=authenticated && mode!=='reset';
  $('auth-bottom-meta')?.classList?.toggle('is-signed-in',authenticated);
@@ -192,5 +193,11 @@ async function createCharacter(nameValue,packKey,templateId){
  await request('/rest/v1/characters',{method:'POST',token,body:{name:title,pack_key:pack,sheet_data:t?{templateId:t.id}:{} }});
  return true;
 }
-window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,isAuthenticated:()=>authenticated};
+async function authorizedApi(endpoint,options={}){
+ const token=await validSession();
+ if(!token)throw Error('Сначала войдите в аккаунт.');
+ return request(endpoint,{...options,token});
+}
+window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,
+ isAuthenticated:()=>authenticated,currentUserId:()=>window.__holen_current_user_id||null,api:authorizedApi};
 })();

@@ -10,8 +10,8 @@
 
 const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
+const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
+const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',backgrounds:'Предыстории',feats:'Черты',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
 const LIBRARY_PACK_VIEWS={
  'bestiary-journeys':{library:'bestiary',pack:'journeys'},
  'bestiary-insects':{library:'bestiary',pack:'insects'},
@@ -46,6 +46,7 @@ function navigate(name, {push=true}={}) {
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
   const libraryPack=LIBRARY_PACK_VIEWS[view];
+  if(view!=='dnd-sheet')document.body.classList.remove('dnd-focus-mode');
   if(!['rooms','gm'].includes(view))document.body.classList.remove('room-focus-mode');
   currentView=view;
   if(view==='home')navigationTrail=['home'];

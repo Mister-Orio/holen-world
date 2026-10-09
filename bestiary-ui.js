@@ -1,53 +1,18 @@
-/* Мир Холэна: компактная галерея бестиария. Полный лист — отдельная страница. */
-(()=>{
-'use strict';
-const root=document.getElementById('bestiary-app');
-if(!root)return;
-const monsters=window.HOLEN_BESTIARY||[];
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-const factions={red:'Красная колония',fungal:'Независимый кордицепс',neutral:'Нейтральные'};
-let pack=location.hash==='#bestiary-journeys'?'journeys':'insects';
-const types=new Set(['ant','infected-ant','beetle','worm']);
-const context=new URLSearchParams(location.search);
-let keyword=(context.get('q')||'').toLocaleLowerCase('ru').trimStart();
-let faction=['red','fungal','neutral'].includes(context.get('faction'))?context.get('faction'):'all';
-function card(x){
- const query=new URLSearchParams({id:x.id});
- if(keyword)query.set('q',keyword);
- if(faction!=='all')query.set('faction',faction);
- const url=esc('creature.html?'+query.toString());
- const type=types.has(x.visual_type)?x.visual_type:'ant';
- const icon='<svg class="best-type-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="assets/bestiary/types.svg?v=0113#'+type+'"></use></svg>';
- return '<a class="library-cover-tile best-tile best-tile-'+esc(x.faction)+'" href="'+url+'" aria-label="Открыть лист: '+esc(x.name)+'">'+
-  '<span class="library-cover-image best-tile-image">'+icon+'</span>'+
-  '<span class="library-cover-title best-tile-name">'+esc(x.name)+'</span></a>';
-}
-function render(){
- const packMonsters=monsters.filter(x=>x.pack_key===pack);
- const results=packMonsters.filter(x=>(faction==='all'||x.faction===faction)&&
- (x.name+' '+x.role+' '+x.description+' '+(factions[x.faction]||'')).toLocaleLowerCase('ru').includes(keyword));
- const searchFocus=document.activeElement?.id==='best-search';
- const position=searchFocus?document.activeElement.selectionStart:0;
- root.innerHTML='<div class="bestiary-toolbar"><label for="best-search">Поиск по существам<input id="best-search" type="search" autocomplete="off" value="'+esc(keyword)+'" placeholder="Название, фракция или роль…"></label>'+
- '<label for="best-faction">Фракция<select id="best-faction"><option value="all">Все фракции</option>'+
- '<option value="red" '+(faction==='red'?'selected':'')+'>Красная колония</option>'+
- '<option value="fungal" '+(faction==='fungal'?'selected':'')+'>Независимый кордицепс</option>'+
- '<option value="neutral" '+(faction==='neutral'?'selected':'')+'>Нейтральные</option></select></label>'+
- '<span class="best-count" role="status">Существ: '+results.length+' из '+packMonsters.length+'</span></div>'+
- '<div class="library-cover-grid bestiary-compact-grid">'+results.map(card).join('')+'</div>'+
- (results.length?'':'<p class="room-empty">'+(packMonsters.length?'По запросу ничего не найдено.':'Существа этого пака ещё не добавлены.')+'</p>');
- if(searchFocus){const field=root.querySelector('#best-search');field?.focus();field?.setSelectionRange(position,position);}
-}
-root.addEventListener('input',e=>{
- if(e.target?.id==='best-search'){keyword=e.target.value.toLocaleLowerCase('ru').trimStart();render();}
-});
-root.addEventListener('change',e=>{
- if(e.target?.id==='best-faction'){faction=e.target.value;render();}
-});
-window.addEventListener('holen:library-pack',e=>{
- if(e.detail?.library!=='bestiary')return;
- if(pack!==e.detail.pack){pack=e.detail.pack;keyword='';faction='all';}
- render();
-});
-render();
-})();
+(()=>{'use strict';const root=document.getElementById('bestiary-app');if(!root)return;
+const s=window.HOLEN_SRD,esc=s.esc,ants=window.HOLEN_BESTIARY||[],params=new URLSearchParams(location.search),factions={red:'Красная колония',fungal:'Независимый кордицепс',neutral:'Нейтральные'};
+let pack=location.hash==='#bestiary-journeys'?'journeys':'insects',f=s.filters(params),faction=['red','fungal','neutral'].includes(params.get('faction'))?params.get('faction'):'all',loaded=[],epoch=0,page=1;const pageSize=60;
+function select(id,label,rows,value){return '<label for="'+id+'">'+label+'<select id="'+id+'">'+rows.map(([k,n])=>'<option value="'+esc(k)+'" '+(k===value?'selected':'')+'>'+esc(n)+'</option>').join('')+'</select></label>';}
+function remember(){const q=pack==='journeys'?s.query(f):new URLSearchParams();if(pack==='insects'){if(f.q)q.set('q',f.q);if(faction!=='all')q.set('faction',faction);}const current=new URL(location.href);for(const k of ['q','edition','cr','size','type','faction'])current.searchParams.delete(k);q.forEach((v,k)=>current.searchParams.set(k,v));history.replaceState(history.state,'',current.pathname+(current.searchParams.size?'?'+current.searchParams:'')+current.hash);}
+function render(){const isDnd=pack==='journeys',pool=isDnd?loaded:ants.filter(x=>x.pack_key===pack),results=isDnd?s.filter(pool,f):pool.filter(x=>(faction==='all'||x.faction===faction)&&(x.name+' '+x.role+' '+x.description+' '+(factions[x.faction]||'')).toLocaleLowerCase('ru').includes(f.q)),active=document.activeElement?.id,pos=active==='best-search'?document.activeElement.selectionStart:0;
+const n=v=>v.includes('/')?Number(v.split('/')[0])/Number(v.split('/')[1]):Number(v);
+const controls=isDnd?select('best-edition','Редакция',[['2014','D&D 2014 · SRD 5.1'],['2024','D&D 2024 · SRD 5.2.1']],f.edition)+select('best-cr','Опасность (CR)',[['all','Любая опасность'],...Array.from(new Set(pool.map(x=>x.cr))).sort((a,b)=>n(a)-n(b)).map(x=>[x,x])],f.cr)+select('best-size','Размер',[['all','Любой размер'],...Object.entries(s.sizes)],f.size)+select('best-type','Тип существа',[['all','Любой тип'],...Object.entries(s.types)],f.type):select('best-faction','Фракция',[['all','Все фракции'],...Object.entries(factions)],faction);
+page=Math.min(page,Math.max(1,Math.ceil(results.length/pageSize)));
+root.innerHTML=(isDnd?'<p class="srd-note">Открытый бестиарий SRD: 317 существ 2014 года и 330 — 2024 года. Показатели редакций хранятся отдельно. Полные блоки характеристик — на языке оригинала.</p>':'')+'<div class="bestiary-toolbar '+(isDnd?'srd-toolbar':'')+'"><label for="best-search">Поиск по существам<input id="best-search" type="search" autocomplete="off" value="'+esc(f.q)+'" placeholder="'+(isDnd?'Русское или английское название…':'Название, фракция или роль…')+'"></label>'+controls+'<span class="best-count" role="status">Существ: '+results.length+' из '+pool.length+'</span></div><div class="library-cover-grid bestiary-compact-grid">'+results.slice((page-1)*pageSize,page*pageSize).map(x=>{
+const q=isDnd?s.query(f):new URLSearchParams();q.set('id',x.id);if(!isDnd){if(f.q)q.set('q',f.q);if(faction!=='all')q.set('faction',faction);}const name=isDnd?x.name_ru:x.name,icon=isDnd?s.icon(x.type):'<svg class="best-type-icon" viewBox="0 0 64 64" aria-hidden="true"><use href="assets/bestiary/types.svg?v=0113#'+esc(x.visual_type||'ant')+'"></use></svg>';
+return '<a class="library-cover-tile best-tile '+(isDnd?'srd-tile':'best-tile-'+esc(x.faction))+'" href="'+esc('creature.html?'+q)+'"><span class="library-cover-image best-tile-image">'+icon+'</span><span class="library-cover-title best-tile-name">'+esc(name)+'</span>'+(isDnd?'<small>CR '+esc(x.cr)+' · '+esc(s.sizes[x.size]||x.size)+'</small>':'')+'</a>';}).join('')+'</div>'+(results.length?'':'<p class="room-empty">По запросу ничего не найдено.</p>')+(results.length>pageSize?'<nav class="srd-pagination" aria-label="Страницы каталога"><button class="btn subtle" data-best-page="-1" '+(page===1?'disabled':'')+'>← Назад</button><span>'+page+' / '+Math.ceil(results.length/pageSize)+'</span><button class="btn subtle" data-best-page="1" '+(page*pageSize>=results.length?'disabled':'')+'>Вперёд →</button></nav>':'')+(isDnd?s.attribution():'');
+if(active==='best-search'){const e=root.querySelector('#best-search');e.focus();e.setSelectionRange(pos,pos);}}
+async function refresh(){const token=++epoch;if(pack!=='journeys'){render();return;}root.innerHTML='<p class="room-empty">Загружаем бестиарий D&D '+f.edition+'…</p>';try{const data=await s.load(f.edition);if(token!==epoch)return;loaded=data;render();}catch(e){if(token!==epoch)return;root.innerHTML='<p class="room-empty">Не удалось загрузить каталог. <button class="btn subtle" data-best-retry>Повторить</button></p>';}}
+root.addEventListener('input',e=>{if(e.target.id==='best-search'){f.q=e.target.value.toLocaleLowerCase('ru').trimStart();page=1;remember();render();}});
+root.addEventListener('change',e=>{const keys={'best-edition':'edition','best-cr':'cr','best-size':'size','best-type':'type'};if(e.target.id==='best-faction'){faction=e.target.value;page=1;remember();render();}else if(keys[e.target.id]){f[keys[e.target.id]]=e.target.value;page=1;if(e.target.id==='best-edition')f.cr=f.size=f.type='all';remember();e.target.id==='best-edition'?refresh():render();}});
+root.addEventListener('click',e=>{const btn=e.target.closest('[data-best-page]');if(btn){page+=Number(btn.dataset.bestPage);render();root.scrollIntoView({block:'start'});}if(e.target.closest('[data-best-retry]'))refresh();});
+window.addEventListener('holen:library-pack',e=>{if(e.detail?.library!=='bestiary')return;const changed=pack!==e.detail.pack;pack=e.detail.pack;if(changed){f={edition:f.edition,q:'',cr:'all',size:'all',type:'all'};faction='all';page=1;remember();}refresh();});refresh();})();

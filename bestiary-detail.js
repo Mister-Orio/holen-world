@@ -9,6 +9,7 @@ const icon={'red-infantry':'♟','cordyceps':'☣','red-titan':'⬢','bombardier
 const factionNames={red:'Красная колония',fungal:'Независимая грибная угроза',neutral:'Нейтральные'};
 const context=new URLSearchParams(location.search);
 const id=context.get('id')||'';
+if(/^dnd-(2014|2024)-/.test(id))return;
 const creature=list.find(m=>m.id===id);
 const pack=creature?.pack_key==='journeys'?'journeys':'insects';
 const packList=list.filter(x=>x.pack_key===pack);

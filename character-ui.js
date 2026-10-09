@@ -104,6 +104,7 @@ pack.addEventListener('change',templates);
 form.addEventListener('submit',async event=>{
  event.preventDefault();
  if(mutating)return;
+ if(pack.value==='journeys'){const q=new URLSearchParams({name:$('character-name').value.trim()||'Новый персонаж'});location.href='index.html?'+q+'#dnd-sheet';return;}
  const btn=$('character-create-btn');mutating=true;btn.disabled=true;say('Сохраняем персонажа…');
  try{
    await auth.createCharacter($('character-name').value,pack.value,template.value);

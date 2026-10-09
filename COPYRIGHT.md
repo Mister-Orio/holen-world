@@ -21,3 +21,11 @@
 ---
 
 Этот файл является уведомлением об авторских правах и **не является открытой лицензией**.
+
+## Материалы SRD в выпуске 0.11.7
+
+This work includes material from the System Reference Document 5.1 and System Reference Document 5.2.1, authored by Wizards of the Coast LLC and available at [D&D Beyond](https://www.dndbeyond.com/srd). These documents are licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode).
+
+The English monster stat blocks and spell metadata in this project derive from those SRDs. Russian display labels, selection, extraction and formatting were added by Мир Холэна. The project's reservation of rights does not remove the CC BY 4.0 permissions for this material. The corresponding original PDFs are linked from each record.
+
+Тексты коммерческих книг и полный перевод dnd.su не включены. Названия и краткие собственные справки по опциям PHB сопровождаются ссылками на первоисточник. Арты авторских муравьёв не являются иллюстрациями из книг D&D.

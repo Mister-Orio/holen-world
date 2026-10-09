@@ -8,6 +8,7 @@
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
 <link href="styles.css?v=0116" rel="stylesheet"/>
+<link href="dnd-builder.css?v=0117" rel="stylesheet"/><link href="dnd-library.css?v=0117" rel="stylesheet"/>
 </head>
 <body>
 <!-- ШАБЛОН ПЛАТФОРМЫ — навигация общая для всех разделов -->
@@ -20,6 +21,8 @@
 <a class="nav-link" data-view="bestiary" href="#bestiary"><span class="nav-icon">◈</span> Бестиарий</a>
 <a class="nav-link" data-view="lore" href="#lore"><span class="nav-icon">◇</span> Предметы Холэна</a>
 <a class="nav-link" data-view="rules" href="#rules"><span class="nav-icon">≡</span> Правила</a>
+<a class="nav-link" data-view="backgrounds" href="#backgrounds"><span class="nav-icon">▤</span> Предыстории</a>
+<a class="nav-link" data-view="feats" href="#feats"><span class="nav-icon">✦</span> Черты</a>
 <a class="nav-link" data-view="profile" href="#profile"><span class="nav-icon">◉</span> Профиль</a></nav>
 <p class="sidebar-caption">ИГРА</p>
 <nav class="side-nav">
@@ -35,7 +38,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.6</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.7</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -170,6 +173,8 @@
 <div class="sheet-note"><span class="connection-dot"></span> Пока это оригинальный HTML внутри платформы. Локальные сохранения остаются в его собственном листе; сетевой синхронизации ещё нет.</div>
 <iframe class="sheet-frame" id="sheet-frame" loading="lazy" title="Интерактивный лист отряда"></iframe>
 </section>
+<section class="view" id="view-backgrounds" aria-labelledby="backgrounds-heading"><div class="page-heading"><span class="eyebrow">СПРАВОЧНИК / D&amp;D</span><h1 id="backgrounds-heading">Предыстории</h1><p>Прошлое персонажа, навыки и происхождение.</p></div><div id="dnd-backgrounds-root"></div></section>
+<section class="view" id="view-feats" aria-labelledby="feats-heading"><div class="page-heading"><span class="eyebrow">СПРАВОЧНИК / D&amp;D</span><h1 id="feats-heading">Черты</h1><p>Выбери редакцию и найди черту для своего персонажа.</p></div><div id="dnd-feats-root"></div></section>
 <section class="view" id="view-dnd-sheet" aria-labelledby="dnd-sheet-heading"><div class="page-heading"><span class="eyebrow">ПУТЕШЕСТВИЯ ХОЛЭНА / D&amp;D</span><h1 id="dnd-sheet-heading">Лист персонажа</h1><p>Выбери редакцию, класс и происхождение. Все поля листа можно заполнить и сохранить в профиле.</p></div><div id="dnd-sheet-root"></div></section>
 <section aria-labelledby="bestiary-heading" class="view" id="view-bestiary">
 <div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ИГРОВЫЕ ПАКИ</span><h1 id="bestiary-heading">Бестиарий Холэна</h1><p>Выбери игровой пак, чтобы открыть его каталог.</p></div>
@@ -243,11 +248,11 @@
   
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.6</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.7</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="dnd-data.js?v=0116"></script><script src="squad-abilities.js?v=0116"></script><script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0115"></script>
-<script src="catalog-data.js?v=0116"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0116"></script><script src="bestiary-ui.js?v=0115"></script><script src="auth-ui.js?v=0116"></script><script src="character-ui.js?v=0116"></script><script src="dnd-sheet-ui.js?v=0116"></script><script src="online-room-ui.js?v=0116"></script>
+<script src="dnd-data.js?v=0117"></script><script src="dnd-options-data.js?v=0117"></script><script src="bestiary-srd.js?v=0117"></script><script src="squad-abilities.js?v=0116"></script><script src="data.js?v=0110"></script><script src="bestiary-data.js?v=0115"></script>
+<script src="catalog-data.js?v=0116"></script><script src="holen-rules-data.js?v=0110"></script><script src="items-data.js?v=0110"></script><script src="app.js?v=0117"></script><script src="bestiary-ui.js?v=0117"></script><script src="dnd-options-ui.js?v=0117"></script><script src="auth-ui.js?v=0116"></script><script src="character-ui.js?v=0117"></script><script src="dnd-sheet-ui.js?v=0117"></script><script src="online-room-ui.js?v=0116"></script>
 </body>
 </html>

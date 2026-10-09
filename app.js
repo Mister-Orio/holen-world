@@ -11,7 +11,7 @@
 const DATA = window.ANT_DATA;
 const $ = id => document.getElementById(id);
 const VIEWS = ['home','journeys','insects','classes','races','profile','auth','squads','sheet','bestiary','rules','lore','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Специализации',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Мир Холэна',rooms:'Комнаты',gm:'Панель ГМа'};
+const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда',bestiary:'Бестиарий',rules:'Правила',lore:'Мир Холэна',rooms:'Комнаты',gm:'Панель ГМа'};
 const COLONY_LABEL = {black:'Чёрная колония',green:'Зелёная колония'};
 
 // В интерфейс нельзя подставлять сырой текст пользователя через innerHTML.
@@ -22,6 +22,14 @@ function escapeHtml(value) {
 
 // 02. НАВИГАЦИЯ
 let currentView = 'home';
+let navigationTrail=['home'];
+const TRAILS={home:['home'],squads:['home','insects','squads'],sheet:['home','insects','squads','sheet'],insects:['home','insects'],journeys:['home','journeys']};
+function updateBreadcrumb(){
+ const el=$('breadcrumbs');if(!el)return;
+ const names=['ХОЛЭН',...navigationTrail.map(v=>BREADCRUMBS[v]||v)];
+ el.innerHTML='<button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button>'+
+ navigationTrail.map((v,i)=>'<span class="crumb-sep">/</span><button type="button" class="crumb-link '+(i===navigationTrail.length-1?'crumb-current':'')+'" data-crumb="'+escapeHtml(v)+'">'+escapeHtml(BREADCRUMBS[v]||v)+'</button>').join('');
+}
 function closeMenu() {
   $('sidebar').classList.remove('open');
   $('mobile-scrim').hidden = true;
@@ -31,10 +39,18 @@ function navigate(name, {push=true}={}) {
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
   currentView=view;
+  if(view==='home')navigationTrail=['home'];
+  else if(history.state?.trail && !push && history.state.view===view)navigationTrail=history.state.trail;
+  else if(navigationTrail.includes(view))navigationTrail=navigationTrail.slice(0,navigationTrail.indexOf(view)+1);
+  else if(view==='squads')navigationTrail=['home','insects','squads'];
+  else if(view==='sheet')navigationTrail=[...navigationTrail.filter(v=>v!=='sheet'),'sheet'];
+  else if((previous==='insects'||previous==='journeys') && !['rooms','gm','profile','auth'].includes(view))
+    navigationTrail=['home',previous,view];
+  else navigationTrail=['home',view];
+  updateBreadcrumb();
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${view}`));
   document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.getAttribute('data-view') === view));
-  $('breadcrumb-title').textContent = BREADCRUMBS[view];
-  if(push && window.location.hash !== `#${view}`) history.pushState({view,from:previous,inApp:true},'',`#${view}`);
+  if(push && window.location.hash !== `#${view}`) history.pushState({view,from:previous,trail:[...navigationTrail],inApp:true},'',`#${view}`);
   $('page-back-strip').hidden=view==='home';
   closeMenu();
   if(view==='sheet' && !$('sheet-frame').getAttribute('src')) return navigate('squads');
@@ -291,6 +307,21 @@ function initProfile() {
 }
 
 // 06. ПОДКЛЮЧЕНИЕ КНОПОК. Код остаётся без библиотек и работает офлайн.
+// Навигация по хлебным крошкам, возврат домой и сворачивание панели.
+$('page-home').addEventListener('click',()=>navigate('home'));
+$('breadcrumbs').addEventListener('click',event=>{
+ const t=event.target.closest('[data-crumb]');
+ if(t)navigate(t.dataset.crumb);
+});
+const SIDEBAR_PREF='holen-sidebar-hidden-v1';
+function setSidebarHidden(hidden){
+ document.body.classList.toggle('sidebar-collapsed',!!hidden);
+ $('sidebar-toggle').setAttribute('aria-expanded',String(!hidden));
+ $('sidebar-toggle').setAttribute('aria-label',hidden?'Показать боковую панель':'Скрыть боковую панель');
+ try{localStorage.setItem(SIDEBAR_PREF,hidden?'1':'0');}catch(_){}
+}
+try{setSidebarHidden(localStorage.getItem(SIDEBAR_PREF)==='1');}catch(_){setSidebarHidden(false);}
+$('sidebar-toggle').addEventListener('click',()=>setSidebarHidden(!document.body.classList.contains('sidebar-collapsed')));
 $('page-back').addEventListener('click',goBack);
 $('sheet-back').addEventListener('click',goBack);
 document.querySelectorAll('[data-select-rules]').forEach(b=>b.addEventListener('click',()=>{currentRulesPack=b.dataset.selectRules;renderRules();}));

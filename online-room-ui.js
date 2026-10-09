@@ -10,14 +10,14 @@ if(!root||!gmRoot||!auth)return;
 const key='holen_online_active_room_v10';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-let activeId=null, snapshot=null, rooms=[], characters=[], status='', busy=false, loading=false,lastSnapshot=0,err='';
+let activeId=null, snapshot=null, rooms=[], characters=[], charactersLoadedFor=null, status='', busy=false, loading=false,lastSnapshot=0,err='';
 try{activeId=sessionStorage.getItem(key)||null;}catch(_){}
 function notice(t,isError=false){status=t;err=isError?'is-error':'';const n=$('online-status');if(n){n.textContent=t;n.className='online-status '+err;}}
 const api=(path,opts)=>auth.api(path,opts);
 async function rpc(name,args){return api('/rest/v1/rpc/'+name,{method:'POST',body:args});}
 function currentMember(){return snapshot?.members?.find(m=>m.user_id===auth.currentUserId())||null;}
 function setRoom(id){
- activeId=id; snapshot=null;characters=[];
+ activeId=id; snapshot=null;characters=[];charactersLoadedFor=null;
  try{id?sessionStorage.setItem(key,id):sessionStorage.removeItem(key);}catch(_){}
 }
 function packLabel(p){return p==='insects'?'Муравьиная революция':'Путешествия Холэна';}
@@ -64,6 +64,7 @@ function roomView(){
     return t?'<button type="button" class="btn subtle" data-online-action="choose" data-id="'+esc(c.id)+'">'+esc(c.name)+' · '+esc(t.name)+'</button>':'';
    }).join('')+'</div>':'<p>Сначала создай персонажа в разделе «Мой профиль».</p>'):
    '<p>Онлайн-листы для «Путешествий Холэна» пока разрабатываются.</p>')+
+  '<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> '+
   '<button type="button" class="btn subtle" data-online-action="profile">Открыть профиль →</button></div>':'';
  return '<section class="panel online-session"><div class="room-dash-head"><div><span class="overline">ОНЛАЙН-КОМНАТА · АЛЬФА</span>'+
  '<h2>'+esc(room.name)+'</h2><p>'+esc(packLabel(room.pack_key))+'</p>'+
@@ -100,7 +101,7 @@ function gmView(){
 }
 function paint(){
  const focus=document.activeElement;
- if(root.contains(focus)&&['INPUT','SELECT','TEXTAREA'].includes(focus?.tagName))return;
+ if((root.contains(focus)||gmRoot.contains(focus))&&['INPUT','SELECT','TEXTAREA'].includes(focus?.tagName))return;
  root.innerHTML='<div class="online-status '+err+'" id="online-status" role="status" aria-live="polite">'+esc(status)+'</div>'+
  (activeId?roomView():lobby());
  gmRoot.innerHTML=gmView();
@@ -118,8 +119,9 @@ async function refresh(force=false){
   if(activeId){
    snapshot=await rpc('holen_room_snapshot',{p_room:activeId});
    if(!snapshot?.room)throw Error('Комната не найдена.');
-   if(snapshot.room.status==='active'&&currentMember()?.role==='player'&&!snapshot.units?.some(u=>u.owner_id===auth.currentUserId())){
+   if(snapshot.room.status==='active'&&currentMember()?.role==='player'&&!snapshot.units?.some(u=>u.owner_id===auth.currentUserId())&&charactersLoadedFor!==activeId){
     characters=await auth.listCharacters(snapshot.room.pack_key);
+    charactersLoadedFor=activeId;
    }
   }else await ownRooms();
   if(!status||err)notice('',false);
@@ -150,6 +152,7 @@ document.addEventListener('click',event=>{
  const a=b.dataset.onlineAction;
  if(a==='login'){auth.open('login');return;}
  if(a==='profile'){navigate('profile');return;}
+ if(a==='refresh-chars'){charactersLoadedFor=null;refresh(true);return;}
  if(a==='rooms'){navigate('rooms');return;}
  if(a==='gm'){navigate('gm');return;}
  if(a==='back'){setRoom(null);refresh(true);return;}
@@ -182,6 +185,6 @@ document.addEventListener('click',event=>{
 });
 window.addEventListener('holen-auth-changed',()=>{if(!auth.isAuthenticated()){snapshot=null;rooms=[];setRoom(null);}refresh(true);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastSnapshot>4000)refresh(true);});
-setInterval(()=>{if(auth.isAuthenticated()&&activeId)refresh();},6000);
+setInterval(()=>{if(auth.isAuthenticated()&&activeId&&(location.hash==='#rooms'||location.hash==='#gm'))refresh();},6000);
 paint();if(auth.isAuthenticated())refresh(true);
 })();

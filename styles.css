@@ -404,3 +404,13 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
 .auth-policy a{text-decoration:underline;color:#b9ffcf}
 .auth-policy[hidden]{display:none!important}
 @media(max-width:720px){.online-grid{grid-template-columns:1fr}.online-gm-card{padding:15px}.online-session{padding:15px}}
+
+/* Онлайн-команды игроков и подтверждения ведущего */
+.online-requests{display:grid;gap:10px;margin:12px 0 24px}
+.online-request{border:1px solid #58745d;background:#1d3627;border-radius:12px;padding:13px 16px}
+.online-request strong{display:block;font-size:13px;color:#d5f0db}
+.online-request small{display:block;color:#b6cfbd;font-size:12px;margin-top:6px}
+.online-request .online-inline{margin-top:12px}
+.online-player-actions{margin:18px 0}
+.online-player-actions input{display:block;width:min(100%,190px);background:#102119;border:1px solid #5e8067;color:#fff;border-radius:10px;padding:11px;margin:9px 0 15px}
+.online-player-actions .btn{margin:2px 0 13px}

@@ -12,13 +12,13 @@ const $=id=>document.getElementById(id);
 const form=$('auth-form'), name=$('auth-username'),email=$('auth-email'),pass=$('auth-password'),confirm=$('auth-confirm');
 const buttons={register:$('auth-register-btn'),login:$('auth-login-btn'),forgot:$('auth-forgot-btn')};
 const info=$('auth-response');
-let mode='register',session=null;
+let mode='register',session=null,authenticated=false;
 function feedback(t,err=false){info.textContent=t;info.hidden=false;info.className='auth-response'+(err?' is-error':'');}
 function clear(){info.hidden=true;info.textContent='';}
 function store(s){session=s;try{s?localStorage.setItem(STORE,JSON.stringify(s)):localStorage.removeItem(STORE);}catch(_){}}
 try{session=JSON.parse(localStorage.getItem(STORE)||'null');}catch(_){session=null;}
-async function request(endpoint,{method='GET',body,token}={}){
- const res=await fetch(PROJECT+endpoint,{method,headers:{'apikey':KEY,'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
+async function request(endpoint,{method='GET',body,token,headers={}}={}){
+ const res=await fetch(PROJECT+endpoint,{method,headers:{'apikey':KEY,'Content-Type':'application/json',...headers,...(token?{'Authorization':'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
  let data;try{data=await res.json();}catch(_){data={};}
  if(!res.ok)throw Error(data.msg||data.error_description||data.message||'Сервер отклонил запрос ('+res.status+').');
  return data;
@@ -43,24 +43,35 @@ async function loadProfile(){
  }catch(_){store(null);renderSession(null);}
 }
 function renderSession(data){
+ authenticated=!!data;
  const note=$('auth-session'),profile=$('profile-auth-info'),top=$('top-auth-open');
+ $('auth-form').hidden=authenticated && mode!=='reset';
+ $('auth-bottom-meta')?.classList?.toggle('is-signed-in',authenticated);
+ $('profile-auth-actions').hidden=authenticated;
+ $('profile-demo-card').hidden=authenticated;
+ $('profile-account-card').hidden=!authenticated;
+ $('auth-title').textContent=authenticated && mode!=='reset'?'Аккаунт активен':$('auth-title').textContent;
  if(data){
    const display=data.username;
    note.hidden=false;
    $('auth-session-name').textContent=display;
    $('auth-session-email').textContent=data.user.email||'';
-   profile.textContent='Вы вошли как '+display+'. Аккаунт хранится в Supabase; игровые комнаты пока работают локально.';
+   $('profile-account-name').textContent=display;
+   $('profile-account-email').textContent=data.user.email||'';
+   profile.textContent='Вы вошли как '+display+'. Ваши персонажи хранятся в Supabase; комнаты пока работают локально.';
    top.querySelector('span').textContent=display;
    $('profile-name').value=display;
+   $('auth-subtitle').textContent='Вы уже авторизованы. Перейдите в профиль для работы с персонажами.';
  }else{
-   note.hidden=true;profile.textContent='Пока не вошли. Создайте аккаунт или авторизуйтесь по почте.';
+   note.hidden=true;
+   profile.textContent='Чтобы сохранять персонажей, зарегистрируйтесь или войдите по почте.';
    top.querySelector('span').textContent='Войти';
  }
  window.dispatchEvent(new Event('holen-auth-changed'));
-
 }
 function selectMode(next){
  mode=next;clear();
+ $('auth-form').hidden=authenticated && next!=='reset';
  const reg=next==='register',login=next==='login',recover=next==='recover',reset=next==='reset';
  $('auth-title').textContent=reg?'Создать аккаунт':login?'Войти в Холэн':recover?'Восстановить пароль':'Новый пароль';
  $('auth-subtitle').textContent=reg?'Игровой ник, почта и пароль. Сначала подтвердите адрес электронной почты.':login?'Войдите с помощью электронной почты и пароля.':recover?'Отправим ссылку для восстановления, если этот адрес зарегистрирован.':'Введите новый пароль для своего аккаунта.';
@@ -101,11 +112,11 @@ async function submit(e){
      if(x.access_token)store({...x,expires_at:Date.now()+x.expires_in*1000});
      feedback('Если регистрация принята, проверьте почту и подтвердите адрес по ссылке. Без подтверждения вход может быть недоступен.');
      pass.value='';confirm.value='';
-     if(x.access_token)await loadProfile();
+     if(x.access_token){await loadProfile();navigate('profile');}
    }else if(mode==='login'){
      const s=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:mail,password}});
      store({...s,expires_at:Date.now()+s.expires_in*1000});pass.value='';
-     await loadProfile();feedback('Вы вошли в аккаунт. Перейдите в «Мой профиль».');
+     await loadProfile();navigate('profile');
    }else if(mode==='recover'){
      await request('/auth/v1/recover?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail}});
      feedback('Если аккаунт существует и почтовая отправка настроена, придёт письмо со ссылкой восстановления.');
@@ -117,11 +128,11 @@ async function submit(e){
  }catch(e){feedback(failure(e),true);}
  finally{btn.disabled=false;}
 }
-function open(next='login'){selectMode(next);navigate('auth');}
+function open(next='login'){if(authenticated && next!=='reset'){navigate('profile');return;}selectMode(next);navigate('auth');}
 async function logout(){
  const token=await validSession();
  try{if(token)await request('/auth/v1/logout',{method:'POST',token});}catch(_){}
- store(null);renderSession(null);selectMode('login');feedback('Вы вышли из аккаунта.');
+ store(null);renderSession(null);selectMode('login');navigate('auth');feedback('Вы вышли из аккаунта.');
 }
 form.addEventListener('submit',submit);
 buttons.register.addEventListener('click',()=>selectMode('register'));
@@ -129,7 +140,8 @@ buttons.login.addEventListener('click',()=>selectMode('login'));
 buttons.forgot.addEventListener('click',()=>selectMode('recover'));
 $('auth-back-login').addEventListener('click',()=>selectMode('login'));
 $('auth-logout').addEventListener('click',logout);
-$('top-auth-open').addEventListener('click',()=>open(session?'login':'login'));
+$('profile-account-logout').addEventListener('click',logout);
+$('top-auth-open').addEventListener('click',()=>open('login'));
 document.querySelectorAll('[data-open-auth]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.openAuth)));
 document.querySelectorAll('[data-password-toggle]').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.passwordToggle);el.type=el.type==='password'?'text':'password';b.setAttribute('aria-pressed',String(el.type==='text'));}));
 const hash=location.hash;
@@ -150,6 +162,26 @@ async function listCharacters(pack){
  const data=await request('/rest/v1/characters?select=id,name,pack_key,sheet_data&pack_key=eq.'+p+'&order=created_at.desc',{token});
  return Array.isArray(data)?data:[];
 }
+async function updateCharacterName(characterId,newName){
+ const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
+ const title=String(newName||'').trim();
+ if(title.length<1||title.length>72)throw Error('Имя персонажа: от 1 до 72 символов.');
+ if(!/^[0-9a-f-]{36}$/i.test(characterId))throw Error('Неверный идентификатор персонажа.');
+ const user=await request('/auth/v1/user',{token});
+ const rows=await request('/rest/v1/characters?id=eq.'+encodeURIComponent(characterId)+'&owner_id=eq.'+encodeURIComponent(user.id),
+ {method:'PATCH',token,body:{name:title,updated_at:new Date().toISOString()},headers:{Prefer:'return=representation'}});
+ if(!Array.isArray(rows)||rows.length!==1)throw Error('Персонаж не найден или нет прав на изменение.');
+ return rows[0];
+}
+async function deleteCharacter(characterId){
+ const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
+ if(!/^[0-9a-f-]{36}$/i.test(characterId))throw Error('Неверный идентификатор персонажа.');
+ const user=await request('/auth/v1/user',{token});
+ const rows=await request('/rest/v1/characters?id=eq.'+encodeURIComponent(characterId)+'&owner_id=eq.'+encodeURIComponent(user.id),
+ {method:'DELETE',token,headers:{Prefer:'return=representation'}});
+ if(!Array.isArray(rows)||rows.length!==1)throw Error('Персонаж не найден или нет прав на удаление.');
+ return true;
+}
 async function createCharacter(nameValue,packKey,templateId){
  const token=await validSession();if(!token)throw Error('Сначала войдите в аккаунт.');
  const title=String(nameValue||'').trim();
@@ -160,5 +192,5 @@ async function createCharacter(nameValue,packKey,templateId){
  await request('/rest/v1/characters',{method:'POST',token,body:{name:title,pack_key:pack,sheet_data:t?{templateId:t.id}:{} }});
  return true;
 }
-window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter};
+window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,isAuthenticated:()=>authenticated};
 })();

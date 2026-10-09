@@ -474,3 +474,12 @@ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
 .online-footprint{border:1px solid #66856c;background:#2c4534;border-radius:8px;padding:4px 7px;display:inline-block;font-size:10px;margin-left:5px}
 @media(max-width:920px){.bestiary-grid{grid-template-columns:1fr}.desktop-sidebar-toggle{display:none}}
 @media(max-width:600px){.breadcrumb{font-size:11px;gap:3px}.crumb-link{font-size:10px}.proto-badge{display:none}.best-creature{padding:14px}}
+
+/* Ссылка на боевой лист внутри подтверждённой комнаты */
+.online-sheet-access{padding:13px 16px;border:1px solid #578565;background:#203a29;border-radius:12px;margin:17px 0}
+.online-sheet-access .btn{display:inline-flex;min-height:40px;align-items:center;justify-content:center}
+.online-sheet-access p{margin:9px 0 0}
+@media(max-width:920px){
+ body.sidebar-collapsed .sidebar.open{transform:translateX(0)!important;pointer-events:auto}
+ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
+}

@@ -77,6 +77,8 @@ function selectMode(next){
  $('auth-title').textContent=reg?'Создать аккаунт':login?'Войти в Холэн':recover?'Восстановить пароль':'Новый пароль';
  $('auth-subtitle').textContent=reg?'Игровой ник, почта и пароль. Сначала подтвердите адрес электронной почты.':login?'Войдите с помощью электронной почты и пароля.':recover?'Отправим ссылку для восстановления, если этот адрес зарегистрирован.':'Введите новый пароль для своего аккаунта.';
  $('auth-name-field').hidden=!reg;
+ $('auth-policy-wrap').hidden=!reg;
+ $('auth-policy-accept').required=reg;
  $('auth-email-field').hidden=reset;
  $('auth-password-field').hidden=recover;
  $('auth-confirm-field').hidden=!(reg||reset);
@@ -105,6 +107,7 @@ async function submit(e){
  try{
    const username=name.value.trim().normalize('NFC'),mail=email.value.trim().toLowerCase(),password=pass.value;
    if(mode==='register'&&(!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)))throw Error('Логин: 3–24 символа, буквы, цифры, _ и -.');
+   if(mode==='register'&&!$('auth-policy-accept').checked)throw Error('Сначала ознакомьтесь с политикой конфиденциальности и подтвердите согласие.');
    if(mode!=='reset'&&(!mail||!email.validity.valid))throw Error('Укажите действительный адрес почты.');
    if(mode!=='recover' && (password.length<12||password.length>128))throw Error('Пароль должен содержать от 12 до 128 символов.');
    if((mode==='register'||mode==='reset')&&password!==confirm.value)throw Error('Пароли не совпадают.');

@@ -66,6 +66,23 @@ function roomView(){
    '<p>Онлайн-листы для «Путешествий Холэна» пока разрабатываются.</p>')+
   '<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> '+
   '<button type="button" class="btn subtle" data-online-action="profile">Открыть профиль →</button></div>':'';
+ const pending=(s.requests||[]).some(r=>r.actor_id===auth.currentUserId());
+ const attackTargets=enemies.filter(u=>u.hp>0);
+ const healTargets=friends.filter(u=>u.owner_id!==auth.currentUserId()&&u.hp>0&&u.hp<u.cap);
+ const actions=!gm&&self&&self.hp>0&&room.status==='active'?
+  '<section class="online-gm-card online-player-actions"><h3>Действия отряда</h3>'+
+  (pending?'<p>Твоя заявка ожидает решения ГМа.</p>':
+   '<p>Проверку броска и расчёт урона пока проводит ГМ. Здесь отправляется заявка на применение результата.</p>'+
+   (attackTargets.length?'<label class="field-label" for="online-attack-target">Цель атаки</label><select id="online-attack-target" class="room-select">'+
+     attackTargets.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+' · '+u.hp+' ОЗ</option>').join('')+'</select>'+
+     '<label class="field-label" for="online-attack-amount">Подтверждённый урон (1–30)</label><input type="number" id="online-attack-amount" min="1" max="30" value="3">'+
+     '<button type="button" class="btn primary" data-online-action="send-attack">Запросить атаку</button>':
+     '<p>Пока нет живых противников для атаки.</p>')+
+   (self.template_key==='medic'&&self.charges>0&&healTargets.length?
+     '<label class="field-label" for="online-heal-target">Союзник для лечения</label><select id="online-heal-target" class="room-select">'+
+     healTargets.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+' · '+u.hp+'/'+u.cap+' ОЗ</option>').join('')+'</select>'+
+     '<button type="button" class="btn subtle" data-online-action="send-heal">Запросить лечение (+3 ОЗ, −1 заряд)</button>':'')
+  )+'</section>':'';
  return '<section class="panel online-session"><div class="room-dash-head"><div><span class="overline">ОНЛАЙН-КОМНАТА · АЛЬФА</span>'+
  '<h2>'+esc(room.name)+'</h2><p>'+esc(packLabel(room.pack_key))+'</p>'+
  '<p>Код приглашения: <strong>'+esc(room.invite_code)+'</strong></p></div>'+
@@ -77,6 +94,7 @@ function roomView(){
  select+
  '<h3>Отряды игроков</h3><div class="room-unit-list">'+(friends.length?friends.map(unitCard).join(''):'<div class="room-empty">Участники ещё не выбрали персонажей.</div>')+'</div>'+
  '<h3>Противники</h3><div class="room-unit-list">'+(enemies.length?enemies.map(unitCard).join(''):'<div class="room-empty">Противников пока нет. Их добавляет только ГМ.</div>')+'</div>'+
+ actions+
  '<h3>Журнал событий</h3><ol class="online-events">'+(s.events||[]).map(e=>'<li>'+esc(e.message)+'</li>').join('')+'</ol>'+
  (!gm&&room.status==='active'?'<button class="btn subtle" data-online-action="leave" type="button">Покинуть комнату</button>':'')+'</section>';
 }
@@ -85,8 +103,18 @@ function gmView(){
  if(!auth.isAuthenticated())return '<div class="panel online-intro">Для управления онлайн-комнатой войди в аккаунт.</div>';
  if(!s||member?.role!=='gm')return '<div class="panel online-intro"><h2>Онлайн-рубка ГМа</h2><p>Создай онлайн-комнату или открой принадлежащую тебе сессию.</p><button class="btn primary" data-online-action="rooms" type="button">В комнаты →</button></div>';
  const items=(s.units||[]).map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+' ('+u.hp+'/'+u.cap+')</option>').join('');
+ const roster=(s.members||[]);
+ const requests=(s.requests||[]).map(q=>{
+   const player=roster.find(m=>m.user_id===q.actor_id);
+   const target=(s.units||[]).find(u=>u.id===q.target_unit_id);
+   return '<article class="online-request"><div><strong>'+esc(player?.display_name||'Игрок')+' · '+(q.kind==='attack'?'Атака':'Лечение')+'</strong>'+
+   '<small>Цель: '+esc(target?.name||'Неизвестно')+' · '+(q.kind==='attack'?'Урон '+q.amount:'Лечение 3 ОЗ')+'</small></div>'+
+   '<div class="online-inline"><button class="btn primary" type="button" data-online-action="approve" data-id="'+esc(q.id)+'">Подтвердить</button>'+
+   '<button class="btn subtle" type="button" data-online-action="decline" data-id="'+esc(q.id)+'">Отклонить</button></div></article>';
+ }).join('')||'<p class="room-empty">Заявок нет.</p>';
  return '<section class="panel online-session"><span class="overline">ОНЛАЙН · ПРАВА ГМа ПРОВЕРЯЕТ СЕРВЕР</span><h2>'+esc(s.room.name)+'</h2>'+
  '<p>Комната '+esc(s.room.invite_code)+' · '+esc(packLabel(s.room.pack_key))+'</p>'+
+ '<h3>Заявки игроков</h3><div class="online-requests">'+requests+'</div>'+
  '<div class="online-grid"><section class="online-gm-card"><h3>Управление здоровьем</h3><label class="field-label" for="online-gm-target">Цель</label>'+
  '<select id="online-gm-target" class="room-select">'+items+'</select>'+
  '<label class="field-label" for="online-gm-amount">Количество ОЗ</label><input type="number" id="online-gm-amount" min="1" max="9999" value="3">'+
@@ -164,6 +192,18 @@ document.addEventListener('click',event=>{
   return;
  }
  if(a==='choose')return action(async()=>{await rpc('holen_room_pick',{p_room:activeId,p_character:b.dataset.id});});
+ if(a==='send-attack'){
+   const target=$('online-attack-target')?.value,damage=Number($('online-attack-amount')?.value);
+   if(!target||!Number.isInteger(damage)||damage<1||damage>30){notice('Выбери цель и корректный урон от 1 до 30.',true);return;}
+   return action(async()=>rpc('holen_room_request',{p_room:activeId,p_kind:'attack',p_target:target,p_amount:damage}));
+ }
+ if(a==='send-heal'){
+   const target=$('online-heal-target')?.value;
+   if(!target){notice('Выбери союзника для лечения.',true);return;}
+   return action(async()=>rpc('holen_room_request',{p_room:activeId,p_kind:'heal',p_target:target,p_amount:3}));
+ }
+ if(a==='approve'||a==='decline')
+   return action(async()=>rpc('holen_gm_decide',{p_room:activeId,p_request:b.dataset.id,p_approve:a==='approve'}));
  if(a==='leave'){
   if(!confirm('Покинуть онлайн-комнату?'))return;
   return action(async()=>{await rpc('holen_room_leave',{p_room:activeId});setRoom(null);});

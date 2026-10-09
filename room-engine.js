@@ -31,7 +31,7 @@ function startRoom(text){
  write(s);setCode(code);setActor('gm');return s;
 }
 function joinRoom(raw){const code=clean(raw,15).toUpperCase();if(!/^ANT-[A-Z2-9]{5}$/.test(code))throw Error('Код должен иметь вид ANT-ABCDE.');
- if(!load(code))throw Error('Комната не найдена. Пока комнаты доступны только во вкладках одного браузера.');setCode(code);return current();}
+ const state=load(code);if(!state)throw Error('Комната не найдена. Пока комнаты доступны только во вкладках одного браузера.');setCode(code);setActor(state.units.some(u=>u.id==='p1')?'p2':'p1');return current();}
 function transact(fn){const s=current();if(!s)throw Error('Сначала открой комнату.');fn(s);return write(s);}
 function assertGm(){if(actor()!=='gm')throw Error('Действие доступно только демонстрационной роли ГМа.');}
 function assertPlayer(role){if(actor()!==role)throw Error('Переключись на соответствующего игрока.');}

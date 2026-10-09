@@ -612,3 +612,9 @@ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
 /* Тип существа в каталоге; арт загружается только в полном листе. */
 .best-type-icon{width:60%;max-width:80px;height:auto;aspect-ratio:1/1;color:#e2c58e;filter:drop-shadow(0 4px 8px #0006)}
 .best-tile-fungal .best-type-icon{color:#c7d9a2}
+
+/* Переходы учитывают порядок отфильтрованного списка. */
+.creature-siblings .btn{max-width:100%;white-space:normal;text-align:left;gap:10px}
+.creature-nav-arrow{width:24px;height:24px;flex:0 0 24px}
+.creature-sibling-prev .creature-nav-arrow{transform:rotate(180deg)}
+.creature-sibling-next{margin-left:auto}

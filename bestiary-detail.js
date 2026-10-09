@@ -7,11 +7,19 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const safeImage=x=>typeof x==='string'&&/^assets\/bestiary\/[a-z0-9/_-]+\.(?:webp|avif|png|jpe?g)$/.test(x)?x:null;
 const icon={'red-infantry':'♟','cordyceps':'☣','red-titan':'⬢','bombardier':'✦','burrow-worm':'〰','worm-handler':'⚑'};
 const factionNames={red:'Красная колония',fungal:'Независимая грибная угроза'};
-const id=new URLSearchParams(location.search).get('id')||'';
+const context=new URLSearchParams(location.search);
+const id=context.get('id')||'';
+const keyword=(context.get('q')||'').toLocaleLowerCase('ru').trimStart();
+const faction=['red','fungal'].includes(context.get('faction'))?context.get('faction'):'all';
+const navQuery=new URLSearchParams();
+if(keyword)navQuery.set('q',keyword);
+if(faction!=='all')navQuery.set('faction',faction);
+const catalogUrl='index.html'+(navQuery.size?'?'+navQuery.toString():'')+'#bestiary';
+document.querySelectorAll('a[href="index.html#bestiary"]').forEach(a=>a.setAttribute('href',catalogUrl));
 const creature=list.find(m=>m.id===id);
 if(!creature){
  document.title='Существо не найдено · Мир Холэна';
- root.innerHTML='<section class="creature-not-found"><h1>Существо не найдено</h1><p>Этот лист ещё не существует или ссылка содержит ошибку.</p><a href="index.html#bestiary" class="btn primary">Открыть бестиарий</a></section>';
+ root.innerHTML='<section class="creature-not-found"><h1>Существо не найдено</h1><p>Этот лист ещё не существует или ссылка содержит ошибку.</p><a href="'+esc(catalogUrl)+'" class="btn primary">Открыть бестиарий</a></section>';
  return;
 }
 const h=creature;
@@ -30,8 +38,25 @@ const values=[
  ['Занимаемое место',h.footprint_w+'×'+h.footprint_h+' клетки']
 ];
 const characteristics=['Сила','Ловкость','Телосложение','Интеллект','Мудрость','Харизма'];
-const siblingAt=list.findIndex(m=>m.id===id);
-const siblings=[list[siblingAt-1],list[siblingAt+1]].filter(Boolean);
+const searchFactions={red:'Красная колония',fungal:'Независимый кордицепс'};
+const filtered=list.filter(x=>(faction==='all'||x.faction===faction)&&
+ (x.name+' '+x.role+' '+x.description+' '+(searchFactions[x.faction]||'')).toLocaleLowerCase('ru').includes(keyword));
+// Прямая ссылка с несовместимыми фильтрами сохраняет обычную навигацию.
+const navList=filtered.some(x=>x.id===id)?filtered:list;
+const siblingAt=navList.findIndex(m=>m.id===id);
+const siblings=[
+ {creature:navList[siblingAt-1],direction:'prev'},
+ {creature:navList[siblingAt+1],direction:'next'}
+].filter(x=>x.creature);
+function siblingLink({creature:x,direction}){
+ const query=new URLSearchParams(navQuery);
+ query.set('id',x.id);
+ const arrow='<svg class="creature-nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+ const name='<span>'+esc(x.name)+'</span>';
+ const label=(direction==='prev'?'Предыдущее существо: ':'Следующее существо: ')+x.name;
+ return '<a href="'+esc('creature.html?'+query.toString())+'" class="btn subtle creature-sibling-'+direction+'" rel="'+direction+'" aria-label="'+esc(label)+'">'+
+ (direction==='prev'?arrow+name:name+arrow)+'</a>';
+}
 root.innerHTML='<article class="creature-sheet">'+
  '<div class="creature-sheet-head"><span class="overline">БЕСТИАРИЙ · МУРАВЬИНАЯ РЕВОЛЮЦИЯ</span>'+
  '<h1>'+esc(h.name)+'</h1>'+
@@ -53,6 +78,6 @@ root.innerHTML='<article class="creature-sheet">'+
  '<aside class="creature-aside"><div class="creature-art-panel">'+art+'</div>'+
  '<p class="creature-art-caption">'+(portrait?'Иллюстрация существа':'Сейчас показан символ-заглушка. Иллюстрацию добавим после выбора единого художественного стиля.')+'</p></aside>'+
  '</div><nav class="creature-siblings" aria-label="Соседние существа">'+
- siblings.map(x=>'<a href="creature.html?id='+encodeURIComponent(x.id)+'" class="btn subtle">'+esc(x.name)+' →</a>').join('')+
+ siblings.map(siblingLink).join('')+
  '</nav></article>';
 })();

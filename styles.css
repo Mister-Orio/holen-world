@@ -483,3 +483,61 @@ body.sidebar-collapsed .main-area{margin-left:0;width:100%}
  body.sidebar-collapsed .sidebar.open{transform:translateX(0)!important;pointer-events:auto}
  body.sidebar-collapsed .main-area{margin-left:0;width:100%}
 }
+
+/* Бестиарий v0.11.1: маленькие обложки вместо листов в каталоге. */
+.bestiary-compact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,154px));align-items:start;gap:13px;margin:17px 0 30px}
+.best-tile{display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:0;text-decoration:none;background:#1a2a22;border:1px solid #496650;border-radius:13px;padding:9px 9px 12px;transition:border-color .15s,transform .15s,background .15s}
+.best-tile:hover{transform:translateY(-2px);border-color:#83b891;background:#21392a}
+.best-tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.best-tile-image{width:100%;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:radial-gradient(circle at 30% 24%,#4e654e,#213728 68%,#182a20);border:1px solid #58765d}
+.best-tile-fungal .best-tile-image{background:radial-gradient(circle at 28% 25%,#667452,#31412d 63%,#1b281c);border-color:#728265}
+.best-tile-image img{display:block;object-fit:cover;width:100%;height:100%;aspect-ratio:1/1}
+.best-tile-symbol{font-size:clamp(36px,5vw,52px);line-height:1;color:#e2c58e;text-shadow:0 4px 15px #0008}
+.best-tile-fungal .best-tile-symbol{color:#c7d9a2}
+.best-tile-name{font-weight:750;color:#e2f1e6;font-size:12px;line-height:1.35;overflow-wrap:anywhere;text-align:center}
+@media(max-width:420px){.bestiary-compact-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.best-tile{padding:7px 7px 10px}.best-tile-name{font-size:11px}.best-tile-symbol{font-size:35px}}
+
+/* Самостоятельная страница конкретного существа, адрес creature.html?id=... */
+.creature-detail-page{min-height:100vh;background:var(--bg)}
+.creature-shell{max-width:1280px;padding:0 22px;margin:auto}
+.creature-topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:22px 0;border-bottom:1px solid var(--border)}
+.creature-brand{display:flex;align-items:center;gap:9px;font-weight:850;color:#bbebcd}
+.creature-brand strong{color:#e6f5eb;font-size:13px;letter-spacing:.05em}
+.creature-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:#a9c3b3;font-size:12px}
+.creature-nav a{text-decoration:underline;text-underline-offset:3px;color:#b4e6c1}
+.creature-nav [aria-current]{color:#f2f8ee}
+.creature-main{padding:16px 0 36px}
+.creature-backbar{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 24px}
+.creature-sheet-head{margin-bottom:26px}
+.creature-sheet-head .overline{letter-spacing:.12em;color:#93c5a5;font-size:11px;font-weight:800}
+.creature-sheet-head h1{font-size:clamp(30px,4vw,49px);margin:8px 0 13px}
+.creature-sheet-head>p{max-width:850px;color:#bcd0c1;font-size:14px;line-height:1.75}
+.creature-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}
+.creature-tags>span{background:#254032;border:1px solid #4c7056;border-radius:999px;color:#c9e9d3;padding:5px 11px;font-size:11px}
+.creature-content{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(230px,.8fr);align-items:start;gap:22px}
+.creature-main-column{display:grid;gap:16px;min-width:0}
+.creature-panel,.creature-art-panel{border:1px solid #486451;border-radius:16px;background:#192920;padding:20px;min-width:0}
+.creature-panel h2{font-size:19px;margin-bottom:14px}
+.creature-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.creature-stat{background:#263b2b;border:1px solid #405c46;border-radius:10px;padding:11px 7px;text-align:center;min-width:0}
+.creature-stat strong{display:block;font-size:18px;color:#d2f0db;line-height:1.2;overflow-wrap:anywhere}
+.creature-stat small{display:block;color:#abc5b0;font-size:10px;margin-top:6px}
+.creature-modifiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.creature-modifiers>div{background:#233628;border-radius:9px;padding:11px 12px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.creature-modifiers strong{font-size:12px;color:#bad4bf}.creature-modifiers span{color:#e6efd8;font-size:17px;font-weight:850}
+.creature-ability{border-left:3px solid #689e74;background:#21382a;border-radius:0 10px 10px 0;padding:13px 15px;margin:10px 0}
+.creature-ability h3{font-size:14px;margin:0 0 6px}.creature-ability p,.creature-notes p{font-size:13px;line-height:1.75;color:#bdd0c1;margin:0 0 8px}
+.creature-art-panel{padding:12px}
+.creature-portrait{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:12px}
+.creature-art-placeholder{aspect-ratio:3/4;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:15px;border-radius:12px;background:radial-gradient(circle at 35% 25%,#405540,#1a3125 65%,#17261e);text-align:center;border:1px dashed #6b896c}
+.creature-art-placeholder span{font-size:clamp(90px,12vw,155px);color:#ddc28c;line-height:1;text-shadow:0 8px 25px #0008}
+.creature-art-placeholder small{font-size:12px;color:#b9cfbc}
+.creature-art-caption{color:#aebfaf;font-size:11px;line-height:1.6;margin:10px 5px}
+.creature-not-found{border:1px solid #536b58;border-radius:15px;padding:40px 20px;text-align:center}
+.creature-not-found p{color:#bed1c2}
+.creature-siblings{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}
+.creature-footer{padding:18px 0 35px;display:flex;gap:10px;justify-content:space-between;border-top:1px solid var(--border);font-size:11px;color:#a3b8aa}
+.creature-footer a{text-decoration:underline}
+@media(max-width:850px){.creature-content{grid-template-columns:1fr}.creature-aside{grid-row:1}.creature-art-panel{max-width:290px;margin:0 auto}.creature-art-caption{text-align:center}.creature-art-placeholder{min-height:0}}
+@media(max-width:500px){.creature-shell{padding:0 14px}.creature-topbar{padding:15px 0}.creature-main{padding-top:10px}.creature-panel{padding:15px}.creature-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.creature-modifiers{grid-template-columns:repeat(2,minmax(0,1fr))}.creature-sheet-head h1{font-size:30px}.creature-art-panel{max-width:240px}.creature-backbar .btn{flex:1;text-align:center}}
+@media print{.creature-backbar,.creature-topbar,.creature-footer,.creature-siblings{display:none!important}.creature-shell{max-width:none;padding:0}.creature-content{grid-template-columns:1fr 220px;gap:12px}.creature-panel,.creature-art-panel{break-inside:avoid}}

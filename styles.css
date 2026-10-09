@@ -246,3 +246,46 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
 .room-no-requests{font-size:13px;color:#aec3b5}
 @media(max-width:850px){.room-unit-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){.room-unit-list{grid-template-columns:1fr}.room-dash-head .btn{width:auto}.room-head-actions{width:100%}.room-role-bar select{min-width:0;width:100%}.room-role-bar label{width:100%}}
+
+
+/* ---------------------------------------------------------------
+   09. Аккаунт v0.9 — отзывчивый экран авторизации
+   --------------------------------------------------------------- */
+.top-auth-btn{min-width:90px;justify-content:center}
+.profile-auth-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.auth-profile-note{border:1px solid #446550;border-radius:10px;padding:12px 14px;background:#1b2e24;color:#c5e7cd;font-size:12px;margin:0 0 18px}
+.auth-layout{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);max-width:1100px;gap:18px;margin:auto;align-items:stretch}
+.auth-promo{position:relative;min-height:680px;border:1px solid #425f4e;border-radius:18px;background:linear-gradient(0deg,rgba(7,19,13,.98),rgba(9,19,15,.55) 72%),url('assets/holen-city.webp') center/cover;overflow:hidden}
+.auth-promo-content{display:flex;flex-direction:column;height:100%;padding:clamp(24px,3.5vw,45px)}
+.auth-sigil{display:grid;place-items:center;width:75px;height:75px;font-size:46px;color:#e4d09c;border:1px solid #ac9d7587;border-radius:22px;background:#101d17a5;margin:65px 0 12px}
+.auth-promo h1{color:#f5f8ec;font-size:clamp(34px,3.8vw,50px);line-height:1.13;letter-spacing:-.04em;margin:20px 0 15px}
+.auth-promo p{color:#c6daca;font-size:13px;line-height:1.8;max-width:390px}
+.auth-benefits{display:flex;flex-direction:column;gap:13px;margin-top:auto;color:#dcf1dd;font-size:12px}
+.auth-card{padding:clamp(22px,3vw,39px);background:linear-gradient(158deg,#1d3026,#17241e)}
+.auth-card h2{font-size:clamp(25px,3vw,34px);margin:15px 0 10px;color:#f7f8ee}
+.auth-subtitle{color:#b7ccbd!important;font-size:12px!important;line-height:1.65!important;margin-bottom:20px}
+.auth-preview-note{padding:13px 14px;color:#d9d3b6;background:#342f254d;border:1px solid #74694c;border-radius:12px;font-size:11px;line-height:1.6;margin-bottom:20px}
+.auth-preview-note strong{color:#f7dea3}
+.auth-session{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;margin-bottom:14px;border:1px solid #5f9676;background:#233e2d;border-radius:12px}
+.auth-session strong{color:#b7f2d0}.auth-session span{color:#c0d8c8;font-size:12px;flex:1}
+.auth-field{display:flex;flex-direction:column;gap:8px;margin-bottom:17px}
+.auth-field[hidden],.auth-session[hidden],#auth-reset-help[hidden],#auth-back-login[hidden]{display:none!important}
+.auth-field label{font-size:12px;font-weight:750;color:#e5f5e9}
+.auth-field>input,.auth-password-field input{width:100%;min-height:47px;min-width:0;color:#eef9f1;background:#101c19;border:1px solid #4c6856;border-radius:10px;padding:12px 14px;margin:0;outline:none;font-size:14px}
+.auth-field input:focus{border-color:#8bd0a5;box-shadow:0 0 0 3px #86c5a320}
+.auth-field small{color:#9bb8a6;font-size:10px;line-height:1.5}
+.auth-password-field{position:relative}
+.auth-password-field input{padding-right:54px}
+.auth-password-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:42px;height:39px;border:0;border-radius:7px;background:transparent;color:#a2c5ad}
+.auth-password-toggle:hover{background:#233c2d}
+.auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0}
+.auth-actions .btn{font-size:12px;min-height:44px;padding:10px 7px}
+.auth-forgot{grid-column:1/-1;padding:10px 6px;border:0;color:#afc7b6;background:transparent;text-decoration:underline;text-underline-offset:3px;font-size:12px}
+.auth-forgot[hidden]{display:none}
+.auth-response{padding:12px 13px;margin:12px 0;border:1px solid #547b5e;border-radius:10px;background:#21402f;color:#d6f4d9;font-size:12px;line-height:1.55}
+.auth-response[hidden]{display:none}
+.auth-response.is-error{background:#462923;border-color:#a96e62;color:#ffcec4}
+.auth-bottom-meta{font-size:11px!important;color:#99b29e!important;line-height:1.6;border-top:1px solid #3b5543;padding-top:15px;margin-top:20px}
+@media(max-width:930px){.auth-layout{grid-template-columns:1fr}.auth-promo{min-height:260px}.auth-sigil{display:none}.auth-promo-content{padding:25px}.auth-benefits{display:none}.auth-promo h1{font-size:31px}}
+@media(max-width:600px){.auth-layout{gap:12px}.auth-promo{min-height:220px}.auth-promo h1{font-size:28px}.auth-card{padding:22px 17px}.top-auth-btn{min-width:54px}}
+@media(max-width:370px){.auth-actions{grid-template-columns:1fr}.auth-forgot{grid-column:auto}}

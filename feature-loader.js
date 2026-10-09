@@ -32,6 +32,7 @@ async function forView(view){
 }
 function loading(root,view){
  if(!root)return ()=>{};
+ if(failed.has(root))root.querySelector('.feature-status')?.remove();
  if((views[view]||[]).every(x=>ready.has(x))){(failed.get(root)||[]).forEach(([node,value])=>node.inert=value);failed.delete(root);return ()=>{};}
  if(busy.has(root))return busy.get(root);
  const children=failed.get(root)||[...root.children].map(node=>[node,node.inert]);

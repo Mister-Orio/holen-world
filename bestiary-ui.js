@@ -6,14 +6,12 @@ if(!root)return;
 const monsters=window.HOLEN_BESTIARY||[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const factions={red:'Красная колония',fungal:'Независимый кордицепс'};
-const symbols={'red-infantry':'♟','cordyceps':'☣','red-titan':'⬢','bombardier':'✦','burrow-worm':'〰','worm-handler':'⚑'};
-const imagePath=value=>typeof value==='string'&&/^assets\/bestiary\/[a-z0-9/_-]+\.(?:webp|avif|png|jpe?g)$/.test(value)?value:null;
+const types=new Set(['ant','infected-ant','beetle','worm']);
 let keyword='',faction='all';
 function card(x){
  const url='creature.html?id='+encodeURIComponent(x.id);
- const cover=imagePath(x.images?.cover);
- const icon=cover?'<img src="'+esc(cover)+'" loading="lazy" decoding="async" width="128" height="128" alt="">':
- '<span class="best-tile-symbol" aria-hidden="true">'+esc(symbols[x.id]||'◇')+'</span>';
+ const type=types.has(x.visual_type)?x.visual_type:'ant';
+ const icon='<svg class="best-type-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="assets/bestiary/types.svg?v=0113#'+type+'"></use></svg>';
  return '<a class="library-cover-tile best-tile best-tile-'+esc(x.faction)+'" href="'+url+'" aria-label="Открыть лист: '+esc(x.name)+'">'+
   '<span class="library-cover-image best-tile-image">'+icon+'</span>'+
   '<span class="library-cover-title best-tile-name">'+esc(x.name)+'</span></a>';

@@ -42,7 +42,12 @@ window.HOLEN_BESTIARY = [
       0
     ],
     "footprint": "1×1",
-    "playtest": "Полное зеркало чёрной пехоты. Урон зависит от числа выживших."
+    "playtest": "Полное зеркало чёрной пехоты. Урон зависит от числа выживших.",
+    "visual_type": "ant",
+    "images": {
+      "portrait": "assets/bestiary/red-infantry-art.webp",
+      "portrait_alt": "Красные муравьи-пехотинцы в подземной колонии"
+    }
   },
   {
     "id": "cordyceps",
@@ -88,7 +93,12 @@ window.HOLEN_BESTIARY = [
       -2,
       -3
     ],
-    "playtest": "Заражение не распространяется во время боя; споры срабатывают после гибели последнего."
+    "playtest": "Заражение не распространяется во время боя; споры срабатывают после гибели последнего.",
+    "visual_type": "infected-ant",
+    "images": {
+      "portrait": "assets/bestiary/cordyceps-art.webp",
+      "portrait_alt": "Муравьи, заражённые кордицепсом, с грибными наростами"
+    }
   },
   {
     "id": "red-titan",
@@ -134,7 +144,12 @@ window.HOLEN_BESTIARY = [
       0,
       -1
     ],
-    "playtest": "Мини-босс. Топот требует решения ГМа по соседним клеткам."
+    "playtest": "Мини-босс. Топот требует решения ГМа по соседним клеткам.",
+    "visual_type": "ant",
+    "images": {
+      "portrait": "assets/bestiary/red-titan-art.webp",
+      "portrait_alt": "Красный муравей-исполин среди обычных муравьёв"
+    }
   },
   {
     "id": "bombardier",
@@ -176,7 +191,12 @@ window.HOLEN_BESTIARY = [
       0,
       -2
     ],
-    "playtest": "2 заряда химического выброса за бой; направление брюшка пока не ограничивает атаку."
+    "playtest": "2 заряда химического выброса за бой; направление брюшка пока не ограничивает атаку.",
+    "visual_type": "beetle",
+    "images": {
+      "portrait": "assets/bestiary/bombardier-art.webp",
+      "portrait_alt": "Жук-бомбардир, выпускающий огненную струю"
+    }
   },
   {
     "id": "burrow-worm",
@@ -226,7 +246,12 @@ window.HOLEN_BESTIARY = [
       1,
       -3
     ],
-    "playtest": "Подкоп и атака требуют двух отдельных ходов; червь и погонщик — отдельные существа."
+    "playtest": "Подкоп и атака требуют двух отдельных ходов; червь и погонщик — отдельные существа.",
+    "visual_type": "worm",
+    "images": {
+      "portrait": "assets/bestiary/burrow-worm-art.webp",
+      "portrait_alt": "Норный червь с кольцевой зубастой пастью"
+    }
   },
   {
     "id": "worm-handler",
@@ -272,6 +297,11 @@ window.HOLEN_BESTIARY = [
       2,
       0
     ],
-    "playtest": "Управляет одним червём, командой не даёт ему дополнительного хода."
+    "playtest": "Управляет одним червём, командой не даёт ему дополнительного хода.",
+    "visual_type": "ant",
+    "images": {
+      "portrait": "assets/bestiary/worm-handler-art.webp",
+      "portrait_alt": "Муравей-погонщик рядом с норным червём"
+    }
   }
 ];

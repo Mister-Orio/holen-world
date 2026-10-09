@@ -20,7 +20,7 @@ document.querySelector('meta[name="description"]')?.setAttribute('content',h.des
 document.getElementById('creature-breadcrumb').textContent=h.name;
 const portrait=safeImage(h.images?.portrait);
 const art=portrait?
- '<img class="creature-portrait" src="'+esc(portrait)+'" width="768" height="1024" alt="'+esc(h.images?.portrait_alt||h.name)+'" decoding="async" fetchpriority="high">':
+ '<img class="creature-portrait" src="'+esc(portrait)+'" width="768" height="768" alt="'+esc(h.images?.portrait_alt||h.name)+'" decoding="async" fetchpriority="high">':
  '<div class="creature-art-placeholder" role="img" aria-label="Иллюстрация пока не добавлена"><span aria-hidden="true">'+esc(icon[h.id]||'◇')+'</span><small>Иллюстрация появится позже</small></div>';
 const values=[
  ['ОЗ',h.hp],['Класс защиты',h.armor_class],['Скорость',h.speed+' клеток'],

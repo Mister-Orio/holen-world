@@ -1465,6 +1465,7 @@ button.quiet:hover {
     Муравьиная революция · Холэн · Лист отряда · Стандарт интерфейса v1.0 · Скауты
    </div>
 </main>
+<script src="../sheet-access.js"></script>
 <script>
    "use strict";
 
@@ -1583,6 +1584,7 @@ function startingState() {
 let state = startingState();
 
 function loadState() {
+    if(!window.HOLEN_SHEET_EDITABLE)return;
     try {
         const saved = JSON.parse(localStorage.getItem(storageKey()) || (squadId === "01" ? localStorage.getItem(LEGACY_STORAGE_KEY) : null));
         if (!saved) return;
@@ -1622,6 +1624,7 @@ function loadState() {
 }
 
 function saveState() {
+    if(!window.HOLEN_SHEET_EDITABLE)return;
     try {
         localStorage.setItem(storageKey(), JSON.stringify({ ...state, rulesSignature: RULES_SIGNATURE }));
     } catch (error) {
@@ -2082,6 +2085,10 @@ loadState();
 updateRuleLabels();
 showCurrentSquad();
 render();
-  </script>
+  
+window.addEventListener('holen-sheet-authorized',()=>{
+    state=startingState();loadState();showCurrentSquad();render();
+});
+</script>
 </body>
 </html>

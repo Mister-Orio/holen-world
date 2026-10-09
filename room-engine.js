@@ -54,8 +54,9 @@ function adjustHp(s,id,delta,override=false){
  const u=unit(s,id);
  if(delta<0){u.hp=Math.max(0,u.hp+delta);u.cap=Math.min(u.cap,Math.ceil(u.hp/u.per)*u.per);}
  if(delta>0){
-  if(override){u.cap=u.max;u.hp=Math.min(u.max,u.hp+delta);}
-  else if(u.hp>0)u.hp=Math.min(u.cap,u.hp+delta);
+  // Обычное лечение ни при каких обстоятельствах не возвращает погибших бойцов.
+  // Для отряда с 0 ОЗ требуется новый резервный отряд, а не лечение.
+  if(u.hp>0)u.hp=Math.min(u.cap,u.hp+delta);
  }
  return u;
 }
@@ -94,15 +95,15 @@ function decideRequest(id,accepted){
  });
 }
 function gmDamage(id,amount){assertGm();if(!Number.isInteger(amount)||amount<1||amount>9999)throw Error('Урон: целое число от 1 до 9999.');return transact(s=>{const u=adjustHp(s,id,-amount);log(s,'ГМ: −'+amount+' ОЗ отряду «'+u.name+'» ('+u.hp+'/'+u.cap+').');});}
-function gmHeal(id,amount){assertGm();if(!Number.isInteger(amount)||amount<1||amount>9999)throw Error('Лечение: целое число от 1 до 9999.');return transact(s=>{const u=adjustHp(s,id,amount,true);log(s,'ГМ восстановил '+amount+' ОЗ отряду «'+u.name+'» (ручное решение; итог '+u.hp+'/'+u.max+').');});}
+function gmHeal(id,amount){assertGm();if(!Number.isInteger(amount)||amount<1||amount>9999)throw Error('Лечение: целое число от 1 до 9999.');return transact(s=>{const u=unit(s,id);if(u.hp===0)throw Error('Уничтоженный отряд нельзя вылечить.');const before=u.hp;adjustHp(s,id,amount);log(s,'ГМ провёл лечение: +'+(u.hp-before)+' ОЗ отряду «'+u.name+'» (итог '+u.hp+'/'+u.cap+').');});}
 function gmRest(kind){
  assertGm();if(!['short','long'].includes(kind))throw Error('Неизвестный тип отдыха.');
  return transact(s=>{
-  for(const u of s.units.filter(x=>x.owner!=='gm')){
-   if(kind==='short'){if(u.hp>0)u.hp=u.cap;}
+  for(const u of s.units.filter(x=>x.owner!=='gm' && x.hp>0)){
+   if(kind==='short'){u.hp=u.cap;}
    else{u.cap=u.max;u.hp=u.max;if(u.templateId==='medic')u.charges=4;}
   }
-  log(s,kind==='short'?'ГМ оформил короткий отдых: живые отряды восстановлены до текущего максимума.':'ГМ разрешил долгий отдых: отряды, павшие бойцы и лечебные заряды восстановлены.');
+  log(s,kind==='short'?'ГМ оформил короткий отдых: живые отряды восстановлены до текущего максимума.':'ГМ разрешил долгий отдых: восстановлены выжившие отряды, павшие бойцы в них и лечебные заряды. Уничтоженные отряды не воскресают.');
  });
 }
 function gmAddEnemy(){

@@ -35,7 +35,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button>
 <div class="breadcrumb"><span>ХОЛЭН</span><span class="crumb-sep">/</span><strong id="breadcrumb-title">Главная</strong></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.9.1</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.10</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden="hidden" id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" title="Вернуться к предыдущему разделу" type="button">← Назад</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -98,7 +98,7 @@
 <label class="field-label" for="character-name">Имя персонажа</label><input id="character-name" type="text" maxlength="72" placeholder="Например, Меральт" required>
 <label class="field-label" for="character-pack">Игровой пак</label><select id="character-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна</option></select>
 <div id="character-template-field"><label class="field-label" for="character-template">Специализация</label><select id="character-template" class="room-select"></select></div>
-<button class="btn primary" id="character-create-btn" type="submit">Сохранить персонажа</button><p id="character-message" class="profile-feedback" role="status"></p></form></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Созданные и посещённые комнаты будут отображаться здесь после запуска онлайн-режима.</p><span class="capsule">Раздел в разработке</span></div></div></div>
+<button class="btn primary" id="character-create-btn" type="submit">Сохранить персонажа</button><p id="character-message" class="profile-feedback" role="status"></p></form></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
 </section>
 <!-- Личный кабинет: серверная авторизация по почте через Supabase -->
 <section class="view" id="view-auth" aria-labelledby="auth-title">
@@ -140,7 +140,7 @@
         <label for="auth-confirm">Повторите пароль *</label>
         <div class="auth-password-field"><input id="auth-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Повторите пароль"><button type="button" class="auth-password-toggle" data-password-toggle="auth-confirm" aria-label="Показать пароль" aria-pressed="false">◉</button></div>
       </div>
-      <div class="auth-response" id="auth-response" role="status" aria-live="polite" hidden></div>
+      <label class="auth-policy" id="auth-policy-wrap"><input type="checkbox" id="auth-policy-accept" required> <span>Я ознакомился(-ась) с <a href="privacy.html" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a> и понимаю, что данные аккаунта хранятся на зарубежном сервере в Германии.</span></label><div class="auth-response" id="auth-response" role="status" aria-live="polite" hidden></div>
       <button type="submit" id="auth-submit" class="btn primary wide">Создать аккаунт</button>
       <div class="auth-actions" aria-label="Действия с аккаунтом">
         <button id="auth-register-btn" class="btn subtle" type="button">Зарегистрироваться</button>
@@ -219,8 +219,10 @@
 <div class="empty-state item-empty" id="item-empty"><div class="empty-glyph">◇</div><h2>Предметы ещё не добавлены</h2><p>Поиск, тип предмета, редкость и доступные паки уже готовы. Когда ты передашь список, мы внесём его без переработки интерфейса.</p></div>
 </section></section>
 <section aria-labelledby="rooms-heading" class="view" id="view-rooms">
-  <div class="page-heading"><span class="eyebrow">СОВМЕСТНАЯ ИГРА · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h1 id="rooms-heading">Игровые комнаты</h1><p>Проверка взаимодействий ГМа и двух игроков. Пока синхронизируются только вкладки <strong>этого браузера</strong> — другие устройства подключим позже.</p></div>
-  <div class="online-warning" role="note"><strong>Тестовая среда.</strong> Не онлайн-сервис: доступ по коду работает в рамках одного браузера и одного адреса сайта. Выбор роли здесь не защищён серверной авторизацией.</div>
+  <div class="page-heading"><span class="eyebrow">СОВМЕСТНАЯ ИГРА · ОНЛАЙН-АЛЬФА</span><h1 id="rooms-heading">Игровые комнаты</h1><p>Подключайся с разных устройств: состав участников, выбор персонажей и решения ГМа теперь сохраняются на сервере. Онлайн-режим проходит тестирование.</p></div>
+  <div class="online-warning" role="note"><strong>Онлайн-альфа:</strong> серверные роли защищены, но синхронизация идёт примерно раз в 6 секунд. Пока доступны муравьиные отряды; журнал, бестиарий и полные способности находятся в разработке.</div>
+  <div id="online-room-root" class="online-room-root"></div>
+  <details class="legacy-room-details"><summary>Открыть старую локальную демонстрацию (без серверных прав)</summary>
   <div class="room-grid" id="room-setup">
     <form class="panel" id="room-create-form"><span class="pill muted-pill">ШАГ 1 · ВЕДУЩИЙ</span><h2>Создать тестовую комнату</h2><label class="field-label" for="room-create-name">Название комнаты</label><input id="room-create-name" maxlength="72" required value="Операция: Красный тоннель"/><button class="btn primary wide" type="submit">Создать комнату</button></form>
     <form class="panel" id="room-join-form"><span class="pill muted-pill">ШАГ 2 · УЧАСТНИКИ</span><h2>Присоединиться</h2><p>Открой эту страницу в новой вкладке и введи код, затем выбери свободное место игрока.</p><label class="field-label" for="room-join-code">Код приглашения</label><input id="room-join-code" placeholder="ANT-XXXXX" autocomplete="off" required/><button class="btn subtle wide" type="submit">Открыть комнату</button></form>
@@ -234,10 +236,13 @@
     <div class="room-action-panel" id="room-action-panel"></div>
     <div class="room-feed"><h3>Журнал комнаты</h3><ol id="room-feed"></ol></div>
   </section>
+  </details>
 </section>
 <section aria-labelledby="gm-heading" class="view" id="view-gm">
-  <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Рубка ведущего: лечение, отдых, добавление противников и подтверждение действий. Сейчас всё работает только в локальном прототипе.</p></div>
-  <div class="online-warning" role="note">Демонстрационная версия. Права ГМа в ней не защищены от изменения в браузере. Для открытого интернета потребуются авторизация и серверные проверки.</div>
+  <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Управление настоящей онлайн-комнатой: здоровье, отдых, состав и тренировочные противники. Сервер проверяет права ведущего.</p></div>
+  <div class="online-warning" role="note">Онлайн-альфа: изменения ОЗ и отдых проверяются сервером. Механики способностей и бестиарий ещё в разработке.</div>
+  <div id="online-gm-root"></div>
+  <details class="legacy-room-details"><summary>Открыть локальную демонстрацию старой рубки</summary>
   <div id="gm-no-room" class="panel"><h2 id="gm-no-room-title">Сначала создай комнату</h2><p id="gm-no-room-text">Перейди в «Комнаты», создай тестовую сессию и выбери роль ГМа.</p><button type="button" class="btn primary" data-room-go="rooms">Перейти в комнаты</button></div>
   <div id="gm-dashboard" class="panel" hidden>
     <div class="room-dash-head"><div><span class="overline">ВЕДУЩИЙ · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h2 id="gm-room-title">Комната</h2><p id="gm-room-code"></p></div><button class="btn subtle" type="button" data-room-go="rooms">В комнату ↗</button></div>
@@ -255,13 +260,14 @@
  </div><h3>Игроки и противники</h3><div id="gm-units"></div>
     <h3>История решений</h3><ol class="room-feed-list" id="gm-feed"></ol>
   </div>
+  </details>
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.9.1</span><span>Аккаунты: Supabase · Комнаты: локальный прототип · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.10</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
 <script src="data.js"></script>
-<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script>
+<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script><script src="online-room-ui.js"></script>
 </body>
 </html>

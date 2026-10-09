@@ -28,16 +28,16 @@
 </nav>
 <div class="sidebar-foot">
 <span class="connection-dot"></span>
-<div><strong>Автономный прототип</strong><span>Без серверов и регистрации</span></div>
+<div><strong>Холэн онлайн · альфа</strong><span>Аккаунты и комнаты через Supabase</span></div>
 </div>
 </aside>
 <div class="main-area">
 <header class="topbar">
-<button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button>
-<div class="breadcrumb"><span>ХОЛЭН</span><span class="crumb-sep">/</span><strong id="breadcrumb-title">Главная</strong></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.10.1</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
+<div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.11.0</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
-<main id="main" tabindex="-1"><div class="page-back-strip" hidden="hidden" id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" title="Вернуться к предыдущему разделу" type="button">← Назад</button></div>
+<main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
 <div class="page-heading home-intro">
 <span class="eyebrow">НАСТОЛЬНЫЕ ПРИКЛЮЧЕНИЯ / ХОЛЭН</span>
@@ -69,15 +69,13 @@
 <section aria-labelledby="classes-heading" class="view" id="view-classes">
 <div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПЕРСОНАЖИ</span><h1 id="classes-heading">Классы</h1><p>Сначала выбери тип материала, затем источник. Официальные классы и авторские специализации хранятся отдельно.</p></div>
 <div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип классов" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="classes" type="button">Официальные D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="classes" type="button">Авторские · хоумбрю</button></div></div>
-<div class="source-header"><span class="overline">ДОСТУПНЫЕ ИСТОЧНИКИ</span><span class="muted">Выбери набор</span></div>
-<div class="source-grid" id="classes-sources"></div>
-<div aria-live="polite" class="catalog-results" id="classes-results"></div>
+<details class="catalog-source-toggle" open><summary>Показать / скрыть источники классов</summary><div class="source-grid" id="classes-sources"></div></details>
+<details class="catalog-list-toggle" open><summary>Показать / скрыть список классов</summary><div aria-live="polite" class="catalog-results" id="classes-results"></div></details>
 </section><section aria-labelledby="races-heading" class="view" id="view-races">
 <div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПРОИСХОЖДЕНИЯ</span><h1 id="races-heading">Расы</h1><p>Расы и игровые виды сгруппированы по источникам. Колонии муравьёв отмечены отдельно и не выдаются за самостоятельные расы.</p></div>
 <div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип рас" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="races" type="button">Официальные D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="races" type="button">Авторские · хоумбрю</button></div></div>
-<div class="source-header"><span class="overline">ДОСТУПНЫЕ ИСТОЧНИКИ</span><span class="muted">Выбери набор</span></div>
-<div class="source-grid" id="races-sources"></div>
-<div aria-live="polite" class="catalog-results" id="races-results"></div>
+<details class="catalog-source-toggle" open><summary>Показать / скрыть источники рас</summary><div class="source-grid" id="races-sources"></div></details>
+<details class="catalog-list-toggle" open><summary>Показать / скрыть список рас</summary><div aria-live="polite" class="catalog-results" id="races-results"></div></details>
 </section><section aria-labelledby="journeys-heading" class="view" id="view-journeys">
 <div class="pack-page-banner journey-banner"><span class="eyebrow">МИР ХОЛЭНА / ПАК</span><h1 id="journeys-heading">Путешествия Холэна</h1><p>Города Великого Пакта, магический стимпанк и истории за пределами муравьиных тоннелей.</p></div>
 <div class="announcement"><span class="pulsedot"></span><div>Страница пака открыта для навигации. Игровые персонажи и материалы этого пака ещё не добавлены — их не будем выдумывать.</div></div>
@@ -92,7 +90,7 @@
 </div>
 <div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Все семь интерактивных листов на одной странице.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
 </section><section aria-labelledby="profile-heading" class="view" id="view-profile">
-<div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт доступен на разных устройствах. Игровые комнаты пока находятся в локальном тестовом режиме.</p></div>
+<div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт, персонажи и онлайн-комнаты доступны на разных устройствах. Полные боевые листы ещё переходят на серверную синхронизацию.</p></div>
 <div class="profile-auth-actions" id="profile-auth-actions"><button class="btn primary" type="button" data-open-auth="register">Создать аккаунт</button><button class="btn subtle" type="button" data-open-auth="login">Войти</button></div><p class="auth-profile-note" id="profile-auth-info">Проверяем авторизацию…</p><div class="profile-layout"><div class="panel profile-card" id="profile-demo-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Локальный ник для демонстрации</h2><p>Только для тестовых вкладок. Ник постоянного аккаунта задаётся при регистрации.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="panel profile-card profile-account-card" id="profile-account-card" hidden><div aria-hidden="true" class="profile-avatar">◇</div><span class="overline">УЧЁТНАЯ ЗАПИСЬ</span><h2 id="profile-account-name">Путешественник</h2><p id="profile-account-email" class="profile-account-email"></p><p class="profile-account-tip">Персонажи и игровые заготовки сохраняются в твоём аккаунте и доступны на других устройствах.</p><button class="btn subtle" type="button" id="profile-account-logout">Выйти из аккаунта</button><a class="btn subtle" href="mailto:holen.world@gmail.com?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%BD%D0%B0%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0%20%D0%A5%D0%BE%D0%BB%D1%8D%D0%BD">Запросить удаление аккаунта</a><small>Удаление аккаунта обрабатывается через обращение на почту проекта, не автоматически.</small></div><div class="profile-extras"><div class="panel profile-characters"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Создавай, просматривай и редактируй своих персонажей. Для муравьиных отрядов доступны базовые характеристики и переход к интерактивному листу.</p><div id="character-list" class="character-collection" aria-live="polite"></div><button class="btn subtle" id="character-refresh" type="button">Обновить список</button>
 <form id="character-create-form" class="character-create-form"><h3>Добавить персонажа</h3>
 <label class="field-label" for="character-name">Имя персонажа</label><input id="character-name" type="text" maxlength="72" placeholder="Например, Меральт" required>
@@ -172,8 +170,8 @@
 <iframe class="sheet-frame" id="sheet-frame" loading="lazy" title="Интерактивный лист отряда"></iframe>
 </section>
 <section aria-labelledby="bestiary-heading" class="view" id="view-bestiary">
-<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СУЩЕСТВА</span><h1 id="bestiary-heading">Бестиарий</h1><p>Единый каталог противников и обитателей Холэна. Базу существ добавим на следующем этапе.</p></div>
-<div class="empty-state"><div class="empty-glyph">◈</div><h2>Пока здесь тихо...</h2><p>Мы не будем выдумывать характеристики врагов. Сначала утвердим структуру карточек, а потом перенесём сюда реальные данные.</p><span class="capsule">Запланировано: поиск · фильтры · карточка существа · добавление в бой</span></div>
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / СУЩЕСТВА</span><h1 id="bestiary-heading">Бестиарий Холэна</h1><p>Утверждённые шесть противников «Муравьиной революции»: полные характеристики и способности. Размеры червя 3×1 и исполина 2×2 зафиксированы; карта с занятыми клетками пока в разработке.</p></div>
+<div id="bestiary-app"></div>
 </section>
 <section aria-labelledby="rules-heading" class="view" id="view-rules">
 <div class="page-heading"><span class="eyebrow">СПРАВОЧНИК / ИГРОВАЯ СИСТЕМА</span><h1 id="rules-heading">Библиотека правил</h1><p>Выбери игровой пак. Правила основной кампании и «Муравьиной революции» хранятся отдельно.</p></div>
@@ -222,52 +220,20 @@
   <div class="page-heading"><span class="eyebrow">СОВМЕСТНАЯ ИГРА · ОНЛАЙН-АЛЬФА</span><h1 id="rooms-heading">Игровые комнаты</h1><p>Подключайся с разных устройств: состав участников, выбор персонажей и решения ГМа теперь сохраняются на сервере. Онлайн-режим проходит тестирование.</p></div>
   <div class="online-warning" role="note"><strong>Онлайн-альфа:</strong> серверные роли защищены, но синхронизация идёт примерно раз в 6 секунд. Пока доступны муравьиные отряды; журнал, бестиарий и полные способности находятся в разработке.</div>
   <div id="online-room-root" class="online-room-root"></div>
-  <details class="legacy-room-details"><summary>Открыть старую локальную демонстрацию (без серверных прав)</summary>
-  <div class="room-grid" id="room-setup">
-    <form class="panel" id="room-create-form"><span class="pill muted-pill">ШАГ 1 · ВЕДУЩИЙ</span><h2>Создать тестовую комнату</h2><label class="field-label" for="room-create-name">Название комнаты</label><input id="room-create-name" maxlength="72" required value="Операция: Красный тоннель"/><button class="btn primary wide" type="submit">Создать комнату</button></form>
-    <form class="panel" id="room-join-form"><span class="pill muted-pill">ШАГ 2 · УЧАСТНИКИ</span><h2>Присоединиться</h2><p>Открой эту страницу в новой вкладке и введи код, затем выбери свободное место игрока.</p><label class="field-label" for="room-join-code">Код приглашения</label><input id="room-join-code" placeholder="ANT-XXXXX" autocomplete="off" required/><button class="btn subtle wide" type="submit">Открыть комнату</button></form>
-  </div>
-  <section class="panel room-dashboard" id="room-dashboard" hidden>
-    <div class="room-dash-head"><div><span class="overline">КОМНАТА · ТЕСТОВАЯ</span><h2 id="room-active-title">Комната</h2><p id="room-active-code"></p></div><div class="room-head-actions"><button class="btn subtle" id="room-copy-code" type="button">Копировать код</button><button class="btn subtle" id="room-leave" type="button">Выйти</button></div></div>
-    <div class="room-role-bar"><label for="room-role">Роль в этой вкладке (только для локальной демонстрации)</label><select id="room-role"><option value="gm">ГМ</option><option value="p1">Игрок 1</option><option value="p2">Игрок 2</option></select><span class="pill" id="room-role-pill">ГМ</span></div>
-    <div id="room-message" class="room-message" role="status" aria-live="polite"></div>
-    <div class="room-meta" id="room-meta"></div>
-    <div id="room-units"></div>
-    <div class="room-action-panel" id="room-action-panel"></div>
-    <div class="room-feed"><h3>Журнал комнаты</h3><ol id="room-feed"></ol></div>
-  </section>
-  </details>
+  
 </section>
 <section aria-labelledby="gm-heading" class="view" id="view-gm">
   <div class="page-heading"><span class="eyebrow">ИНСТРУМЕНТЫ · ВЕДУЩИЙ</span><h1 id="gm-heading">Панель ГМа</h1><p>Управление настоящей онлайн-комнатой: здоровье, отдых, состав и тренировочные противники. Сервер проверяет права ведущего.</p></div>
   <div class="online-warning" role="note">Онлайн-альфа: изменения ОЗ и отдых проверяются сервером. Механики способностей и бестиарий ещё в разработке.</div>
   <div id="online-gm-root"></div>
-  <details class="legacy-room-details"><summary>Открыть локальную демонстрацию старой рубки</summary>
-  <div id="gm-no-room" class="panel"><h2 id="gm-no-room-title">Сначала создай комнату</h2><p id="gm-no-room-text">Перейди в «Комнаты», создай тестовую сессию и выбери роль ГМа.</p><button type="button" class="btn primary" data-room-go="rooms">Перейти в комнаты</button></div>
-  <div id="gm-dashboard" class="panel" hidden>
-    <div class="room-dash-head"><div><span class="overline">ВЕДУЩИЙ · ЛОКАЛЬНЫЙ ПРОТОТИП</span><h2 id="gm-room-title">Комната</h2><p id="gm-room-code"></p></div><button class="btn subtle" type="button" data-room-go="rooms">В комнату ↗</button></div>
-    <div class="room-meta" id="gm-turn-summary"></div><button class="btn primary" id="gm-next-turn" type="button">Следующий ход →</button>
-    <h3>Заявки игроков</h3><div class="request-list" id="gm-requests"></div>
-    <div class="gm-command-grid">
- <section class="gm-command-card"><h3>✚ Ручное восстановление здоровья</h3><p>Обычное лечение не превышает максимум выживших бойцов и не возвращает погибших. Уничтоженный отряд не лечится.</p>
- <label for="gm-target">Отряд</label><select id="gm-target" class="room-select"></select>
- <label for="gm-heal-amount">Восстановить ОЗ</label><input id="gm-heal-amount" type="number" min="1" max="9999" value="3">
- <button class="btn primary" id="gm-heal-btn" type="button">Восстановить</button></section>
- <section class="gm-command-card"><h3>☾ Отдых отрядов</h3><p>Короткий отдых лечит выживших до текущего предела. Долгий с разрешения ГМа пополняет только сохранившиеся отряды и возвращает ресурсы, но не воскрешает уничтоженные.</p>
- <div class="room-unit-actions"><button class="btn subtle" id="gm-short-rest" type="button">Короткий отдых</button><button class="btn subtle" id="gm-long-rest" type="button">Долгий отдых</button></div></section>
- <section class="gm-command-card"><h3>⚔ Добавить противника</h3><p>Бестиарий под конкретный пак ещё готовится. Сейчас доступен только явно обозначенный тренировочный противник.</p>
- <button class="btn subtle" id="gm-add-training" type="button">Добавить тренировочного врага</button></section>
- </div><h3>Игроки и противники</h3><div id="gm-units"></div>
-    <h3>История решений</h3><ol class="room-feed-list" id="gm-feed"></ol>
-  </div>
-  </details>
+  
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.10.2</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.11.0</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="data.js"></script>
-<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="room-engine.js?v=0102"></script><script src="room-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script><script src="online-room-ui.js?v=0102"></script>
+<script src="data.js"></script><script src="bestiary-data.js"></script>
+<script src="catalog-data.js"></script><script src="holen-rules-data.js"></script><script src="items-data.js"></script><script src="app.js"></script><script src="bestiary-ui.js"></script><script src="auth-ui.js"></script><script src="character-ui.js"></script><script src="online-room-ui.js?v=0102"></script>
 </body>
 </html>

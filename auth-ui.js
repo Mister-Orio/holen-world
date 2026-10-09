@@ -90,7 +90,7 @@ async function submit(e){
  const btn=$('auth-submit');btn.disabled=true;
  try{
    const username=name.value.trim().normalize('NFC'),mail=email.value.trim().toLowerCase(),password=pass.value;
-   if(mode==='register'&&(!/^[\\p{L}\\p{N}_-]{3,24}$/u.test(username)))throw Error('Логин: 3–24 символа, буквы, цифры, _ и -.');
+   if(mode==='register'&&(!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)))throw Error('Логин: 3–24 символа, буквы, цифры, _ и -.');
    if(mode!=='reset'&&(!mail||!email.validity.valid))throw Error('Укажите действительный адрес почты.');
    if(mode!=='recover' && (password.length<12||password.length>128))throw Error('Пароль должен содержать от 12 до 128 символов.');
    if((mode==='register'||mode==='reset')&&password!==confirm.value)throw Error('Пароли не совпадают.');

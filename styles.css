@@ -140,6 +140,11 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
 .panel .registry-search input{flex:1;min-width:0;width:100%;margin:0;padding:12px 0;border:0;border-radius:0;background:transparent;min-height:46px;box-shadow:none}
 .panel .registry-search:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 .panel .registry-search input:focus-visible{outline:0}
+.class-edition-control{display:grid;gap:8px;max-width:300px;font-weight:700}
+.class-edition-control select{min-height:46px;padding:10px 14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;font:inherit}
+.catalog-item-source{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.wizard-skill-choices{display:flex;flex-wrap:wrap;gap:12px;padding:16px;border:1px solid var(--border);border-radius:12px}
+.wizard-skill-choices label{display:flex;align-items:center;gap:8px}
 .spell-list{display:grid;gap:7px}.spell-entry{display:grid;grid-template-columns: minmax(0,1fr) minmax(0,1.3fr);gap:14px;background:#12201a;border:1px solid #385145;border-radius:10px;padding:12px 14px;align-items:start}
 .spell-entry strong,.spell-entry small,.spell-entry span{display:block;overflow-wrap:anywhere}
 .spell-entry strong{font-size:13px}.spell-entry span{color:#c4e9d5;font-size:12px}
@@ -268,6 +273,13 @@ button.pack-card:hover{transform:translateY(-2px);border-color:#83bf9a;box-shado
 .profile-auth-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
 .auth-profile-note{border:1px solid #446550;border-radius:10px;padding:12px 14px;background:#1b2e24;color:#c5e7cd;font-size:12px;margin:0 0 18px}
 .auth-layout{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);max-width:1100px;gap:18px;margin:auto;align-items:stretch}
+html.auth-gated,html.auth-gated body{overflow:hidden}
+html.auth-gated #view-auth{display:block;position:fixed;inset:0;z-index:10000;overflow-y:auto;padding:clamp(18px,4vw,52px);background:#0d1815}
+html.auth-gated #view-auth .auth-layout{min-height:calc(100dvh - clamp(36px,8vw,104px));align-content:center}
+html.auth-checking #auth-form,html.auth-checking .auth-actions{visibility:hidden}
+html.auth-checking #auth-subtitle:after{content:" Проверяем сохранённый вход…"}
+html.auth-gated .auth-preview-note{display:none}
+@media(max-width:930px){html.auth-gated .auth-promo{min-height:0}html.auth-gated .auth-promo h1{font-size:26px;margin:4px 0}html.auth-gated .auth-promo p{margin:8px 0 0}html.auth-gated .auth-promo-content{padding:20px}html.auth-gated .auth-card{padding:24px}}
 .auth-promo{position:relative;min-height:680px;border:1px solid #425f4e;border-radius:18px;background:linear-gradient(0deg,rgba(7,19,13,.98),rgba(9,19,15,.55) 72%),url('assets/holen-city.webp') center/cover;overflow:hidden}
 .auth-promo-content{display:flex;flex-direction:column;height:100%;padding:clamp(24px,3.5vw,45px)}
 .auth-sigil{display:grid;place-items:center;width:75px;height:75px;font-size:46px;color:#e4d09c;border:1px solid #ac9d7587;border-radius:22px;background:#101d17a5;margin:65px 0 12px}

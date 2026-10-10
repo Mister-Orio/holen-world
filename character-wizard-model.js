@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const d=window.HOLEN_DND,o=window.HOLEN_DND_OPTIONS,keys=Object.keys(d.abilities);
 const steps=s=>s.pack==='insects'?['Пак','Имя','Специализация','Проверка']:['Пак','Имя и уровень','Класс и раса','Предыстория','Характеристики','Подкласс и черты','Проверка'];
-function fresh(){const sheet=d.blank('2014','fighter','human');sheet.abilityMode='point-buy';sheet.baseAbilities=Object.fromEntries(keys.map(k=>[k,8]));return {pack:'journeys',name:'',step:0,templateId:'',variantHuman:false,extras:[],sheet:d.normalize(sheet)};}
+function fresh(){const sheet=d.blank('2014','fighter','human');sheet.abilityMode='point-buy';sheet.baseAbilities=Object.fromEntries(keys.map(k=>[k,8]));return {pack:'journeys',name:'',step:0,templateId:'',variantHuman:false,extras:[],backgroundSkills:[],sheet:d.normalize(sheet)};}
 function cls(s){return d.editions[s.sheet.edition].classes.find(x=>x.id===s.sheet.classId);}
 function budgets(s){
  const sh=s.sheet,levels=[4,8,12,16,19,...(sh.classId==='fighter'?[6,14]:sh.classId==='rogue'?[10]:[])];
@@ -29,7 +29,8 @@ function sync(s){
  s.sheet.subclass=sub?.name||'';s.sheet.selectedSubclassId=sub?.id||'';
  s.sheet.background=bg?.name||'';s.sheet.backgroundId=bg?.id||'';
  s.sheet.saveProficiencies=[...c.saves];s.sheet.casting=c.casting;
- s.sheet.skills=Object.fromEntries(d.skills.map(([id])=>[id,bg?.skills.includes(id)?1:0]));
+ s.backgroundSkills=[...new Set(s.backgroundSkills||[])].filter(id=>bg?.skillChoices?.options.includes(id)).slice(0,bg?.skillChoices?.count||0);
+ s.sheet.skills=Object.fromEntries(d.skills.map(([id])=>[id,bg?.skills.includes(id)||s.backgroundSkills.includes(id)?1:0]));
  s.extras=selection(s,s.extras);s.sheet.featIds=[...new Set([...mandatory(s),...s.extras])];
  s.sheet.hpMode='average';s.sheet.hp=9999;s.sheet.hitDice=s.sheet.level;
  s.sheet.resources=c.resources.map(name=>({name,current:0,max:0}));
@@ -38,7 +39,7 @@ function sync(s){
 }
 function restore(value){
  const base=fresh(),v=value&&typeof value==='object'?value:{};
- const s={...base,pack:v.pack==='insects'?'insects':'journeys',name:typeof v.name==='string'?v.name.slice(0,72):'',templateId:typeof v.templateId==='string'?v.templateId:'',variantHuman:!!v.variantHuman,extras:Array.isArray(v.extras)?v.extras:[],sheet:d.normalize(v.sheet||base.sheet)};
+ const s={...base,pack:v.pack==='insects'?'insects':'journeys',name:typeof v.name==='string'?v.name.slice(0,72):'',templateId:typeof v.templateId==='string'?v.templateId:'',variantHuman:!!v.variantHuman,extras:Array.isArray(v.extras)?v.extras:[],backgroundSkills:Array.isArray(v.backgroundSkills)?v.backgroundSkills:[],sheet:d.normalize(v.sheet||base.sheet)};
  s.step=Math.max(0,Math.min(steps(s).length-1,Number.isInteger(v.step)?v.step:0));return sync(s);
 }
 function change(s,key,value){
@@ -55,6 +56,9 @@ function change(s,key,value){
  else if(key==='feat'){
   const [id,on]=value;
   s.extras=on?selection(s,[...s.extras,id]):s.extras.filter(x=>x!==id);
+ }else if(key==='backgroundSkill'){
+  const [id,on]=value,bg=background(s);
+  if(bg?.skillChoices?.options.includes(id))s.backgroundSkills=on?[...new Set([...s.backgroundSkills,id])].slice(0,bg.skillChoices.count):s.backgroundSkills.filter(x=>x!==id);
  }else if(key==='classId'){s.sheet.classId=value;s.sheet.selectedSubclassId='';}
  else if(key==='speciesId'){s.sheet.speciesId=value;s.sheet.speed=d.editions[s.sheet.edition].species.find(x=>x.id===value)?.speed||30;}
  else if(key==='level'){s.sheet.level=Number(value);}
@@ -67,7 +71,7 @@ function validate(s,step=s.step,templates=[]){
  if(step===1){if(!s.name.trim()||s.name.trim().length>72)return 'Введи имя от 1 до 72 символов.';return '';}
  if(s.pack==='insects')return step===2&&!templates.some(t=>t.id===s.templateId)?'Выбери специализацию.':'';
  if(step===2)return !cls(s)||!d.editions[s.sheet.edition].species.some(x=>x.id===s.sheet.speciesId)?'Выбери класс и расу.':'';
- if(step===3)return !background(s)?'Выбери предысторию.':'';
+ if(step===3){const bg=background(s);return !bg?'Выбери предысторию.':bg.skillChoices&&s.backgroundSkills.length!==bg.skillChoices.count?'Выбери навыки предыстории: '+bg.skillChoices.count+'.':'';}
  if(step===4){
   if(s.sheet.abilityMode==='point-buy'&&(keys.some(k=>s.sheet.baseAbilities[k]<8||s.sheet.baseAbilities[k]>15)||d.pointBuyCost(s.sheet.baseAbilities)>27))return 'На покупку характеристик доступно 27 очков; значения — от 8 до 15.';
   if(s.sheet.abilityMode==='standard-array'&&[...keys.map(k=>s.sheet.baseAbilities[k])].sort((a,b)=>a-b).join()!==[...d.standardArray].sort((a,b)=>a-b).join())return 'Используй каждое значение стандартного набора один раз.';

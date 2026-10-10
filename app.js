@@ -43,6 +43,9 @@ function closeMenu() {
 }
 let navigationEpoch=0;
 async function navigate(name, {push=true}={}) {
+  if(window.HOLEN_AUTH_GATE?.isLocked()&&name!=='auth'){
+    window.HOLEN_AUTH_GATE.remember(VIEWS.includes(name)?name:'home');name='auth';
+  }
   const token=++navigationEpoch;
   const view = VIEWS.includes(name)?name:'home';
   const previous=currentView;
@@ -321,6 +324,7 @@ function showCatalog(type, category='homebrew') {
   navigate(type);
 }
 function renderCatalog(type) {
+  if(type==='classes'){renderClassCatalog();return;}
   const state=catalogState[type];
   const sources=window.HOLEN_CATALOG[type][state.category];
   if(!sources.some(x=>x.id===state.source)) state.source=sources[0]?.id||null;
@@ -357,6 +361,28 @@ function renderCatalog(type) {
   srcWrap.querySelectorAll('[data-select-source]').forEach(btn=>btn.addEventListener('click',()=>{
     state.source=btn.dataset.selectSource;renderCatalog(type);
   }));
+}
+function renderClassCatalog(){
+ const state=catalogState.classes,official=state.category==='official',edition=state.source==='dnd2024'?'2024':'2014';
+ document.querySelectorAll('[data-kind="classes"][data-category]').forEach(btn=>{const active=btn.dataset.category===state.category;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
+ const sources=$('classes-sources');sources.innerHTML=official?'<label class="class-edition-control">Редакция<select id="classes-edition"><option value="2014">D&D 2014</option><option value="2024">D&D 2024</option></select></label>':'';
+ const control=$('classes-edition');if(control){control.value=edition;control.addEventListener('change',()=>{state.source='dnd'+control.value;renderClassCatalog();});}
+ let cards=[];
+ if(official){
+  cards=window.HOLEN_DND.editions[edition].classes.map(entry=>{
+   const source=entry.supplement?'TCE · Котёл Таши со всякой всячиной':'PHB '+edition+' · Книга игрока';
+   return '<article class="catalog-item"><span class="catalog-item-symbol muted-glyph" aria-hidden="true">◈</span><div class="catalog-item-content"><strong>'+escapeHtml(entry.name)+'</strong><small class="catalog-item-source">'+escapeHtml(source)+'</small></div><a class="catalog-action" href="'+escapeHtml(window.HOLEN_DND.referenceUrl(edition,'class',entry.id))+'">Лист ↗</a></article>';
+  });
+ }else{
+  for(const source of window.HOLEN_CATALOG.classes.homebrew){
+   for(const id of source.squadIds||[]){const squad=window.ANT_DATA.squads.find(x=>x.id===id);if(!squad)continue;
+    cards.push('<article class="catalog-item sheet-list-item"><span class="catalog-item-symbol" aria-hidden="true">'+escapeHtml(squad.icon)+'</span><div class="catalog-item-content"><strong>'+escapeHtml(squad.name)+'</strong><small class="catalog-item-source">Холэн · Муравьиная революция</small><small>'+escapeHtml(squad.role)+' · '+escapeHtml(COLONY_LABEL[squad.colony])+'</small></div><button type="button" class="catalog-action" data-sheet="'+escapeHtml(squad.id)+'">Лист ↗</button></article>');
+   }
+   for(const item of source.items||[]){const row=typeof item==='string'?{name:item}:item;cards.push('<article class="catalog-item"><div class="catalog-item-content"><strong>'+escapeHtml(row.name)+'</strong><small class="catalog-item-source">'+escapeHtml(row.sourceName||source.name)+'</small>'+(row.description?'<small>'+escapeHtml(row.description)+'</small>':'')+'</div></article>');}
+  }
+ }
+ $('classes-results').innerHTML='<div class="catalog-results-heading"><div><span class="overline">'+(official?'КЛАССИЧЕСКИЕ · ОФИЦИАЛЬНЫЕ':'ХОУМБРЮ')+'</span><h2>'+(official?'D&D '+edition:'Авторские материалы')+'</h2></div><span class="muted">'+cards.length+' вариантов</span></div><div class="catalog-items">'+cards.join('')+'</div><p class="source-note">'+(official?'Издательский источник указан под каждым классом.':'Специализации «Муравьиной революции» относятся к отдельной тактической системе отрядов.')+'</p>';
+ $('classes-results').querySelectorAll('[data-sheet]').forEach(btn=>btn.addEventListener('click',()=>openSheet(btn.dataset.sheet)));
 }
 
 // ================================================================

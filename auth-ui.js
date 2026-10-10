@@ -12,7 +12,7 @@ const $=id=>document.getElementById(id);
 const form=$('auth-form'), name=$('auth-username'),email=$('auth-email'),pass=$('auth-password'),confirm=$('auth-confirm');
 const buttons={register:$('auth-register-btn'),login:$('auth-login-btn'),forgot:$('auth-forgot-btn')};
 const info=$('auth-response');
-let mode='register',session=null,authenticated=false;
+let mode='login',session=null,authenticated=false;
 function feedback(t,err=false){info.textContent=t;info.hidden=false;info.className='auth-response'+(err?' is-error':'');}
 function clear(){info.hidden=true;info.textContent='';}
 function store(s){session=s;try{s?localStorage.setItem(STORE,JSON.stringify(s)):localStorage.removeItem(STORE);}catch(_){}}
@@ -29,7 +29,7 @@ async function validSession(){
    try{
      const fresh=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
      store({...fresh,expires_at:Date.now()+fresh.expires_in*1000});
-   }catch(_){store(null);return null;}
+   }catch(_){store(null);renderSession(null);return null;}
  }
  return session.access_token;
 }
@@ -38,13 +38,15 @@ async function loadProfile(){
  if(!token){renderSession(null);return;}
  try{
    const user=await request('/auth/v1/user',{token});
-   const list=await request('/rest/v1/profiles?select=username&id=eq.'+encodeURIComponent(user.id),{token});
+   if(!user.id)throw Error('Сессия не подтверждена.');
+   let list=[];try{list=await request('/rest/v1/profiles?select=username&id=eq.'+encodeURIComponent(user.id),{token});}catch(_){}
    renderSession({user,username:list?.[0]?.username||'Путешественник'});
  }catch(_){store(null);renderSession(null);}
 }
 function renderSession(data){
  authenticated=!!data;
  window.__holen_current_user_id=data?.user?.id||null;
+ window.HOLEN_AUTH_GATE?.sync(authenticated,{recovery:mode==='reset'});
  const note=$('auth-session'),profile=$('profile-auth-info'),top=$('top-auth-open');
  $('auth-form').hidden=authenticated && mode!=='reset';
  $('auth-bottom-meta')?.classList?.toggle('is-signed-in',authenticated);
@@ -72,6 +74,7 @@ function renderSession(data){
 }
 function selectMode(next){
  mode=next;clear();
+ window.HOLEN_AUTH_GATE?.sync(authenticated,{recovery:next==='reset'});
  $('auth-form').hidden=authenticated && next!=='reset';
  const reg=next==='register',login=next==='login',recover=next==='recover',reset=next==='reset';
  $('auth-title').textContent=reg?'Создать аккаунт':login?'Войти в Холэн':recover?'Восстановить пароль':'Новый пароль';
@@ -116,21 +119,30 @@ async function submit(e){
      if(x.access_token)store({...x,expires_at:Date.now()+x.expires_in*1000});
      feedback('Если регистрация принята, проверьте почту и подтвердите адрес по ссылке. Без подтверждения вход может быть недоступен.');
      pass.value='';confirm.value='';
-     if(x.access_token){await loadProfile();navigate('profile');}
+     if(x.access_token){await completeLogin();}
    }else if(mode==='login'){
      const s=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:mail,password}});
      store({...s,expires_at:Date.now()+s.expires_in*1000});pass.value='';
-     await loadProfile();navigate('profile');
+     await completeLogin();
    }else if(mode==='recover'){
      await request('/auth/v1/recover?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail}});
      feedback('Если аккаунт существует и почтовая отправка настроена, придёт письмо со ссылкой восстановления.');
    }else if(mode==='reset'){
      const token=await validSession();if(!token)throw Error('Ссылка восстановления истекла. Запросите новую.');
      await request('/auth/v1/user',{method:'PUT',body:{password},token});
-     pass.value='';confirm.value='';selectMode('login');feedback('Пароль обновлён. Теперь войдите в аккаунт.');
+     pass.value='';confirm.value='';await logout();feedback('Пароль обновлён. Теперь войдите в аккаунт.');
    }
  }catch(e){feedback(failure(e),true);}
  finally{btn.disabled=false;}
+}
+async function completeLogin(){
+ await loadProfile();if(!authenticated)return;
+ resumeNavigation();
+}
+function resumeNavigation(){
+ const target=window.HOLEN_AUTH_GATE?.takeReturn();
+ if(target){const url=new URL(target);if(url.pathname===location.pathname&&url.search===location.search){navigate(url.hash.slice(1)||'home');return;}location.replace(target);return;}
+ navigate('profile');
 }
 function open(next='login'){if(authenticated && next!=='reset'){navigate('profile');return;}selectMode(next);navigate('auth');}
 async function logout(){
@@ -149,6 +161,7 @@ $('top-auth-open').addEventListener('click',()=>open('login'));
 document.querySelectorAll('[data-open-auth]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.openAuth)));
 document.querySelectorAll('[data-password-toggle]').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.passwordToggle);el.type=el.type==='password'?'text':'password';b.setAttribute('aria-pressed',String(el.type==='text'));}));
 const hash=location.hash;
+selectMode('login');
 if(hash.includes('access_token=') && hash.includes('refresh_token=')){
  const p=new URLSearchParams(hash.slice(1));
  const s={access_token:p.get('access_token'),refresh_token:p.get('refresh_token'),expires_in:Number(p.get('expires_in')||3600)};
@@ -158,7 +171,13 @@ if(hash.includes('access_token=') && hash.includes('refresh_token=')){
  else{selectMode('login');feedback('Адрес подтверждён. Вы вошли в аккаунт.');}
  navigate('auth',{push:false});
 }
-loadProfile();
+loadProfile().then(()=>{
+ if(authenticated&&mode!=='reset'&&currentView==='auth'){
+  resumeNavigation();
+ }
+});
+window.addEventListener('storage',e=>{if(e.key===STORE){try{session=JSON.parse(e.newValue||'null');}catch(_){session=null;}loadProfile();}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadProfile();});
 async function listCharacters(pack){
  const token=await validSession();
  if(!token)return [];

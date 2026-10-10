@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
+const saved=new Map(),classes=new Set(),attrs={};
+const sibling={inert:false},body={children:[]},root={parentElement:body,setAttribute:(k,v)=>attrs[k]=v,removeAttribute:k=>delete attrs[k],querySelectorAll:()=>[],contains:()=>false};body.children=[root,sibling];
+const doc={body,documentElement:{classList:{toggle:(k,v)=>v?classes.add(k):classes.delete(k)}},getElementById:()=>root,addEventListener:()=>{}};
+const box={window:{},document:doc,URL,URLSearchParams,location:{href:'https://example.test/holen/index.html#rules',search:''},sessionStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},requestAnimationFrame:fn=>fn()};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'..','auth-gate.js'),'utf8'),box);const gate=box.window.HOLEN_AUTH_GATE;
+assert.equal(gate.isLocked(),true);assert.equal(sibling.inert,true);assert.equal(attrs['aria-modal'],'true');
+assert.equal(gate.safeReturn('https://evil.test/holen/index.html'),null);assert.equal(gate.safeReturn('../private.html'),null);assert.equal(gate.safeReturn('index.html#access_token=secret'),null);
+assert.equal(gate.safeReturn('creature.html?id=worm'),'https://example.test/holen/creature.html?id=worm');
+gate.remember('rules');assert.equal(gate.takeReturn(),'https://example.test/holen/index.html#rules');assert.equal(gate.takeReturn(),null);
+gate.sync(true);assert.equal(gate.isLocked(),false);assert.equal(sibling.inert,false);assert.equal(attrs['aria-modal'],undefined);
+gate.sync(true,{recovery:true});assert.equal(gate.isLocked(),true);assert.equal(sibling.inert,true);
+gate.sync(true,{checking:true});assert.equal(gate.isLocked(),true);assert.equal(classes.has('auth-checking'),true);
+console.log('PASS: auth gate, recovery lock, inert restoration and safe return URLs.');

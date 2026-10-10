@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 
-<html lang="ru">
+<html lang="ru" class="auth-gated auth-checking">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="#0d1615" name="theme-color"/>
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
-<link href="styles.css?v=0123" rel="stylesheet"/>
+<link href="styles.css?v=0124" rel="stylesheet"/>
 <link href="ui-icons.css?v=0122a" rel="stylesheet"/>
 
 </head>
@@ -39,7 +39,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.3</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.4</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -71,9 +71,9 @@
 <div class="announcement"><span class="pulsedot"></span><div><strong>Прототип:</strong> справочники доступны без регистрации. В аккаунте можно сохранять персонажей и подключаться к онлайн-комнатам; игровой режим проходит тестирование.</div></div>
 </section>
 <section aria-labelledby="classes-heading" class="view" id="view-classes">
-<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПЕРСОНАЖИ</span><h1 id="classes-heading">Классы</h1><p>Сначала выбери тип материала, затем источник. Официальные классы и авторские специализации хранятся отдельно.</p></div>
-<div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип классов" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="classes" type="button">Официальные D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="classes" type="button">Авторские · хоумбрю</button></div></div>
-<details class="catalog-source-toggle" open><summary>Показать / скрыть источники классов</summary><div class="source-grid" id="classes-sources"></div></details>
+<div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПЕРСОНАЖИ</span><h1 id="classes-heading">Классы</h1><p>Выбери классические классы нужной редакции или хоумбрю. Источник указан под каждым вариантом.</p></div>
+<div class="catalog-toolbar catalog-kind-toolbar"><span class="toolbar-label">Источник правил</span><div aria-label="Тип классов" class="filter-group source-filter" role="group"><button aria-pressed="true" class="filter active" data-category="official" data-kind="classes" type="button">Классические D&amp;D</button><button aria-pressed="false" class="filter" data-category="homebrew" data-kind="classes" type="button">Авторские · хоумбрю</button></div></div>
+<details class="catalog-source-toggle" open><summary>Показать / скрыть выбор редакции</summary><div class="source-grid" id="classes-sources"></div></details>
 <details class="catalog-list-toggle" open><summary>Показать / скрыть список классов</summary><div aria-live="polite" class="catalog-results" id="classes-results"></div></details>
 </section><section aria-labelledby="races-heading" class="view" id="view-races">
 <div class="page-heading"><span class="eyebrow">БИБЛИОТЕКА / ПРОИСХОЖДЕНИЯ</span><h1 id="races-heading">Расы</h1><p>Расы и игровые виды сгруппированы по источникам. Колонии муравьёв отмечены отдельно и не выдаются за самостоятельные расы.</p></div>
@@ -249,14 +249,15 @@
   
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.3</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.4</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="feature-loader.js?v=0123"></script>
+<script src="auth-gate.js?v=0124"></script>
+<script src="feature-loader.js?v=0124"></script>
 <script src="ui-icons.js?v=0122"></script>
-<script src="app.js?v=0123"></script>
-<script src="auth-ui.js?v=0123"></script>
+<script src="app.js?v=0124"></script>
+<script src="auth-ui.js?v=0124"></script>
 </body>
 </html>
 

@@ -13,7 +13,7 @@ function catalogMatches(record,edition,source){const info=sourceFor(record,editi
 function catalogSources(records,edition){
  const books=new Map(records.map(x=>{const a=sourceFor(x,edition);return[a.abbr,a.name];}));
  const ph=edition==='2024'?'PH24':'PH14';
- return [...(books.has(ph)?[[ph,'Player’s Handbook · Книга игрока '+edition]]:[]),['all','Все источники'],['homebrew','HB · Хоумбрю'],...[...books].filter(([id])=>id!==ph).sort((a,b)=>a[1].localeCompare(b[1],'ru')).map(([id,name])=>[id,id+' · '+name])];
+ return [['all','Все источники'],...(books.has(ph)?[[ph,'Player’s Handbook · Книга игрока '+edition]]:[]),['homebrew','HB · Хоумбрю'],...[...books].filter(([id])=>id!==ph).sort((a,b)=>a[1].localeCompare(b[1],'ru')).map(([id,name])=>[id,id+' · '+name])];
 }
 window.HOLEN_OPTION_SOURCES={sourceFor,matches,catalogMatches,catalogSources};
 })();

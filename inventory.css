@@ -1,0 +1,15 @@
+.inventory-toolbar{display:grid;grid-template-columns:minmax(220px,2fr) minmax(170px,1fr) minmax(170px,1fr) auto;gap:16px;align-items:end;padding:22px;border:1px solid var(--border);border-radius:18px;margin:24px 0}
+.inventory-toolbar label{font-weight:700;display:block;min-width:0}
+.inventory-toolbar input,.inventory-toolbar select{display:block;width:100%;min-width:0;margin-top:9px;padding:14px;border:1px solid #486451;border-radius:12px;background:#12231c;color:var(--text);font:inherit;min-height:52px}
+.inventory-toolbar :is(input,select):focus-visible,.inventory-scroll:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.inventory-toolbar p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px}
+.inventory-section{margin:28px 0;min-width:0}.inventory-section h2{font-size:20px;margin-bottom:13px}
+.inventory-scroll{max-width:100%;overflow-x:auto;border:1px solid #405a4b;border-radius:14px;background:#15231e}
+.inventory-table{border-collapse:collapse;width:100%;min-width:780px;text-align:left;font-size:14px;line-height:1.55}
+.inventory-table th,.inventory-table td{padding:14px 16px;border-bottom:1px solid #30473b;vertical-align:top}
+.inventory-table thead th{background:#213a2e;color:#e5c589;white-space:nowrap;font-size:12px;letter-spacing:.03em}
+.inventory-table th[scope=row]{color:#ecf3e9;min-width:150px}.inventory-table td{color:#bed0c3}.inventory-table tbody tr:nth-child(even){background:#1a2c23}
+.inventory-table tbody tr:last-child>*{border-bottom:0}.inventory-table tbody tr:hover{background:#274436}
+.inventory-notes{color:var(--muted);font-size:13px;line-height:1.7}.inventory-notes details{padding:16px;border:1px solid var(--border);border-radius:12px;margin:12px 0}.inventory-notes summary{cursor:pointer;color:var(--text);font-weight:700}.inventory-notes a{color:var(--gold)}
+#view-inventory{min-width:0}@media(max-width:1100px){.inventory-toolbar{grid-template-columns:minmax(180px,2fr) minmax(150px,1fr)}.inventory-toolbar .btn{min-height:52px}}
+@media(max-width:580px){.inventory-toolbar{grid-template-columns:minmax(0,1fr);padding:16px}.inventory-table{font-size:13px}.inventory-table th,.inventory-table td{padding:12px}.inventory-toolbar p{grid-column:auto}}

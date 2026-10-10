@@ -773,3 +773,6 @@ body.room-focus-mode .online-session{min-height:calc(100vh - 40px)}
  #dnd-character-form h2{font-size:15pt}
 }
 
+
+/* Registry 2.0: optional public conditions. */
+.spell-entry dl{margin:12px 0 0;grid-column:1/-1}.spell-entry dl>div{margin:8px 0}.spell-entry dt{font-weight:700;color:#c8dbc9}.spell-entry dd{margin:3px 0 0;color:var(--muted);line-height:1.6;font-size:13px}.spell-entry details{grid-column:1/-1}.spell-entry details>summary{cursor:pointer;font-size:13px;color:var(--gold);padding:8px 0}.spell-entry .spell-entry-main{min-width:0}

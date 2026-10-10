@@ -65,7 +65,7 @@ window.ANT_DATA = {
     },
     {
       "id": "captain",
-      "name": "Капитан колонии",
+      "name": "Капитан отряда",
       "role": "Командование отрядами",
       "colony": "black",
       "number": 3,

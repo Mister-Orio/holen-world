@@ -9,8 +9,8 @@
    ================================================================ */
 
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','rooms','gm'];
-const BREADCRUMBS = {home:'Главная',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',backgrounds:'Предыстории',feats:'Черты',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
+const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','inventory','rooms','gm'];
+const BREADCRUMBS = {home:'Главная',inventory:'Инвентарь',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',backgrounds:'Предыстории',feats:'Черты',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
 const LIBRARY_PACK_VIEWS={
  'bestiary-journeys':{library:'bestiary',pack:'journeys'},
  'bestiary-insects':{library:'bestiary',pack:'insects'},
@@ -126,7 +126,7 @@ function openSheet(id) {
 // Важно: глобальный window.ANT_DATA.rules предназначен только для «Муравьиной революции».
 let currentRulesPack='journeys';
 const RULEPACKS={
-  journeys:{title:'Путешествия Холэна',description:'Книга «Великий пакт», редакция 1.7. D&D 5e (2014) с законами и лицензиями Холэна; доступна полная версия исходного документа.'},
+  journeys:{title:'Путешествия Холэна',description:'Книга игрока 1.8 и реестр магии 2.0. Правила D&D 5e (2014), законы Холэна и условия применения магии.'},
   insects:{title:'Муравьиная революция',description:'Утверждённые общие правила отрядного варгейма: один жетон, потери, отдых и резервы. Не путать с обычной D&D.'}
 };
 async function openRules(pack, {focusBook=false}={}) {
@@ -149,10 +149,10 @@ function renderRules() {
   $('spell-registry').hidden=currentRulesPack!=='journeys';
   $('player-book-heading').textContent='Книга игрока · '+RULEPACKS[currentRulesPack].title;
   // 04.1 ДВЕ КНИГИ ИГРОКА: файлы хранятся в books/ и выбираются по текущему паку.
-  // ВНИМАНИЕ: «Великий пакт 1.7» включён целиком с разрешения владельца.
+  // Публикуется только памятка игрока 1.8. Мастерская книга остаётся приватной.
   // При публикации сайта PDF будет доступен любому посетителю, даже без аккаунта.
   const playerBooks={
-    journeys:{file:'books/velikiy_pakt_holen_1_7.pdf',desc:'«Великий пакт», редакция 1.7: полная энциклопедия и правила мира Холэна в исходной формулировке. PDF содержит 47 страниц и таблицы.'},
+    journeys:{file:'books/holen_players_1_8.pdf',desc:'Краткая книга игрока 1.8: создание персонажа, законы магии, валюта и обращение предметов. Без мастерских сюжетных тайн.'},
     insects:{file:'books/muravinaya_revolyutsiya_guide_v01.pdf?v=0116',desc:'Полевое руководство игрока 0.2: основные правила, роли отрядов, размеры существ, типы атак и фракции. Числовые параметры сверяются с действующими листами.'}
   };
   const book=playerBooks[currentRulesPack];
@@ -253,10 +253,10 @@ function renderSpells(reset=true){
   const q=$('spell-search').value.trim().toLocaleLowerCase('ru').replace(/ё/g,'е');
   const all=window.HOLEN_RULES_DATA.spells;
   const list=all.filter(s=>passFacets(s,SPELL_FILTERS)&&
-    `${s.name} ${(s.aliases||[]).join(' ')} ${s.level} ${s.school} ${s.category} ${s.license} ${s.review} ${s.source}`.toLocaleLowerCase('ru').replace(/ё/g,'е').includes(q));
+    `${s.name} ${(s.aliases||[]).join(' ')} ${s.level} ${s.school} ${s.category} ${s.license} ${s.review} ${s.source} ${s.nameEn} ${s.classes}`.toLocaleLowerCase('ru').replace(/ё/g,'е').includes(q));
   $('spell-registry-count').textContent=`Найдено: ${list.length}`;
   $('spell-filter-summary').textContent=`Подходит: ${list.length} из ${all.length} заклинаний`;
-  $('spell-list').innerHTML=registryPage('spell',list,renderSpells).map(s=>`<div class="spell-entry"><div><strong>${registrySource(s,s.name+' ↗')}</strong><small>${escapeHtml(s.level==='Заговор'?'Заговор':s.level+' круг')} · ${escapeHtml(s.school)} · ${escapeHtml(s.source)}</small>${reviewBadge(s)}</div><div><span>${escapeHtml(s.category)}</span><small>${escapeHtml(s.license)}</small></div></div>`).join('')||'<p class="muted">Нет заклинаний по выбранным условиям.</p>';
+  $('spell-list').innerHTML=registryPage('spell',list,renderSpells).map(s=>`<div class="spell-entry"><div class="spell-entry-main"><strong>${registrySource(s,s.name+' ↗')}</strong><small>${escapeHtml(s.level==='Заговор'?'Заговор':s.level+' круг')} · ${escapeHtml(s.school)} · ${escapeHtml(s.source)}</small>${reviewBadge(s)}</div><div><span>${escapeHtml(s.category)}</span><small>${escapeHtml(s.license)}</small></div><details><summary>Условия применения</summary><dl>${[['Классы',s.classes],['Ритуал',s.ritual],['Концентрация',s.concentration],['Теги риска',s.risk],['Разрешённое применение',s.allowed],['Запрещённое применение',s.forbidden],['Исключения / ордер',s.exceptions]].filter(([,v])=>v).map(([k,v])=>`<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></details></div>`).join('')||'<p class="muted">Нет заклинаний по выбранным условиям.</p>';
 }
 function itemDetails(item){
   const fields=[['Тип',item.type],['Настройка',item.attunement],['Цена',item.price],['Вес',item.weight],

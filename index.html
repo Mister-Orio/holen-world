@@ -7,7 +7,7 @@
 <meta content="#0d1615" name="theme-color"/>
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
-<link href="styles.css?v=0124" rel="stylesheet"/>
+<link href="styles.css?v=0126" rel="stylesheet"/>
 <link href="ui-icons.css?v=0122a" rel="stylesheet"/>
 
 </head>
@@ -21,6 +21,7 @@
 <a class="nav-link active" data-view="home" href="#home"><span class="nav-icon">⌂</span> Главная</a>
 <a class="nav-link" data-view="bestiary" href="#bestiary"><span class="nav-icon">◈</span> Бестиарий</a>
 <a class="nav-link" data-view="lore" href="#lore"><span class="nav-icon">◇</span> Предметы Холэна</a>
+<a class="nav-link" data-view="inventory" href="#inventory"><span class="nav-icon">◇</span> Инвентарь</a>
 <a class="nav-link" data-view="rules" href="#rules"><span class="nav-icon">≡</span> Правила</a>
 <a class="nav-link" data-view="backgrounds" href="#backgrounds"><span class="nav-icon">▤</span> Предыстории</a>
 <a class="nav-link" data-view="feats" href="#feats"><span class="nav-icon">✦</span> Черты</a>
@@ -39,7 +40,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.5</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.6</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -55,7 +56,7 @@
 </button>
 <button class="pack-card ants" data-pack="insects" type="button">
 <span aria-hidden="true" class="pack-art"></span><span aria-hidden="true" class="pack-shade"></span>
-<span class="pack-content"><span class="pack-brow">ТАКТИЧЕСКИЙ ПАК · 7 СПЕЦИАЛИЗАЦИЙ</span><strong>Муравьиная революция</strong><span class="pack-copy">Три колонии, война под землёй и командование боевыми отрядами.</span><span class="pack-cta">Открыть пак <span aria-hidden="true">↗</span></span></span>
+<span class="pack-content"><span class="pack-brow">ТАКТИКА · КОМАНДОВАНИЕ</span><strong>Муравьиная революция</strong><span class="pack-copy">Подземные колонии, война за тоннели и командование боевыми отрядами.</span><span class="pack-cta">Открыть пак <span aria-hidden="true">↗</span></span></span>
 </button>
 <article aria-label="Новый пак скоро" class="pack-card mystery">
 <span aria-hidden="true" class="mystery-mark">?</span>
@@ -89,11 +90,11 @@
 <button class="btn subtle" data-book-pack="journeys" type="button">▤ Книга игрока · Путешествия Холэна →</button>
 <button class="btn subtle" data-rules-pack="journeys" type="button">≡ Правила Путешествий Холэна →</button>
 </div></section><section aria-labelledby="insects-heading" class="view" id="view-insects">
-<div class="pack-page-banner insects-banner"><span class="eyebrow">МИР НАСЕКОМЫХ / ПАК</span><h1 id="insects-heading">Муравьиная революция</h1><p>Семь специализаций, три колонии, боевые листы и война за подземные тоннели.</p></div><div aria-label="Материалы пака Муравьиная революция" class="pack-action-row">
+<div class="pack-page-banner insects-banner"><span class="eyebrow">МИР НАСЕКОМЫХ / ПАК</span><h1 id="insects-heading">Муравьиная революция</h1><p>Боевые специализации, подземные колонии и война за тоннели.</p></div><div aria-label="Материалы пака Муравьиная революция" class="pack-action-row">
 <button class="btn subtle" data-book-pack="insects" type="button">▤ Книга игрока · Муравьиная революция →</button>
 <button class="btn subtle" data-rules-pack="insects" type="button">≡ Правила Муравьиной революции →</button>
 </div>
-<div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Все семь интерактивных листов на одной странице.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
+<div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Специализации и интерактивные листы боевых отрядов.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
 </section><section aria-labelledby="profile-heading" class="view" id="view-profile">
 <div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт, персонажи и онлайн-комнаты доступны на разных устройствах. Листы D&D сохраняются в аккаунте; здоровье D&D пока не связано с боем в комнате.</p></div>
 <form id="character-wizard" class="character-wizard" aria-label="Создание персонажа" hidden novalidate></form>
@@ -154,7 +155,7 @@
   </div>
  </div>
 </section><section aria-labelledby="squads-heading" class="view" id="view-squads">
-<div class="page-heading"><span class="eyebrow">МИР НАСЕКОМЫХ / БОЕВЫЕ СПЕЦИАЛИЗАЦИИ</span><h1 id="squads-heading">Специализации отрядов</h1><p>Семь утверждённых боевых специализаций «Муравьиной революции». Это правила авторского пака, а не стандартные классы D&amp;D.</p></div>
+<div class="page-heading"><span class="eyebrow">МИР НАСЕКОМЫХ / БОЕВЫЕ СПЕЦИАЛИЗАЦИИ</span><h1 id="squads-heading">Специализации отрядов</h1><p>Боевые специализации «Муравьиной революции». Это правила авторского пака, а не стандартные классы D&amp;D.</p></div>
 <div class="catalog-toolbar">
 <label class="search-wrap"><span class="visually-hidden">Найти отряд</span><span aria-hidden="true">⌕</span><input id="squad-search" placeholder="Поиск по названию или роли" type="search"/></label>
 <div aria-label="Колония" class="filter-group" role="group">
@@ -201,12 +202,12 @@
 <h2 id="player-book-heading">Книга игрока · Путешествия Холэна</h2>
 <p id="player-book-description">Здесь появится книга игрока соответствующего пака после загрузки документа.</p>
 <span class="book-empty-label" hidden>Книга доступна</span>
-<a class="btn primary" id="player-book-link" href="books/velikiy_pakt_holen_1_7.pdf" target="_blank" rel="noopener">Открыть PDF ↗</a>
+<a class="btn primary" id="player-book-link" href="books/holen_players_1_8.pdf" target="_blank" rel="noopener">Открыть PDF ↗</a>
 </div>
 </section>
 <div class="rules-container" id="rules-container"></div>
 <section aria-labelledby="spell-registry-heading" class="spell-registry panel" id="spell-registry">
-<div class="registry-header"><div><span class="overline">ЕВРАЗИЙСКИЙ РЕЕСТР МАГИИ · 0–6 КРУГ</span><h2 id="spell-registry-heading">Проверка заклинаний</h2><p>441 заклинание из реестра 0.3. Поиск по названию, школе и категории доступа. Статусы рабочие; спорные случаи и окончательный допуск подтверждает ГМ.</p></div><span class="capsule" id="spell-registry-count"></span></div>
+<div class="registry-header"><div><span class="overline">ЕВРАЗИЙСКИЙ РЕЕСТР МАГИИ · 0–9 КРУГ</span><h2 id="spell-registry-heading">Проверка заклинаний</h2><p>517 заклинаний из реестра 2.0. Поиск по названию, школе и категории доступа. У каждой записи сохранён статус проверки; окончательный допуск подтверждает ГМ.</p></div><span class="capsule" id="spell-registry-count"></span></div>
 <label class="search-wrap registry-search"><span class="registry-search-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><use href="assets/ui-icons.svg?v=0122#search"></use></svg></span><span class="visually-hidden">Поиск заклинаний</span><input id="spell-search" placeholder="Название, лицензия или школа" type="search"/></label><div aria-label="Фильтры заклинаний" class="multi-filter-toolbar" id="spell-filters">
 <div class="filter-menu-grid" id="spell-filter-groups"></div>
 <button class="btn subtle filter-reset" id="spell-clear" type="button">Сбросить фильтры</button>
@@ -214,7 +215,7 @@
 <p aria-live="polite" class="filter-counter" id="spell-filter-summary"></p>
 <div class="spell-list" id="spell-list"></div>
 <nav class="registry-pager" id="spell-pagination" aria-label="Страницы заклинаний" hidden></nav>
-<p class="registry-warning">Названия, круги, школы, категории доступа и лицензии — из реестра 0.3. Ссылки ведут на DnD.su. Комментарии и заметки ГМа не публикуются.</p>
+<p class="registry-warning">Названия, круги, школы, категории доступа и условия применения — из реестра 2.0. Ссылки ведут на DnD.su. Комментарии и заметки ГМа не публикуются.</p>
 </section>
 </section>
 <section aria-labelledby="lore-heading" class="view" id="view-lore">
@@ -248,15 +249,16 @@
   <div id="online-gm-root"></div>
   
 </section>
+<section class="view" id="view-inventory" aria-labelledby="inventory-heading"><div class="page-heading"><span class="eyebrow">СНАРЯЖЕНИЕ · D&amp;D 2014</span><h1 id="inventory-heading">Инвентарь</h1><p>Обычное оружие, доспехи и щиты. Сравни показатели и выбери снаряжение для приключения.</p></div><div class="inventory-toolbar"><label>Поиск<input id="inventory-search" type="search" placeholder="Название или свойство…"/></label><label>Раздел<select id="inventory-group"><option value="all">Все разделы</option><option value="simple">Простое оружие</option><option value="martial">Воинское оружие</option><option value="other">Другое оружие</option><option value="light">Лёгкие доспехи</option><option value="medium">Средние доспехи</option><option value="heavy">Тяжёлые доспехи</option><option value="shield">Щиты</option></select></label><label>Вид боя<select id="inventory-combat"><option value="all">Все виды</option><option value="melee">Рукопашное оружие</option><option value="ranged">Дальнобойное оружие</option></select></label><button class="btn subtle" type="button" id="inventory-clear">Сбросить</button><p id="inventory-count" role="status"></p></div><div class="inventory-notes"><p>Цены в валюте Холэна: 10 искр = 1 соль; 10 солей = 1 корон; 10 коронов = 1 империал. Стоимость соответствует PHB 2014. Дистанции — в футах, вес — в фунтах.</p><details><summary>Как читать показатели и особые правила</summary><p>Урон указан без модификатора характеристики. Две дистанции означают нормальную и максимальную дальность; на второй атака с помехой. Для КД используется модификатор Ловкости, а не само значение характеристики. Щит добавляет +2 к КД.</p><p>Длинное копьё: помеха по цели в пределах 5 футов; без верхового животного требует двух рук. Сеть опутывает подходящую цель, а не наносит урон; смотри ограничения в первоисточнике.</p><p>Если Сила ниже требования тяжёлого доспеха, скорость обычно снижается на 10 футов. Ношение без владения накладывает помеху на проверки, спасброски и атаки с Силой/Ловкостью и мешает заклинаниям.</p></details><a href="https://dnd.su/articles/inventory/147-armor-arms-equipment-tools/" target="_blank" rel="noopener noreferrer">Player’s Handbook 2014 · таблицы и полные свойства на DnD.su ↗</a></div><div id="inventory-tables"></div></section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.5</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.6</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a></span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
 <script src="auth-gate.js?v=0124"></script>
-<script src="feature-loader.js?v=0125"></script>
-<script src="ui-icons.js?v=0122"></script>
-<script src="app.js?v=0124"></script>
+<script src="feature-loader.js?v=0126"></script>
+<script src="ui-icons.js?v=0126"></script>
+<script src="app.js?v=0126"></script>
 <script src="auth-ui.js?v=0124"></script>
 </body>
 </html>

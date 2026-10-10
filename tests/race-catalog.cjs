@@ -14,7 +14,7 @@ sh.speciesId='plasmoid';assert.ok(o.featEligibility(smallFeat,sh).eligible);asse
 const group=ctx.window.HOLEN_CATALOG.races.official.find(x=>x.id==='dnd2014-extra');assert.equal(group.items.length,37);for(const item of group.items)assert.ok(newRaces.some(x=>x.name===item.name));
 for(const edition of ['2014','2024'])for(const kind of ['feats','backgrounds']){
  const items=o.editions[edition][kind],ph=edition==='2014'?'PH14':'PH24',choices=src.catalogSources(items,edition);
- assert.equal(choices[0][0],ph);assert.ok(choices[0][1].startsWith('Player’s Handbook'));assert.ok(!choices.some(x=>x[0]==='official'));
+ assert.equal(choices[0][0],'all');assert.equal(choices[1][0],ph);assert.ok(choices[1][1].startsWith('Player’s Handbook'));assert.ok(!choices.some(x=>x[0]==='official'));
  const basic=items.filter(x=>src.catalogMatches(x,edition,ph)),other=items.filter(x=>src.catalogMatches(x,edition,'homebrew'));
  assert.equal(basic.length+other.length,items.length);assert.ok(!other.some(x=>basic.includes(x)));
  if(edition==='2014')assert.ok(other.length>0);else assert.equal(other.length,0);

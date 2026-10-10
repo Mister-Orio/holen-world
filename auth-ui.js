@@ -1,6 +1,6 @@
 /* МИР ХОЛЭНА — email + password (Supabase Auth REST API).
  * В публичном JS только publishable ключ; service_role и пароли НЕ сохраняются.
- * Игровые комнаты пока остаются локальным прототипом, не онлайн-сессией.
+ * Игровые комнаты работают в режиме онлайн-альфы.
  */
 (()=>{
 'use strict';
@@ -59,7 +59,7 @@ function renderSession(data){
    $('auth-session-email').textContent=data.user.email||'';
    $('profile-account-name').textContent=display;
    $('profile-account-email').textContent=data.user.email||'';
-   profile.textContent='Вы вошли как '+display+'. Ваши персонажи хранятся в Supabase; комнаты пока работают локально.';
+   profile.textContent='Вы вошли как '+display+'. Персонажи сохраняются в аккаунте; онлайн-комнаты проходят тестирование.';
    top.querySelector('span').textContent=display;
    $('profile-name').value=display;
    $('auth-subtitle').textContent='Вы уже авторизованы. Перейдите в профиль для работы с персонажами.';

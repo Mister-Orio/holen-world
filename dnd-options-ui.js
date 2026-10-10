@@ -17,16 +17,16 @@ for(const kind of ['backgrounds','feats']){
   root.querySelector('[data-option-source]').value=source;
  }
  function results(){
-  const all=o.editions[edition][kind],items=all.filter(x=>sources.matches(x,edition,source)&&(x.name+' '+x.nameEn+' '+sources.sourceFor(x,edition).name).toLocaleLowerCase('ru').includes(q));
+  const all=o.editions[edition][kind],items=all.filter(x=>sources.matches(x,edition,source)&&(x.name+' '+x.nameEn+' '+(x.aliases||[]).join(' ')+' '+sources.sourceFor(x,edition).name).toLocaleLowerCase('ru').replace(/ё/g,'е').includes(q));
   root.querySelector('.option-count').textContent='Найдено: '+items.length+' из '+all.length;
-  root.querySelector('.dnd-source-note').innerHTML='Краткие пояснения и ссылки на полные правила. Русские названия: <a href="https://'+(edition==='2024'?'next.':'')+'dnd.su/'+kind+'/" target="_blank" rel="noopener">dnd.su ↗</a>.';
+  root.querySelector('.dnd-source-note').textContent='Ссылки «Правила» открывают страницу выбранной '+(kind==='feats'?'черты':'предыстории')+' на DnD.su в нужной редакции.';
   root.querySelector('.dnd-options-grid').innerHTML=items.length?items.map(x=>{
    const info=sources.sourceFor(x,edition),link='index.html?edition='+edition+'&'+(kind==='feats'?'feat':'background')+'='+encodeURIComponent(x.id)+'#profile';
    const detail=kind==='backgrounds'?'Навыки: '+x.skills.map(k=>d.skills.find(y=>y[0]===k)?.[1]||k).join(', ')+(x.originFeat?' · Черта: '+(o.editions[edition].feats.find(y=>y.id===x.originFeat)?.name||x.originFeat):''):(({Origin:'Происхождение',General:'Общая',Optional:'Опциональная','Fighting Style':'Боевой стиль','Epic Boon':'Эпическое дарование'})[x.category]||x.category)+(x.level>1?' · уровень '+x.level+'+':'');
    return '<article class="dnd-option-card"><div class="option-card-heading"><span class="option-source-icon" title="'+esc(info.name)+'" aria-label="Источник: '+esc(info.name)+'">'+icon(info.kind==='homebrew'?'library-feats':'library-rules')+'<b>'+esc(info.abbr)+'</b></span><div><h2>'+esc(x.name)+'</h2><small lang="en">'+esc(x.nameEn)+'</small></div></div><p>'+esc(x.description)+'</p><p>'+esc(detail)+'</p><p class="option-source-name">'+esc(info.name)+'</p><div class="dnd-option-links"><a href="'+esc(x.source)+'" target="_blank" rel="noopener">Правила ↗</a><a class="btn subtle" href="'+esc(link)+'">Создать с '+(kind==='feats'?'чертой':'предысторией')+'</a></div></article>';
   }).join(''):'<p class="room-empty option-empty">'+(source==='homebrew'?'Хоумбрю пока не добавлены. Сейчас в каталоге только официальные материалы.':'Ничего не найдено. Измени поиск или источник.')+'</p>';
  }
- root.addEventListener('input',e=>{if(e.target.type==='search'){q=e.target.value.trim().toLocaleLowerCase('ru');results();}});
+ root.addEventListener('input',e=>{if(e.target.type==='search'){q=e.target.value.trim().toLocaleLowerCase('ru').replace(/ё/g,'е');results();}});
  root.addEventListener('change',e=>{if(e.target.matches('[data-option-edition]')){edition=e.target.value;updateSources();results();}if(e.target.matches('[data-option-source]')){source=e.target.value;results();}});
  window.addEventListener('holen-navigated',e=>{if(e.detail?.view===kind&&!root.children.length)setup();});
  if(location.hash==='#'+kind)setup();

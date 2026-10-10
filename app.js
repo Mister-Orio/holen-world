@@ -247,10 +247,10 @@ function reviewBadge(record){
 }
 function renderSpells(reset=true){
   if(reset)registryPages.spell=0;
-  const q=$('spell-search').value.trim().toLocaleLowerCase('ru');
+  const q=$('spell-search').value.trim().toLocaleLowerCase('ru').replace(/ё/g,'е');
   const all=window.HOLEN_RULES_DATA.spells;
   const list=all.filter(s=>passFacets(s,SPELL_FILTERS)&&
-    `${s.name} ${s.level} ${s.school} ${s.category} ${s.license} ${s.review} ${s.source}`.toLocaleLowerCase('ru').includes(q));
+    `${s.name} ${(s.aliases||[]).join(' ')} ${s.level} ${s.school} ${s.category} ${s.license} ${s.review} ${s.source}`.toLocaleLowerCase('ru').replace(/ё/g,'е').includes(q));
   $('spell-registry-count').textContent=`Найдено: ${list.length}`;
   $('spell-filter-summary').textContent=`Подходит: ${list.length} из ${all.length} заклинаний`;
   $('spell-list').innerHTML=registryPage('spell',list,renderSpells).map(s=>`<div class="spell-entry"><div><strong>${registrySource(s,s.name+' ↗')}</strong><small>${escapeHtml(s.level==='Заговор'?'Заговор':s.level+' круг')} · ${escapeHtml(s.school)} · ${escapeHtml(s.source)}</small>${reviewBadge(s)}</div><div><span>${escapeHtml(s.category)}</span><small>${escapeHtml(s.license)}</small></div></div>`).join('')||'<p class="muted">Нет заклинаний по выбранным условиям.</p>';

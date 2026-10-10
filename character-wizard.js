@@ -11,20 +11,43 @@ const help=html=>'<div class="wizard-help">'+html+'</div>';
 const templates=()=>window.ANT_DATA?.squads||[],owner=()=>auth.currentUserId()||'guest';
 let draftOwner=owner(),state=load(),busy=false,loginPending=false,prefilled=false;
 const params=new URLSearchParams(location.search),requestedFeat=params.get('feat');
+const hasPrefill=['background','feat','class','race'].some(key=>params.has(key));
+const featLabels={Origin:'Происхождение',General:'Общие',Optional:'Опциональные','Fighting Style':'Боевые стили','Epic Boon':'Эпические дары'};
+let featQuery='',featGroup='all';
 function key(id=draftOwner){return 'holen-character-wizard-v1:'+id;}
 function load(){try{return m.restore(JSON.parse(localStorage.getItem(key())||'null'));}catch{return m.fresh();}}
 function remember(){try{localStorage.setItem(key(),JSON.stringify(state));}catch{}}
 function say(message){const node=root.querySelector('.wizard-error');if(node)node.textContent=message;}
 function start(){
  if(busy)return;
- if(!prefilled&&(params.has('background')||requestedFeat)){
+ if(!prefilled&&hasPrefill){
   state=m.fresh();m.change(state,'edition',params.get('edition')==='2024'?'2024':'2014');
+  const ed=d.editions[state.sheet.edition];
+  if(ed.classes.some(x=>x.id===params.get('class')))m.change(state,'classId',params.get('class'));
+  if(ed.species.some(x=>x.id===params.get('race')))m.change(state,'speciesId',params.get('race'));
   const bg=params.get('background');if(o.editions[state.sheet.edition].backgrounds.some(x=>x.id===bg))m.change(state,'backgroundId',bg);
   prefilled=true;
  }
  root.hidden=false;profile.classList.add('creating-character');render();root.scrollIntoView({block:'start',behavior:'instant'});
 }
 function close(){if(busy)return;remember();root.hidden=true;profile.classList.remove('creating-character');document.getElementById('character-create-start').focus();}
+function featRow(f,forced){
+ const selected=state.sheet.featIds.includes(f.id),text=[f.name,f.nameEn,...(f.aliases||[])].join(' ').toLocaleLowerCase('ru').replace(/ё/g,'е');
+ return '<label class="wizard-check" data-feat-row data-selected="'+selected+'" data-category="'+esc(f.category)+'" data-search="'+esc(text)+'"><input type="checkbox" data-feat="'+esc(f.id)+'" '+(selected?'checked':'')+' '+(forced.includes(f.id)?'disabled':'')+'><span>'+esc(f.name)+'<small>'+esc(featLabels[f.category]||f.category)+(forced.includes(f.id)?' · Из предыстории':'')+(f.manual?.filter(x=>!x.startsWith('Проверь дополнительные требования')).length?' · '+esc(f.manual.filter(x=>!x.startsWith('Проверь дополнительные требования')).join('; ')):'')+'</small><a href="'+esc(f.source)+'" target="_blank" rel="noopener">Правила ↗</a></span></label>';
+}
+function featPicker(feats,forced){
+ const selected=feats.filter(f=>state.sheet.featIds.includes(f.id)),remaining=feats.filter(f=>!state.sheet.featIds.includes(f.id));
+ const groups=[...new Set(remaining.map(f=>f.category))];if(!groups.includes(featGroup))featGroup='all';
+ return (selected.length?'<fieldset class="wizard-feat-group wizard-feat-selected"><legend>Выбрано · '+selected.length+'</legend><div class="wizard-feat-list">'+selected.map(f=>featRow(f,forced)).join('')+'</div></fieldset>':'')+
+ '<div class="wizard-fields wizard-feat-toolbar"><label>Поиск черт<input type="search" data-feat-search placeholder="Название черты…" value="'+esc(featQuery)+'"></label><label>Категория<select data-feat-category-filter><option value="all">Все категории</option>'+groups.map(g=>'<option value="'+esc(g)+'" '+(featGroup===g?'selected':'')+'>'+esc(featLabels[g]||g)+'</option>').join('')+'</select></label></div><div class="wizard-feat-candidates">'+groups.map(g=>'<fieldset class="wizard-feat-group" data-feat-group><legend>'+esc(featLabels[g]||g)+'</legend><div class="wizard-feat-list">'+remaining.filter(f=>f.category===g).map(f=>featRow(f,forced)).join('')+'</div></fieldset>').join('')+'</div><p class="tiny-note" data-feat-empty hidden>Нет доступных черт по выбранным условиям.</p>';
+}
+function filterFeats(){
+ const q=featQuery.trim().toLocaleLowerCase('ru').replace(/ё/g,'е');let count=0;
+ root.querySelectorAll('[data-feat-group]').forEach(group=>{
+  let visible=0;group.querySelectorAll('[data-feat-row]').forEach(row=>{row.hidden=!(row.dataset.search.includes(q)&&(featGroup==='all'||featGroup===row.dataset.category));if(!row.hidden)visible++;});
+  group.hidden=!visible;count+=visible;
+ });const empty=root.querySelector('[data-feat-empty]');if(empty)empty.hidden=count>0;
+}
 function body(){
  const sh=state.sheet,c=m.cls(state),ed=d.editions[sh.edition],bg=m.background(state),step=state.step;
  if(step===0)return '<h2>Выбери мир приключения</h2><p>Пак определяет систему правил и следующие шаги.</p><div class="wizard-fields">'+select('Игровой пак','pack',[{id:'journeys',name:'Путешествия Холэна'},{id:'insects',name:'Муравьиная революция'}],state.pack)+(state.pack==='journeys'?select('Редакция правил','edition',[{id:'2014',name:'D&D 2014'},{id:'2024',name:'D&D 2024'}],sh.edition):'')+'</div>'+help(state.pack==='journeys'?'Классический персонаж D&D с характеристиками, предысторией и выбором опций по уровню.':'Авторская система: выбери имя и специализацию отряда.');
@@ -43,24 +66,27 @@ function body(){
  if(step===5){
   const subs=o.availableSubclasses(sh),bud=m.budgets(state),forced=m.mandatory(state),candidates=m.candidates(state);
   const selectable=candidates.filter(f=>forced.includes(f.id)||m.selection(state,[...state.extras,f.id]).includes(f.id));
-  return '<h2>Подкласс и черты</h2><p>Доступные варианты для '+esc(c.name)+' '+sh.level+' уровня.</p>'+(subs.length?select('Подкласс','selectedSubclassId',subs,sh.selectedSubclassId,'Выбери подкласс'):help('Подкласс откроется с '+c.subclassLevel+' уровня.'))+help('Выборы черт: '+bud.general+' при развитии персонажа'+(bud.origin?' · '+bud.origin+' дополнительная черта происхождения':'')+(bud.style?' · '+bud.style+' боевой стиль':'')+'. Можно оставить выбор черт на потом. При выборе черты вместо повышения характеристик учти это в бонусах на прошлом шаге.')+(requestedFeat&&!sh.featIds.includes(requestedFeat)?help('Черта из каталога появится в списке, когда будут выполнены её требования и появится свободный выбор.'):'')+'<div class="wizard-feat-list">'+selectable.map(f=>'<label class="wizard-check"><input type="checkbox" data-feat="'+esc(f.id)+'" '+(sh.featIds.includes(f.id)?'checked':'')+' '+(forced.includes(f.id)?'disabled':'')+'><span>'+esc(f.name)+'<small>'+esc(({Origin:'Происхождение',General:'Общая',Optional:'Опциональная','Fighting Style':'Боевой стиль','Epic Boon':'Эпическое дарование'})[f.category]||f.category)+(forced.includes(f.id)?' · Из предыстории':'')+(f.manual?.filter(x=>!x.startsWith('Проверь дополнительные требования')).length?' · '+esc(f.manual.filter(x=>!x.startsWith('Проверь дополнительные требования')).join('; ')):'')+'</small><a href="'+esc(f.source)+'" target="_blank" rel="noopener">Правила ↗</a></span></label>').join('')+'</div>'+help('Прочие требования черт (например, владения и умение колдовать) проверь по источнику. Их эффекты не изменяют характеристики автоматически.');
+  return '<h2>Подкласс и черты</h2><p>Доступные варианты для '+esc(c.name)+' '+sh.level+' уровня.</p>'+(subs.length?select('Подкласс','selectedSubclassId',subs,sh.selectedSubclassId,'Выбери подкласс'):help('Подкласс откроется с '+c.subclassLevel+' уровня.'))+help('Выборы черт: '+bud.general+' при развитии персонажа'+(bud.origin?' · '+bud.origin+' дополнительная черта происхождения':'')+(bud.style?' · '+bud.style+' боевой стиль':'')+'. Можно оставить выбор черт на потом. При выборе черты вместо повышения характеристик учти это в бонусах на прошлом шаге.')+(requestedFeat&&!sh.featIds.includes(requestedFeat)?help('Черта из каталога появится в списке, когда будут выполнены её требования и появится свободный выбор.'):'')+featPicker(selectable,forced)+help('Прочие требования черт (например, владения и умение колдовать) проверь по источнику. Их эффекты не изменяют характеристики автоматически.');
  }
  const species=ed.species.find(x=>x.id===sh.speciesId),p=m.payload(state),featNames=o.editions[sh.edition].feats.filter(x=>sh.featIds.includes(x.id)).map(x=>x.name).join(', ');
- return '<h2>Проверь персонажа</h2><p>После сохранения откроется полный лист со снаряжением, заклинаниями и боевыми настройками.</p><dl class="wizard-summary">'+[['Имя',state.name],['Пак / редакция','Путешествия Холэна · '+sh.edition],['Класс / раса',c.name+' · '+species.name],['Уровень / здоровье',sh.level+' · '+p.maxHp+' ОЗ'],['Предыстория',bg?.name],['Подкласс',sh.subclass||'Пока недоступен'],['Характеристики',Object.entries(d.abilities).map(([k,n])=>n+': '+sh.abilities[k]).join(' · ')],['Черты',featNames||'Не выбраны']].map(([name,value],i)=>'<div class="'+(i>5?'wide':'')+'"><dt>'+name+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl>'+help('ОЗ рассчитаны по среднему приросту кости класса и Телосложению. КД '+p.armorClass+' — без доспеха. Заклинания, владения класса, снаряжение и эффекты опций дополни в полном листе.');
+ return '<h2>Проверь персонажа</h2><p>После сохранения откроется полный лист со снаряжением, заклинаниями и боевыми настройками.</p><dl class="wizard-summary">'+[['Имя',state.name],['Пак / редакция','Путешествия Холэна · '+sh.edition],['Класс / раса',c.name+' · '+species.name],['Уровень / здоровье',sh.level+' · '+p.maxHp+' ОЗ'],['Предыстория',bg?.name],['Подкласс',sh.subclass||'Пока недоступен'],['Характеристики',Object.entries(d.abilities).map(([k,n])=>n+': '+sh.abilities[k]).join(' · ')],['Черты',featNames||'Не выбраны']].map(([name,value],i)=>'<div class="'+(i>5?'wide':'')+'"><dt>'+name+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl>'+help('ОЗ рассчитаны по среднему приросту кости класса и Телосложению. КД '+p.armorClass+' — без доспеха.')+'<details class="wizard-next-settings"><summary>Что ещё настроить в полном листе</summary><ul><li>Проверь бонусы характеристик от происхождения и черт.</li><li>Выбери владения класса, навыки и инструменты.</li><li>Добавь оружие, доспех и стартовое снаряжение.</li><li>Если персонаж колдует, выбери заклинания и ячейки.</li><li>Заполни способности класса и их ресурсы.</li></ul></details>';
 }
 function signed(n){return n>=0?'+'+n:String(n);}
 function render(focus=false){
  const labels=m.steps(state),last=state.step===labels.length-1;
  root.innerHTML='<div class="wizard-head"><div><span class="overline">НОВЫЙ ПЕРСОНАЖ</span><div class="tiny-note">Шаг '+(state.step+1)+' из '+labels.length+' · '+labels[state.step]+'</div></div><button class="btn subtle" type="button" data-wizard="close">Закрыть</button></div><div class="wizard-progress" aria-hidden="true"><span style="width:'+((state.step+1)/labels.length*100)+'%"></span></div><div class="wizard-body">'+body()+'</div><p class="wizard-error" role="status" aria-live="polite"></p><div class="wizard-footer"><button class="btn subtle" type="button" data-wizard="back" '+(state.step===0?'disabled':'')+'>← Назад</button><button class="btn primary" type="submit">'+(last?(auth.isAuthenticated()?'Сохранить персонажа':'Войти и сохранить'):'Далее →')+'</button></div>';
+ filterFeats();
  if(focus){root.querySelector('h2').tabIndex=-1;root.querySelector('h2').focus();}
  remember();
 }
 root.addEventListener('input',e=>{
+ if(e.target.matches('[data-feat-search]')){featQuery=e.target.value;filterFeats();return;}
  if(busy||!e.target.dataset.field||!['text','number'].includes(e.target.type))return;
  m.change(state,e.target.dataset.field,e.target.value);remember();
 });
 root.addEventListener('change',e=>{
  if(busy)return;
+ if(e.target.matches('[data-feat-category-filter]')){featGroup=e.target.value;filterFeats();return;}
  if(e.target.dataset.field)m.change(state,e.target.dataset.field,e.target.type==='checkbox'?e.target.checked:e.target.value);
  else if(e.target.dataset.feat)m.change(state,'feat',[e.target.dataset.feat,e.target.checked]);
  else return;
@@ -101,6 +127,6 @@ window.addEventListener('holen-auth-changed',()=>{
  draftOwner=next;loginPending=false;state=carry?m.restore(state):load();
  if(!root.hidden){render();if(carry)say('Ты вошёл. Проверь персонажа и сохрани его.');}
 });
-window.addEventListener('holen-navigated',e=>{if(e.detail?.view==='profile'&&!prefilled&&(params.has('background')||requestedFeat))start();});
-if(location.hash==='#profile'&&(params.has('background')||requestedFeat))start();
+window.addEventListener('holen-navigated',e=>{if(e.detail?.view==='profile'&&!prefilled&&hasPrefill)start();});
+if(location.hash==='#profile'&&hasPrefill)start();
 })();

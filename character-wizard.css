@@ -37,3 +37,5 @@
 @media(prefers-reduced-motion:reduce){.wizard-progress span{transition:none}}
 
 .wizard-feat-list a{font-size:11px;color:#d8bb83}.wizard-feat-list .ui-action-icon{width:15px;height:15px}
+
+.wizard-feat-toolbar{margin-top:18px}.wizard-feat-group{min-width:0;border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.wizard-feat-group legend{font-size:13px;font-weight:700;color:var(--gold)}.wizard-feat-group .wizard-feat-list{max-height:none;margin:0}.wizard-feat-candidates{max-height:350px;overflow:auto;overscroll-behavior:contain;padding:0 4px}.wizard-feat-selected{background:#18362a}.wizard-feat-candidates [hidden]{display:none}.wizard-next-settings{margin-top:14px;border:1px solid var(--border);border-radius:10px;padding:12px}.wizard-next-settings summary{cursor:pointer;font-weight:600}.wizard-next-settings ul{padding-left:20px;margin-bottom:0}

@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const site=path.resolve(__dirname,'..'),context={window:{}};vm.createContext(context);
 for(const file of ['holen-rules-data.js','items-data.js'])vm.runInContext(fs.readFileSync(path.join(site,file),'utf8'),context);
 const spells=context.window.HOLEN_RULES_DATA.spells,items=context.window.HOLEN_ITEMS;
-const spellKeys=new Set(['id','name','level','school','category','license','source','sourceUrl','review']);
+const spellKeys=new Set(['id','name','aliases','level','school','category','license','source','sourceUrl','review']);
 const itemKeys=new Set(['id','name','type','rarity','attunement','source','sourceUrl','legalClass','risk','possession','carrying','activation','crafting','trading','license','conditions','review','kind','magic','packs','price','weight','stats','legalNote','value','unit']);
 assert.equal(spells.length,441);assert.equal(items.length,470);
 for(const [records,keys] of [[spells,spellKeys],[items,itemKeys]]){

@@ -26,6 +26,14 @@
 
 This work includes material from the System Reference Document 5.1 and System Reference Document 5.2.1, authored by Wizards of the Coast LLC and available at [D&D Beyond](https://www.dndbeyond.com/srd). These documents are licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode).
 
-The English monster stat blocks and spell metadata in this project derive from those SRDs. Russian display labels, selection, extraction and formatting were added by Мир Холэна. The project's reservation of rights does not remove the CC BY 4.0 permissions for this material. The corresponding original PDFs are linked from each record.
+The monster stat blocks and spell metadata in this project derive from those SRDs. Russian display labels, selection, extraction and formatting were added by Мир Холэна. The project's reservation of rights does not remove the CC BY 4.0 permissions for this material. The corresponding original PDFs are linked from each record.
 
 Тексты коммерческих книг и полный перевод dnd.su не включены. Названия и краткие собственные справки по опциям PHB сопровождаются ссылками на первоисточник. Арты авторских муравьёв не являются иллюстрациями из книг D&D.
+
+## Русский бестиарий в выпуске 0.12.0
+
+Русские тексты 317 листов SRD 5.1 и 330 листов SRD 5.2 предоставлены проектом [OmnisGM / OmnisGM-Rules](https://github.com/OmnisGM-App/OmnisGM-Rules/tree/26169ce31e316ae7b8a0b3dbe031a77626589251), ревизия `26169ce31e316ae7b8a0b3dbe031a77626589251`, по [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode). Исходные файлы: `SRD_CC_v5.1/ru/15_MonstersA-Z.md`, `SRD_CC_v5.2/ru/12_MonstersA-Z.md` и `13_Animals.md`; условия указаны в LICENSE.md и файлах 00_Legal.
+
+Мир Холэна изменил формат Markdown на текстовый лист, сохранил свои названия в каталоге, заменил термин «Внимательность» на «Восприятие» и обозначение костей d на к. Числа, кости урона, КД и ОЗ проверены по английским разделам источника и существующим записям. Авторство Wizards of the Coast LLC и права CC BY 4.0 на SRD сохраняются. Перевод dnd.su целиком не используется.
+
+При адаптации восстановлены реакции и ограничения легендарных действий, уточнены уровни и цели заклинаний, исправлены расхождения числовых показателей с SRD 5.1/5.2.1. Сведения о соседних приложениях исключены из листов существ; вариант роя насекомых относится к соответствующему рою.

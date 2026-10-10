@@ -6,13 +6,13 @@ const catalogs=[data,'catalog-data.js?v=0116',model];
 const choices=[model,options,srd,library,'dnd-options-ui.js?v=0119'];
 const rooms=[data,'squad-abilities.js?v=0116','bestiary-data.js?v=0115','online-room-ui.js?v=0119'];
 const views={
- squads:[data],rules:[data,'holen-rules-data.js?v=0110'],
+ squads:[data],rules:[data,'holen-rules-data.js?v=0121'],
  classes:catalogs,races:catalogs,backgrounds:choices,feats:choices,
  profile:[data,model,'character-ui.js?v=0119'],
  'dnd-sheet':[model,options,srd,library,'dnd-builder.css?v=0117','dnd-sheet-ui.js?v=0119'],
  'bestiary-journeys':[srd,library,'bestiary-ui.js?v=0120'],
  'bestiary-insects':['bestiary-data.js?v=0115',srd,library,'bestiary-ui.js?v=0120'],
- 'lore-journeys':['items-data.js?v=0110'],'lore-insects':['items-data.js?v=0110'],
+ 'lore-journeys':['items-data.js?v=0121'],'lore-insects':['items-data.js?v=0121'],
  rooms,gm:rooms
 };
 function resource(url){

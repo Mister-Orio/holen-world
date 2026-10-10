@@ -169,7 +169,8 @@ const SPELL_FACETS = [
   {key:'level', label:'Круг заклинания'},
   {key:'school', label:'Школа магии'},
   {key:'category', label:'Правовой статус'},
-  {key:'license', label:'Лицензия / разрешение'}
+  {key:'license', label:'Лицензия / разрешение'},
+  {key:'review', label:'Статус проверки'}
 ];
 const SPELL_FILTERS = Object.fromEntries(SPELL_FACETS.map(f=>[f.key,new Set()]));
 
@@ -179,11 +180,11 @@ const ITEM_PACKS = [
   {id:'insects', name:'Муравьиная революция'}
 ];
 const ITEM_FACETS = [
-  {key:'magic',label:'Тип предмета',options:[
-    {value:'true', label:'Магический'}, {value:'false', label:'Обычный'}]},
-  {key:'rarity',label:'Редкость',options:[
-    'Без редкости','Обычный','Необычный','Редкий','Очень редкий','Легендарный','Артефакт'
-  ].map(x=>({value:x,label:x}))}
+  {key:'kind',label:'Раздел'},
+  {key:'type',label:'Тип предмета'},
+  {key:'rarity',label:'Редкость'},
+  {key:'legalClass',label:'Класс обращения'},
+  {key:'review',label:'Статус проверки'}
 ];
 const ITEM_FILTERS = Object.fromEntries(ITEM_FACETS.map(f=>[f.key,new Set()]));
 
@@ -224,38 +225,70 @@ function resetFacets(state,containerId,rerender) {
   wrap.querySelectorAll('[data-count]').forEach(x=>x.textContent='Все');
   rerender();
 }
-function renderSpells(){
+const REGISTRY_PAGE_SIZE=60,registryPages={spell:0,item:0};
+function registryPage(kind,list,rerender){
+  const pages=Math.max(1,Math.ceil(list.length/REGISTRY_PAGE_SIZE));
+  registryPages[kind]=Math.min(registryPages[kind],pages-1);
+  const page=registryPages[kind],nav=$(`${kind}-pagination`);
+  nav.hidden=pages===1;
+  nav.innerHTML=`<button type="button" class="btn subtle" data-page="${page-1}" ${page===0?'disabled':''}>← Назад</button><span aria-live="polite">Страница ${page+1} из ${pages}</span><button type="button" class="btn subtle" data-page="${page+1}" ${page===pages-1?'disabled':''}>Далее →</button>`;
+  nav.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>{
+    registryPages[kind]=Number(button.dataset.page);rerender(false);
+    $(`${kind}-list`).scrollIntoView({block:'start'});
+  }));
+  return list.slice(page*REGISTRY_PAGE_SIZE,(page+1)*REGISTRY_PAGE_SIZE);
+}
+function registrySource(record,label='DnD.su ↗'){
+  return /^https:\/\/(?:[a-z0-9-]+\.)*dnd\.su\//i.test(record.sourceUrl||'')?
+    `<a href="${escapeHtml(record.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`:escapeHtml(label);
+}
+function reviewBadge(record){
+  return record.review?`<span class="registry-review ${record.review==='Спорный случай'?'disputed':''}">${escapeHtml(record.review)}</span>`:'';
+}
+function renderSpells(reset=true){
+  if(reset)registryPages.spell=0;
   const q=$('spell-search').value.trim().toLocaleLowerCase('ru');
   const all=window.HOLEN_RULES_DATA.spells;
   const list=all.filter(s=>passFacets(s,SPELL_FILTERS)&&
-    `${s.name} ${s.level} ${s.school} ${s.category} ${s.license}`.toLocaleLowerCase('ru').includes(q));
+    `${s.name} ${s.level} ${s.school} ${s.category} ${s.license} ${s.review} ${s.source}`.toLocaleLowerCase('ru').includes(q));
   $('spell-registry-count').textContent=`Найдено: ${list.length}`;
   $('spell-filter-summary').textContent=`Подходит: ${list.length} из ${all.length} заклинаний`;
-  // Не рендерим сотни элементов одновременно на телефоне.
-  $('spell-list').innerHTML=list.slice(0,60).map(s=>`<div class="spell-entry"><div><strong>${escapeHtml(s.name)}</strong><small>${escapeHtml(s.level)} · ${escapeHtml(s.school)}</small></div><div><span>${escapeHtml(s.category)}</span><small>${escapeHtml(s.license)}</small></div></div>`).join('')||'<p class="muted">Нет заклинаний по выбранным условиям.</p>';
-  if(list.length>60) $('spell-list').insertAdjacentHTML('beforeend',`<p class="tiny-note">Показаны первые 60 из ${list.length}. Уточни поиск или фильтры.</p>`);
+  $('spell-list').innerHTML=registryPage('spell',list,renderSpells).map(s=>`<div class="spell-entry"><div><strong>${registrySource(s,s.name+' ↗')}</strong><small>${escapeHtml(s.level==='Заговор'?'Заговор':s.level+' круг')} · ${escapeHtml(s.school)} · ${escapeHtml(s.source)}</small>${reviewBadge(s)}</div><div><span>${escapeHtml(s.category)}</span><small>${escapeHtml(s.license)}</small></div></div>`).join('')||'<p class="muted">Нет заклинаний по выбранным условиям.</p>';
 }
-function renderItems() {
+function itemDetails(item){
+  const fields=[['Тип',item.type],['Настройка',item.attunement],['Цена',item.price],['Вес',item.weight],
+    ['Показатели',item.stats],['Оценка',item.value?item.value+' зм / '+item.unit:''],
+    ['Владение',item.possession],['Ношение',item.carrying],['Активация',item.activation],
+    ['Производство / ремонт',item.crafting],['Продажа / передача',item.trading],
+    ['Лицензия',item.license],['Теги риска',item.risk],['Условия',item.conditions],['Примечание',item.legalNote]];
+  return `<dl>${fields.filter(([,value])=>value).map(([label,value])=>`<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl><p class="item-source">Источник: ${escapeHtml(item.source)} · ${registrySource(item,item.magic?'Показатели и эффект на DnD.su ↗':'DnD.su ↗')}</p>`;
+}
+function renderItems(reset=true) {
+  if(reset)registryPages.item=0;
   const q=$('item-search').value.trim().toLocaleLowerCase('ru');
   const all=(window.HOLEN_ITEMS||[]).filter(item=>Array.isArray(item.packs)&&item.packs.includes(currentItemPack));
   const list=all.filter(item=>passFacets(item,ITEM_FILTERS)&&
-    `${item.name||''} ${item.description||''}`.toLocaleLowerCase('ru').includes(q));
+    [item.name,item.kind,item.type,item.rarity,item.legalClass,item.license,item.stats,item.review].filter(Boolean).join(' ').toLocaleLowerCase('ru').includes(q));
   $('item-count').textContent=`Найдено: ${list.length}`;
   $('item-filter-summary').textContent=`Подходит: ${list.length} из ${all.length} предметов`;
   $('item-empty').hidden=list.length>0||all.length>0;
-  $('item-list').innerHTML=list.slice(0,60).map(item=>`<article class="item-entry"><div><strong>${escapeHtml(item.name||'Без названия')}</strong><p>${escapeHtml(item.description||'')}</p></div><div class="item-tags"><span>${item.magic?'Магический':'Обычный'}</span><span>${escapeHtml(item.rarity||'Без редкости')}</span></div></article>`).join('');
+  $('item-registry-note').hidden=!all.length;
+  $('item-list').innerHTML=registryPage('item',list,renderItems).map(item=>`<details class="item-entry"><summary><span class="item-main"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.kind)}${item.kind===item.type?'':' · '+escapeHtml(item.type)}${item.rarity==='Без редкости'?'':' · '+escapeHtml(item.rarity)}</small></span><span class="item-tags">${item.legalClass?`<span>${escapeHtml(item.legalClass)}</span>`:''}${reviewBadge(item)}</span></summary><div class="item-content">${itemDetails(item)}</div></details>`).join('');
   if(all.length&&!list.length) $('item-list').innerHTML='<p class="muted">Нет предметов по выбранным условиям.</p>';
-  if(list.length>60) $('item-list').insertAdjacentHTML('beforeend',`<p class="tiny-note">Показаны первые 60 из ${list.length}.</p>`);
 }
-let ruleFiltersReady=false,itemFiltersReady=false;
+let ruleFiltersReady=false,itemFiltersReady=false,itemFilterPack=null;
 function initRuleFilters(){
   if(ruleFiltersReady)return;ruleFiltersReady=true;
   mountFacetControls('spell-filter-groups',SPELL_FACETS,SPELL_FILTERS,window.HOLEN_RULES_DATA.spells,renderSpells);
   $('spell-clear').addEventListener('click',()=>{$('spell-search').value='';resetFacets(SPELL_FILTERS,'spell-filter-groups',renderSpells);});
 }
 function initItemFilters(){
+  if(itemFilterPack!==currentItemPack){
+    itemFilterPack=currentItemPack;
+    Object.values(ITEM_FILTERS).forEach(values=>values.clear());$('item-search').value='';
+    mountFacetControls('item-filter-groups',ITEM_FACETS,ITEM_FILTERS,(window.HOLEN_ITEMS||[]).filter(item=>item.packs.includes(currentItemPack)),renderItems);
+  }
   if(itemFiltersReady)return;itemFiltersReady=true;
-  mountFacetControls('item-filter-groups',ITEM_FACETS,ITEM_FILTERS,window.HOLEN_ITEMS||[],renderItems);
   $('item-clear').addEventListener('click',()=>{$('item-search').value='';resetFacets(ITEM_FILTERS,'item-filter-groups',renderItems);});
   $('item-search').addEventListener('input',renderItems);
 }

@@ -4,8 +4,16 @@ const books={PH14:'Книга игрока D&D 2014 — Player’s Handbook',PH2
 function sourceFor(record,edition){
  const homebrew=record.homebrew===true||record.sourceKind==='homebrew'||record.sourceBook==='HB';
  const abbr=homebrew?'HB':record.sourceBook||(edition==='2024'?'PH24':'PH14');
- return {abbr,name:record.sourceName||books[abbr]||abbr,kind:homebrew?'homebrew':'official'};
+ return {abbr,name:record.sourceName||books[abbr]||books[abbr.toUpperCase()]||abbr,kind:homebrew?'homebrew':'official'};
 }
 function matches(record,edition,source){const info=sourceFor(record,edition);return source==='all'||source===info.kind||source===info.abbr;}
-window.HOLEN_OPTION_SOURCES={sourceFor,matches};
+// Owner-defined library grouping: "Хоумбрю" means everything outside PHB here.
+// Preserve factual source kind for labels and all other consumers.
+function catalogMatches(record,edition,source){const info=sourceFor(record,edition);return source==='homebrew'?!['PH14','PH24'].includes(info.abbr):matches(record,edition,source);}
+function catalogSources(records,edition){
+ const books=new Map(records.map(x=>{const a=sourceFor(x,edition);return[a.abbr,a.name];}));
+ const ph=edition==='2024'?'PH24':'PH14';
+ return [...(books.has(ph)?[[ph,'Player’s Handbook · Книга игрока '+edition]]:[]),['all','Все источники'],['homebrew','HB · Хоумбрю'],...[...books].filter(([id])=>id!==ph).sort((a,b)=>a[1].localeCompare(b[1],'ru')).map(([id,name])=>[id,id+' · '+name])];
+}
+window.HOLEN_OPTION_SOURCES={sourceFor,matches,catalogMatches,catalogSources};
 })();

@@ -8,6 +8,7 @@
 <meta content="Мир Холэна: путешествия, Муравьиная революция, классы, расы, игровые листы и комнаты для настольных игр." name="description"/>
 <title>Мир Холэна — игровая платформа</title>
 <link href="styles.css?v=0121" rel="stylesheet"/>
+<link href="ui-icons.css?v=0122" rel="stylesheet"/>
 
 </head>
 <body>
@@ -38,7 +39,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.1</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.2</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -95,12 +96,9 @@
 <div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Все семь интерактивных листов на одной странице.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
 </section><section aria-labelledby="profile-heading" class="view" id="view-profile">
 <div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт, персонажи и онлайн-комнаты доступны на разных устройствах. Полные боевые листы ещё переходят на серверную синхронизацию.</p></div>
+<form id="character-wizard" class="character-wizard" aria-label="Создание персонажа" hidden novalidate></form>
 <div class="profile-auth-actions" id="profile-auth-actions"><button class="btn primary" type="button" data-open-auth="register">Создать аккаунт</button><button class="btn subtle" type="button" data-open-auth="login">Войти</button></div><p class="auth-profile-note" id="profile-auth-info">Проверяем авторизацию…</p><div class="profile-layout"><div class="panel profile-card" id="profile-demo-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Локальный ник для демонстрации</h2><p>Только для тестовых вкладок. Ник постоянного аккаунта задаётся при регистрации.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="panel profile-card profile-account-card" id="profile-account-card" hidden><div aria-hidden="true" class="profile-avatar">◇</div><span class="overline">УЧЁТНАЯ ЗАПИСЬ</span><h2 id="profile-account-name">Путешественник</h2><p id="profile-account-email" class="profile-account-email"></p><p class="profile-account-tip">Персонажи и игровые заготовки сохраняются в твоём аккаунте и доступны на других устройствах.</p><button class="btn subtle" type="button" id="profile-account-logout">Выйти из аккаунта</button><a class="btn subtle" href="mailto:holen.world@gmail.com?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%BD%D0%B0%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0%20%D0%A5%D0%BE%D0%BB%D1%8D%D0%BD">Запросить удаление аккаунта</a><small>Удаление аккаунта обрабатывается через обращение на почту проекта, не автоматически.</small></div><div class="profile-extras"><div class="panel profile-characters"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Создавай, просматривай и редактируй своих персонажей. Для муравьиных отрядов доступны базовые характеристики и переход к интерактивному листу.</p><div id="character-list" class="character-collection" aria-live="polite"></div><button class="btn subtle" id="character-refresh" type="button">Обновить список</button>
-<form id="character-create-form" class="character-create-form"><h3>Добавить персонажа</h3>
-<label class="field-label" for="character-name">Имя персонажа</label><input id="character-name" type="text" maxlength="72" placeholder="Например, Меральт" required>
-<label class="field-label" for="character-pack">Игровой пак</label><select id="character-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна</option></select>
-<p class="tiny-note">Для «Путешествий Холэна» сохраняется редактируемый лист D&amp;D. Класс, расу и редакцию можно выбрать в нём.</p><div id="character-template-field"><label class="field-label" for="character-template">Специализация</label><select id="character-template" class="room-select"></select></div>
-<button class="btn primary" id="character-create-btn" type="submit">Сохранить персонажа</button><p id="character-message" class="profile-feedback" role="status"></p></form></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
+<div class="character-create-actions"><button class="btn primary" id="character-create-start" type="button">Создать персонажа →</button></div><p id="character-message" class="profile-feedback" role="status"></p></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
 </section>
 <!-- Личный кабинет: серверная авторизация по почте через Supabase -->
 <section class="view" id="view-auth" aria-labelledby="auth-title">
@@ -251,11 +249,12 @@
   
 </section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.1</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.2</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a> · 7 листов</span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="feature-loader.js?v=0121"></script>
+<script src="feature-loader.js?v=0122"></script>
+<script src="ui-icons.js?v=0122"></script>
 <script src="app.js?v=0121"></script>
 <script src="auth-ui.js?v=0116"></script>
 </body>

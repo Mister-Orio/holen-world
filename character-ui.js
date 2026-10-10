@@ -8,26 +8,21 @@
 const $=id=>document.getElementById(id);
 const auth=window.HOLEN_AUTH_UI;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-const pack=$('character-pack'),template=$('character-template');
-const form=$('character-create-form'),list=$('character-list'),status=$('character-message');
+const list=$('character-list'),status=$('character-message');
 let chars=[],expandedId=null,editingId=null,deletingId=null,version=0,mutating=false;
 const getSquad=c=>(window.ANT_DATA?.squads||[]).find(s=>s.id===c.sheet_data?.templateId);
 const packName=p=>p==='insects'?'Муравьиная революция':'Путешествия Холэна';
 function say(s){status.textContent=s;}
-function templates(){
- $('character-template-field').hidden=pack.value!=='insects';
- template.innerHTML=(window.ANT_DATA?.squads||[]).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('');
-}
+
 function render(){
  const signed=auth.isAuthenticated();
- form.hidden=!signed;
  $('character-refresh').hidden=!signed;
  if(!signed){
    list.innerHTML='<div class="room-empty">Войди в аккаунт, чтобы просматривать, создавать и изменять персонажей. <button type="button" class="btn subtle" data-signin>Войти</button></div>';
    return;
  }
  if(!chars.length){
-   list.innerHTML='<div class="room-empty">У тебя пока нет персонажей. Создай первого с помощью формы ниже.</div>';
+   list.innerHTML='<div class="room-empty">У тебя пока нет персонажей. Нажми «Создать персонажа» и пройди шаги сборки.</div>';
    return;
  }
  list.innerHTML=chars.map(c=>{
@@ -101,21 +96,8 @@ list.addEventListener('submit',async event=>{
  finally{mutating=false;}
 });
 addEventListener('holen-characters-changed',refresh);
-pack.addEventListener('change',templates);
-form.addEventListener('submit',async event=>{
- event.preventDefault();
- if(mutating)return;
- if(pack.value==='journeys'){const q=new URLSearchParams({name:$('character-name').value.trim()||'Новый персонаж'});location.href='index.html?'+q+'#dnd-sheet';return;}
- const btn=$('character-create-btn');mutating=true;btn.disabled=true;say('Сохраняем персонажа…');
- try{
-   await auth.createCharacter($('character-name').value,pack.value,template.value);
-   $('character-name').value='';say('Персонаж сохранён в аккаунте.');
-   await refresh();
- }catch(e){say(e.message||'Не удалось сохранить персонажа.');}
- finally{btn.disabled=false;mutating=false;}
-});
 $('character-refresh').addEventListener('click',refresh);
 addEventListener('holen-auth-changed',()=>{resetEditors();expandedId=null;refresh();});
 window.addEventListener('holen-navigated',e=>{if(e.detail?.view==='profile')refresh();});
-templates();
+render();
 })();

@@ -1,0 +1,39 @@
+.creating-character .profile-layout,.creating-character .profile-auth-actions,.creating-character .auth-profile-note{display:none}
+.character-create-actions{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
+.character-wizard{max-width:900px;margin:0 auto 30px;padding:26px;border:1px solid #b79b6d66;border-radius:20px;background:var(--panel)}
+.character-wizard[hidden]{display:none}
+.wizard-head{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.wizard-head .overline{color:#d8bb83}
+.wizard-progress{height:5px;border-radius:6px;background:#40584d;margin:20px 0 24px;overflow:hidden}
+.wizard-progress span{display:block;height:100%;background:#b79b6d;transition:width .15s ease}
+.wizard-body h2{font-size:28px;margin:0 0 12px}.wizard-body>p{color:var(--muted);margin:0 0 20px}
+.wizard-fields{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.wizard-fields label,.wizard-body>label{display:grid;gap:8px;font-size:14px;font-weight:600;min-width:0}
+.wizard-body input,.wizard-body select{font:inherit;color:var(--text);background:#10211c;border:1px solid #587661;border-radius:10px;padding:12px;width:100%;min-width:0}
+.wizard-body input:focus-visible,.wizard-body select:focus-visible{outline:2px solid #91d8b2;outline-offset:2px}
+.wizard-body .wizard-check{display:flex;align-items:flex-start;gap:10px;line-height:1.5;font-weight:400;margin-top:16px}
+.wizard-check input{width:18px;height:18px;flex:none;accent-color:#91d8b2;margin-top:3px}
+.wizard-help{padding:16px;border-radius:12px;border:1px solid var(--border);background:#14291f;margin-top:18px;color:var(--muted);font-size:14px;line-height:1.6}
+.wizard-help a{color:#d8bb83}.wizard-help p{margin:0}
+.wizard-footer{display:flex;justify-content:space-between;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.wizard-error{color:#ffbcac;min-height:1.5em;margin:14px 0 0;font-size:14px}
+.wizard-abilities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.wizard-ability{padding:14px;border-radius:12px;border:1px solid var(--border);background:#1e3429}
+.wizard-ability>strong{display:block;margin-bottom:12px}.wizard-ability label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:7px 0}
+.wizard-ability input,.wizard-ability select{width:70px;padding:7px}
+.wizard-total{font-size:22px;color:var(--text);display:block;margin-top:10px}
+.wizard-points{display:block;margin:16px 0 8px;color:#d8bb83}.wizard-points.over-budget{color:#ffbcac}
+.wizard-feat-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;max-height:350px;overflow:auto;overscroll-behavior:contain;padding:2px}
+.wizard-feat-list .wizard-check{margin:0;border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;background:#172c23}
+.wizard-feat-list .wizard-check:has(input:checked){border-color:#8abc9a;background:#274637}
+.wizard-feat-list small{display:block;color:var(--muted);font-size:12px}
+.wizard-feat-list .wizard-check:has(input:disabled){opacity:.65}
+.wizard-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.wizard-summary div{border:1px solid var(--border);border-radius:12px;padding:14px;background:#1e3429}
+.wizard-summary dt{color:var(--muted);font-size:12px;margin-bottom:6px}.wizard-summary dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.wizard-summary .wide{grid-column:1/-1}
+.wizard-success{border:1px solid #91d8b2;border-radius:14px;padding:20px;line-height:1.6}.wizard-success .btn{margin:12px 8px 0 0}
+@media(max-width:600px){.character-wizard{padding:18px 14px}.wizard-fields,.wizard-summary,.wizard-feat-list{grid-template-columns:1fr}.wizard-abilities{grid-template-columns:repeat(2,minmax(0,1fr))}.wizard-summary .wide{grid-column:auto}.wizard-footer .btn{padding:12px}.wizard-body h2{font-size:24px}.wizard-head{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){.wizard-progress span{transition:none}}
+
+.wizard-feat-list a{font-size:11px;color:#d8bb83}.wizard-feat-list .ui-action-icon{width:15px;height:15px}

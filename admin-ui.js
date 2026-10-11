@@ -67,7 +67,7 @@ registry.register({key:'catalogs',label:'Каталоги и паки',render:as
  <div class="admin-card"><h2>Подготовить новую версию</h2><p class="admin-note">Загрузи JSON со стабильными ID и утверждёнными данными. Сначала увидишь изменения. Исчезнувшие записи останутся в предыдущей версии.</p>
  <form class="admin-form" data-admin-form="stage"><label>Каталог<select name="module">${catalogs.modules.map(x=>`<option value="${esc(x.key)}">${esc(x.label)}${x.publish_ready?'':' · подготовка'}</option>`).join('')}</select></label>
  <label>Пак<select name="pack">${catalogs.packs.map(x=>`<option value="${esc(x.key)}">${esc(x.name)}</option>`).join('')}</select></label><label>Редакция<select name="edition"><option>2014</option><option>2024</option><option value="custom">Авторская</option></select></label>
- <label class="admin-wide">Основание / версия утверждённого реестра<input name="reference" required maxlength="200"></label><label class="admin-wide">JSON-файл<input name="file" type="file" accept=".json,application/json" required></label><button class="btn primary" ${writable()?'':'disabled'}>Проверить и подготовить</button></form></div>
+ <label class="admin-wide">Основание / версия утверждённого реестра<input name="reference" required maxlength="200"></label><label class="admin-wide">JSON-файл<input name="file" type="file" accept=".json,application/json" required></label><button class="btn primary" ${writable()?'':'disabled'}>Проверить и подготовить</button><button class="btn subtle" type="button" data-admin-action="catalog-export">Скачать выбранный каталог</button></form></div>
  <div id="admin-preview"></div><h2>Сохранённые версии</h2>${table(['Каталог','Пак / редакция','Записи','Действие'],catalogs.versions.map(x=>`<tr><td>${esc(x.module_key)}<code>${esc(x.id)}</code></td><td>${esc(x.pack_key)} · ${esc(x.edition)}</td><td>${x.records}</td><td><button class="btn subtle" data-admin-action="preview" data-id="${esc(x.id)}">Просмотреть</button></td></tr>`))}`;
 }});
 let auditRows=[],auditBefore=null,auditFilter={};
@@ -83,10 +83,12 @@ registry.register({key:'media',label:'Медиатека',render:async()=>{
 async function showPreview(id){
  preview=await rpc('holen_admin_catalog_preview',{p_version:id});const el=document.getElementById('admin-preview');
  el.innerHTML=`<div class="admin-card"><h2>Изменения версии</h2><p>${esc(preview.module)} · ${esc(preview.pack)} · ${esc(preview.edition)}</p><p>Новых: ${preview.added.length} · изменено: ${preview.changed.length} · в архив: ${preview.archived.length}</p>
-  ${preview.conflict?'<p class="admin-note">Версия подготовлена относительно другого состояния каталога. Здесь показаны изменения относительно текущей активной версии — проверь их перед подтверждением.</p>':''}
+  ${preview.conflict&&preview.head!==id?'<p class="admin-note">Версия подготовлена относительно другого состояния каталога. Здесь показаны изменения относительно текущей активной версии — проверь их перед подтверждением.</p>':''}
  ${!preview.publish_ready?'<p class="admin-note">Для этого каталога ещё проверяется связь с игровыми данными. Версия сохранена для проверки.</p>':''}
+ ${preview.module==='backgrounds'?'<p class="admin-note">Публикация обновляет справочник и новые выборы персонажей. Сохранённые персонажи сохранят свои навыки и выбранную предысторию. Для возврата открой прежнюю версию и сделай её активной.</p>':''}
  <details><summary>Просмотреть записи</summary><pre class="admin-json">${esc(JSON.stringify(preview.records,null,2))}</pre></details>
- <div class="admin-actions">${preview.publish_ready&&writable()?`<button class="btn primary" data-admin-action="activate" data-id="${esc(id)}">Сделать активной</button>`:''}</div></div>`;
+ <div class="admin-actions">${preview.publish_ready&&writable()?`<button class="btn primary" data-admin-action="activate" data-id="${esc(id)}" ${preview.head===id?'disabled':''}>${preview.head===id?'Версия уже активна':'Сделать активной'}</button>`:''}</div>
+ ${preview.module==='backgrounds'&&writable()?`<details><summary>Редактировать данные и подготовить новую версию</summary><form class="admin-form" data-admin-form="catalog-edit"><label class="admin-wide">Данные предысторий · JSON<textarea name="records" rows="16" required>${esc(JSON.stringify(preview.records,null,2))}</textarea></label><label class="admin-wide">Основание изменения<input name="reference" maxlength="200" required></label><button class="btn primary">Проверить изменения</button></form><p class="admin-note">Сохраняй ID существующих предысторий. Названия, источники и игровые изменения должны соответствовать утверждённым материалам. Сохранение черновика не публикует его.</p></details>`:''}</div>`;
  el.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 root.addEventListener('click',async e=>{
@@ -118,9 +120,15 @@ root.addEventListener('click',async e=>{
    const data=new FormData(dialog.querySelector('form')),accepted=dialog.returnValue==='confirm';dialog.remove();
    if(accepted&&await confirmAction('Изменить доступ',x.username+' → '+names[data.get('role')]+(data.get('blocked')==='true'?' · заблокировать':''))){
     await mutate('holen_admin_access_change',{p_user:id,p_role:data.get('role'),p_blocked:data.get('blocked')==='true',p_revision:x.revision});await show();notice('Доступ обновлён.');}
+  }else if(action==='catalog-export'){
+   const form=button.closest('form'),data=new FormData(form),module=data.get('module'),pack=data.get('pack'),edition=data.get('edition');
+   const current=await rpc('holen_catalog_public',{p_module:module,p_pack:pack,p_edition:edition});
+   const records=current?.records||(module==='backgrounds'&&pack==='journeys'&&['2014','2024'].includes(edition)?window.HOLEN_BACKGROUNDS.bundled(edition):null);
+   if(!records)throw Error('Для выбранного каталога ещё нет опубликованной версии.');
+   const url=URL.createObjectURL(new Blob([JSON.stringify(records,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=module+'-'+pack+'-'+edition+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }else if(action==='activate'){
    if(await confirmAction('Сделать версию активной',`Новых: ${preview.added.length}, изменённых: ${preview.changed.length}, в архив: ${preview.archived.length}. Предыдущая версия сохраняется.`)){
-    await mutate('holen_admin_catalog_activate',{p_version:id,p_expected_head:preview.head});await show();notice('Активная версия обновлена.');}
+    await mutate('holen_admin_catalog_activate',{p_version:id,p_expected_head:preview.head});if(preview.module==='backgrounds')await window.HOLEN_BACKGROUNDS.ensure(preview.edition,{force:true});await show();notice('Активная версия обновлена.');}
   }else if(action==='pack'||action==='new-pack'){
    const x=catalogs.packs.find(x=>x.key===id)||{key:'',name:'',description:'',revision:0};
    const el=document.getElementById('admin-content');el.innerHTML=`<h2>Описание пака</h2><form data-admin-form="pack" class="admin-form"><label>ID<input name="key" value="${esc(x.key)}" ${x.key?'readonly':''} required pattern="[a-z][a-z0-9-]{1,39}"></label><label>Название<input name="name" value="${esc(x.name)}" maxlength="100" required></label><label class="admin-wide">Описание<textarea name="description" maxlength="1000">${esc(x.description)}</textarea></label><input type="hidden" name="revision" value="${x.revision}"><button class="btn primary">Сохранить</button></form><p class="admin-note">Подготовка нового пака сохраняет его описание. Игровые правила подключаются отдельно.</p>`;
@@ -146,10 +154,16 @@ root.addEventListener('submit',async e=>{
   else if(form.dataset.adminForm==='audit-filter'){auditBefore=null;auditFilter=Object.fromEntries(data);await renderSection();}
   else if(form.dataset.adminForm==='pack'){
    await mutate('holen_admin_pack_save',{p_key:data.get('key'),p_name:data.get('name'),p_description:data.get('description'),p_revision:Number(data.get('revision'))});await show();notice('Описание сохранено.');
+  }else if(form.dataset.adminForm==='catalog-edit'){
+   const records=JSON.parse(data.get('records'));if(!window.HOLEN_BACKGROUNDS.validate(records,preview.edition))throw Error('Проверь поля предысторий, навыки, ID и ссылки DnD.su выбранной редакции.');
+   if(new Blob([JSON.stringify(records)]).size>4194304)throw Error('Каталог должен быть не больше 4 МиБ.');
+   const result=await mutate('holen_admin_catalog_stage',{p_module:preview.module,p_pack:preview.pack,p_edition:preview.edition,p_schema_version:1,p_expected_head:preview.head,p_records:records,p_reference:data.get('reference')});
+   await showPreview(result.version_id);notice('Черновик сохранён. Проверь изменения перед публикацией.');
   }else if(form.dataset.adminForm==='stage'){
    const file=data.get('file');if(!file||file.size>4194304)throw Error('JSON-файл должен быть не больше 4 МиБ.');
    const records=JSON.parse(await file.text());if(!Array.isArray(records))throw Error('Нужен JSON-массив записей.');
    const module=data.get('module'),pack=data.get('pack'),edition=data.get('edition'),m=catalogs.modules.find(x=>x.key===module);
+   if(module==='backgrounds'&&(pack!=='journeys'||!window.HOLEN_BACKGROUNDS.validate(records,edition)))throw Error('Предыстории доступны для «Путешествий Холэна» в редакциях 2014 и 2024. Проверь поля, навыки и ссылки выбранной редакции.');
    const head=catalogs.heads.find(x=>x.module_key===module&&x.pack_key===pack&&x.edition===edition);
    const result=await mutate('holen_admin_catalog_stage',{p_module:module,p_pack:pack,p_edition:edition,p_schema_version:m.schema_version,p_expected_head:head?.version_id||null,p_records:records,p_reference:data.get('reference')});
    await showPreview(result.version_id);notice('Версия сохранена для проверки.');

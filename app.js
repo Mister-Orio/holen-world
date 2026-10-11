@@ -9,7 +9,7 @@
    ================================================================ */
 
 const $ = id => document.getElementById(id);
-const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','inventory','rooms','gm'];
+const VIEWS = ['home','journeys','insects','classes','races','backgrounds','feats','profile','auth','squads','sheet','dnd-sheet','bestiary','bestiary-journeys','bestiary-insects','rules','lore','lore-journeys','lore-insects','inventory','rooms','gm','admin'];
 const BREADCRUMBS = {home:'Главная',inventory:'Инвентарь',journeys:'Путешествия Холэна',insects:'Муравьиная революция',classes:'Классы',races:'Расы',backgrounds:'Предыстории',feats:'Черты',profile:'Профиль',auth:'Аккаунт',squads:'Боевые отряды',sheet:'Лист отряда','dnd-sheet':'Лист D&D',bestiary:'Бестиарий',rules:'Правила',lore:'Предметы Холэна','bestiary-journeys':'Путешествия Холэна','bestiary-insects':'Муравьиная революция','lore-journeys':'Путешествия Холэна','lore-insects':'Муравьиная революция',rooms:'Комнаты',gm:'Панель ГМа'};
 const LIBRARY_PACK_VIEWS={
  'bestiary-journeys':{library:'bestiary',pack:'journeys'},
@@ -18,6 +18,7 @@ const LIBRARY_PACK_VIEWS={
  'lore-insects':{library:'lore',pack:'insects'}
 };
 const PACK_TITLES={journeys:'Путешествия Холэна',insects:'Муравьиная революция'};
+BREADCRUMBS.admin='Панель администратора';
 const COLONY_LABEL = {black:'Чёрная колония',green:'Зелёная колония'};
 
 // В интерфейс нельзя подставлять сырой текст пользователя через innerHTML.

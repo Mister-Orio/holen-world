@@ -1,0 +1,28 @@
+#admin-nav[hidden]{display:none!important}
+.admin-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.admin-header>div{min-width:0;max-width:100%}.admin-header h1{overflow-wrap:anywhere}
+.admin-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.3rem 0}
+.admin-tabs button[aria-selected=true]{background:#234d3c;border-color:#78d7ac}
+.admin-card{border:1px solid var(--line,#304a41);border-radius:18px;padding:1.2rem;margin:1rem 0;background:#14201c}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.8rem}
+.admin-stats strong{display:block;font-size:1.7rem;color:#f0bc65}
+.admin-table-scroll{overflow:auto;max-width:100%}
+.admin-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.admin-table td,.admin-table th{text-align:left;padding:.8rem;border-bottom:1px solid #304a41;vertical-align:top}
+.admin-table th{color:#e8b760}
+.admin-table code{font-size:.76rem;overflow-wrap:anywhere;display:block;max-width:230px}
+.admin-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem}
+.admin-form label{display:flex;flex-direction:column;gap:.4rem}
+.admin-form>*{min-width:0}
+.admin-form input,.admin-form select,.admin-form textarea{width:100%;box-sizing:border-box}
+.admin-form .admin-wide{grid-column:1/-1}
+.admin-form textarea{min-height:150px;resize:vertical}
+.admin-note{color:#b5cac1;line-height:1.6}
+.admin-status{min-height:1.6em;overflow-wrap:anywhere}
+.admin-status.is-error{color:#f3aaa0}
+.admin-dialog{max-width:500px;width:calc(100% - 48px);background:#14201c;color:#edf4ee;border:1px solid #608c74;border-radius:18px;padding:1.5rem}
+.admin-dialog::backdrop{background:rgb(0 0 0/.75)}
+.admin-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
+.admin-mfa-qr{width:200px;height:200px;background:white;object-fit:contain}
+.admin-json{white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}
+@media(max-width:600px){.admin-card{padding:.85rem}.admin-table td,.admin-table th{padding:.6rem}.admin-form{grid-template-columns:1fr}}

@@ -241,6 +241,26 @@ async function authorizedApi(endpoint,options={}){
  if(!token)throw Error('Сначала войдите в аккаунт.');
  return request(endpoint,{...options,token});
 }
+const mfa={
+ async factors(){const user=await authorizedApi('/auth/v1/user');return (user.factors||[]).filter(x=>x.factor_type==='totp');},
+ async enroll(){
+  const factors=await mfa.factors();
+  // A cancelled enrollment must not consume all factor slots. Never remove a verified factor here.
+  for(const f of factors.filter(x=>x.status==='unverified'&&x.friendly_name==='Holen administration')){
+   await authorizedApi('/auth/v1/factors/'+encodeURIComponent(f.id),{method:'DELETE'});
+  }
+  return authorizedApi('/auth/v1/factors',{method:'POST',body:{factor_type:'totp',friendly_name:'Holen administration',issuer:'Holen World'}});
+ },
+ async verify(factorId,code){
+  if(!/^[0-9a-f-]{36}$/i.test(factorId)||!/^\d{6}$/.test(code))throw Error('Введите шестизначный код из приложения.');
+  const expectedUser=window.__holen_current_user_id;
+  const challenge=await authorizedApi('/auth/v1/factors/'+encodeURIComponent(factorId)+'/challenge',{method:'POST',body:{}});
+  const fresh=await authorizedApi('/auth/v1/factors/'+encodeURIComponent(factorId)+'/verify',{method:'POST',body:{challenge_id:challenge.id,code}});
+  if(!fresh.access_token||!fresh.refresh_token||!fresh.expires_in||fresh.user?.id!==expectedUser||window.__holen_current_user_id!==expectedUser)throw Error('Сессия изменилась. Войдите заново.');
+  store({...fresh,expires_at:Date.now()+fresh.expires_in*1000});
+  await loadProfile();
+ }
+};
 window.HOLEN_AUTH_UI={open,refresh:loadProfile,listCharacters,createCharacter,updateCharacterName,deleteCharacter,getCharacter,updateDndCharacter,
- isAuthenticated:()=>authenticated,currentUserId:()=>window.__holen_current_user_id||null,api:authorizedApi};
+ isAuthenticated:()=>authenticated,currentUserId:()=>window.__holen_current_user_id||null,api:authorizedApi,mfa};
 })();

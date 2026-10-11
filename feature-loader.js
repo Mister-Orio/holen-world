@@ -6,6 +6,7 @@ const catalogs=[data,'catalog-data.js?v=0125',model];
 const choices=[model,options,library,'dnd-option-sources.js?v=0126','dnd-options-ui.js?v=0125'];
 const rooms=[data,'squad-abilities.js?v=0116','bestiary-data.js?v=0115','online-room-ui.js?v=0119'];
 const views={
+ admin:['admin.css?v=0127','admin-modules.js?v=0127','media-resolver.js?v=0127','admin-ui.js?v=0127'],
  inventory:['inventory-data.js?v=0126','inventory.css?v=0126','inventory-ui.js?v=0126'],
  squads:[data],rules:[data,'holen-rules-data.js?v=0126'],
  classes:catalogs,races:catalogs,backgrounds:choices,feats:choices,

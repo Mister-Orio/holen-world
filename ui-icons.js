@@ -15,7 +15,7 @@ function upgrade(root){
   }
  }
  root.querySelectorAll('.side-nav [data-view] .nav-icon').forEach(icon=>{
-  if(icon.dataset.upgraded)return;icon.dataset.upgraded='1';icon.setAttribute('aria-hidden','true');icon.innerHTML=svg('library-'+(icon.parentElement.dataset.view==='inventory'?'lore':icon.parentElement.dataset.view),'ui-library-icon');
+  if(icon.dataset.upgraded)return;icon.dataset.upgraded='1';icon.setAttribute('aria-hidden','true');const view=icon.parentElement.dataset.view;icon.innerHTML=svg('library-'+(view==='inventory'?'lore':view==='admin'?'rules':view),'ui-library-icon');
  });
 }
 window.HOLEN_ICONS={svg,upgrade};upgrade(document.body);

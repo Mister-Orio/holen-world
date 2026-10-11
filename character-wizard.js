@@ -9,23 +9,27 @@ const number=(label,key,value,min,max)=>'<label>'+label+'<input type="number" da
 const check=(label,key,on)=>'<label class="wizard-check"><input type="checkbox" data-field="'+key+'" '+(on?'checked':'')+'><span>'+label+'</span></label>';
 const help=html=>'<div class="wizard-help">'+html+'</div>';
 const templates=()=>window.ANT_DATA?.squads||[],owner=()=>auth.currentUserId()||'guest';
-let draftOwner=owner(),state=load(),busy=false,loginPending=false,prefilled=false;
+let savedEntry='',draftOwner=owner(),state=load(),busy=false,loginPending=false,prefilled=false;
 const params=new URLSearchParams(location.search),requestedFeat=params.get('feat');
 const hasPrefill=['background','feat','class','race'].some(key=>params.has(key));
+const entry=JSON.stringify(['edition','background','feat','class','race'].map(key=>params.get(key)));
 const featLabels={Origin:'Происхождение',General:'Общие',Optional:'Опциональные','Fighting Style':'Боевые стили','Epic Boon':'Эпические дары'};
 let featQuery='',featGroup='all';
 function key(id=draftOwner){return 'holen-character-wizard-v1:'+id;}
-function load(){try{return m.restore(JSON.parse(localStorage.getItem(key())||'null'));}catch{return m.fresh();}}
-function remember(){try{localStorage.setItem(key(),JSON.stringify(state));}catch{}}
+function load(){savedEntry='';try{const value=JSON.parse(localStorage.getItem(key())||'null');savedEntry=typeof value?.prefillEntry==='string'?value.prefillEntry:'';return m.restore(value);}catch{return m.fresh();}}
+function remember(){try{localStorage.setItem(key(),JSON.stringify({...state,prefillEntry:savedEntry}));}catch{}}
 function say(message){const node=root.querySelector('.wizard-error');if(node)node.textContent=message;}
 function start(){
  if(busy)return;
  if(!prefilled&&hasPrefill){
+  if(savedEntry!==entry){
   state=m.fresh();m.change(state,'edition',params.get('edition')==='2024'?'2024':'2014');
   const ed=d.editions[state.sheet.edition];
   if(ed.classes.some(x=>x.id===params.get('class')))m.change(state,'classId',params.get('class'));
   if(ed.species.some(x=>x.id===params.get('race')))m.change(state,'speciesId',params.get('race'));
   const bg=params.get('background');if(o.editions[state.sheet.edition].backgrounds.some(x=>x.id===bg))m.change(state,'backgroundId',bg);
+  }
+  savedEntry=entry;
   prefilled=true;
  }
  root.hidden=false;profile.classList.add('creating-character');render();root.scrollIntoView({block:'start',behavior:'instant'});
@@ -51,6 +55,7 @@ function filterFeats(){
 }
 function body(){
  const sh=state.sheet,c=m.cls(state),ed=d.editions[sh.edition],bg=m.background(state),step=state.step,species=ed.species.find(x=>x.id===sh.speciesId);
+ const backgroundRows=o.editions[sh.edition].backgrounds.map(x=>bg&&x.id===bg.id&&x.name!==bg.name?{...x,name:bg.name+' · сохранённый выбор'}:x);if(bg&&!backgroundRows.some(x=>x.id===bg.id))backgroundRows.unshift({...bg,name:bg.name+' · сохранённый выбор'});
  if(step===0)return '<h2>Выбери мир приключения</h2><p>Пак определяет систему правил и следующие шаги.</p><div class="wizard-fields">'+select('Игровой пак','pack',[{id:'journeys',name:'Путешествия Холэна'},{id:'insects',name:'Муравьиная революция'}],state.pack)+(state.pack==='journeys'?select('Редакция правил','edition',[{id:'2014',name:'D&D 2014'},{id:'2024',name:'D&D 2024'}],sh.edition):'')+'</div>'+help(state.pack==='journeys'?'Классический персонаж D&D с характеристиками, предысторией и выбором опций по уровню.':'Авторская система: выбери имя и специализацию отряда.');
  if(step===1)return '<h2>'+m.steps(state)[step]+'</h2><p>С какого момента начнётся история персонажа?</p><label>Имя персонажа<input data-field="name" maxlength="72" autocomplete="off" placeholder="Например, Меральт" value="'+esc(state.name)+'"></label>'+(state.pack==='journeys'?'<div class="wizard-fields">'+select('Развитие','levelMode',[{id:'manual',name:'Выбрать уровень'},{id:'xp',name:'По опыту'}],sh.levelMode)+(sh.levelMode==='xp'?number('Опыт','experience',sh.experience,0,9999999):number('Уровень','level',sh.level,1,20))+'</div>'+help('Уровень '+sh.level+' · Бонус мастерства +'+d.proficiency(sh.level)+'. Здоровье рассчитаем после выбора класса и характеристик.'):'');
  if(state.pack==='insects'){
@@ -59,7 +64,7 @@ function body(){
   return '<h2>Отряд готов</h2><dl class="wizard-summary"><div><dt>Имя</dt><dd>'+esc(state.name)+'</dd></div><div><dt>Специализация</dt><dd>'+esc(t?.name)+'</dd></div></dl>'+help('В аккаунт сохранится заготовка отряда. Его автономный боевой лист пока хранит текущие показатели в этом браузере.');
  }
  if(step===2)return '<h2>Класс и раса</h2><p>Класс определит здоровье, спасброски и доступные подклассы.</p><div class="wizard-fields">'+select('Класс','classId',ed.classes,sh.classId)+select('Раса / вид','speciesId',ed.species,sh.speciesId)+'</div>'+help('Кость здоровья: d'+c.hitDie+' · Подкласс с '+c.subclassLevel+' уровня · Основные характеристики: '+esc(c.primary)+'.')+help('Размер: '+esc(d.speciesSize(sh))+' · Ходьба: '+species.speed+' футов.'+(species.supplement?'<br>'+esc(species.sourceBook+' · '+species.sourceName)+'<br>'+esc(species.worldAccess)+' <a href="'+esc(d.referenceUrl(sh.edition,'species',species.id))+'" target="_blank" rel="noopener">Справка расы ↗</a>':'')+(species.size.includes('или')?'<br>Выбери размер и отметь его в полном листе.':''))+(sh.edition==='2014'&&sh.speciesId==='human'?check('Вариант человека: дополнительная черта с 1 уровня (с разрешения ГМ).','variantHuman',state.variantHuman):'');
- if(step===3)return '<h2>Предыстория</h2><p>Кем персонаж был до начала приключений?</p>'+select('Предыстория','backgroundId',o.editions[sh.edition].backgrounds,sh.backgroundId,'Выбери предысторию')+(bg?help(esc(bg.description)+'<br>Навыки: '+(bg.skills.map(k=>esc(d.skills.find(x=>x[0]===k)?.[1]||k)).join(', ')||'на выбор')+(bg.originFeat?'<br>Черта происхождения: '+esc(o.editions[sh.edition].feats.find(x=>x.id===bg.originFeat)?.name||bg.originFeat):'')+'<br><a href="'+esc(bg.source)+'" target="_blank" rel="noopener">Правила предыстории ↗</a>')+(bg.skillChoices?'<fieldset class="wizard-skill-choices"><legend>Выбери '+bg.skillChoices.count+(bg.skillChoices.count===1?' навык':' навыка')+'</legend>'+bg.skillChoices.options.map(id=>'<label><input type="checkbox" data-background-skill="'+esc(id)+'" '+(state.backgroundSkills.includes(id)?'checked':'')+' '+(!state.backgroundSkills.includes(id)&&state.backgroundSkills.length>=bg.skillChoices.count?'disabled':'')+'> '+esc(d.skills.find(x=>x[0]===id)?.[1]||id)+'</label>').join('')+'</fieldset>':''):'');
+ if(step===3)return '<h2>Предыстория</h2><p>Кем персонаж был до начала приключений? Выбранная версия сохраняется вместе с персонажем.</p>'+select('Предыстория','backgroundId',backgroundRows,sh.backgroundId,'Выбери предысторию')+(bg?help(esc(bg.description)+'<br>Навыки: '+(bg.skills.map(k=>esc(d.skills.find(x=>x[0]===k)?.[1]||k)).join(', ')||'на выбор')+(bg.originFeat?'<br>Черта происхождения: '+esc(o.editions[sh.edition].feats.find(x=>x.id===bg.originFeat)?.name||bg.originFeat):'')+'<br><a href="'+esc(bg.source)+'" target="_blank" rel="noopener">Правила предыстории ↗</a>')+(bg.skillChoices?'<fieldset class="wizard-skill-choices"><legend>Выбери '+bg.skillChoices.count+(bg.skillChoices.count===1?' навык':' навыка')+'</legend>'+bg.skillChoices.options.map(id=>'<label><input type="checkbox" data-background-skill="'+esc(id)+'" '+(state.backgroundSkills.includes(id)?'checked':'')+' '+(!state.backgroundSkills.includes(id)&&state.backgroundSkills.length>=bg.skillChoices.count?'disabled':'')+'> '+esc(d.skills.find(x=>x[0]===id)?.[1]||id)+'</label>').join('')+'</fieldset>':''):'');
  if(step===4){
   const cost=d.pointBuyCost(sh.baseAbilities),methods=[{id:'point-buy',name:'Покупка за 27 очков'},{id:'standard-array',name:'Набор 15, 14, 13, 12, 10, 8'},{id:'manual',name:'Ввести значения вручную'}];
   return '<h2>Характеристики</h2><p>Распредели основу, затем укажи бонусы расы, предыстории и повышения уровня.</p>'+select('Способ распределения','abilityMode',methods,sh.abilityMode)+(sh.abilityMode==='point-buy'?'<strong class="wizard-points '+(cost>27?'over-budget':'')+'">Осталось очков: '+(27-cost)+' из 27</strong>':'')+'<div class="wizard-abilities">'+Object.entries(d.abilities).map(([k,name])=>'<div class="wizard-ability"><strong>'+name+'</strong>'+(sh.abilityMode==='standard-array'?select('Основа','base:'+k,d.standardArray.map(n=>({id:n,name:String(n)})),sh.baseAbilities[k]):number('Основа','base:'+k,sh.baseAbilities[k],sh.abilityMode==='point-buy'?8:1,sh.abilityMode==='point-buy'?15:30))+number('Бонус','bonus:'+k,sh.abilityBonuses[k],-20,20)+'<span class="wizard-total">'+sh.abilities[k]+' <small>('+signed(d.modifier(sh.abilities[k]))+')</small></span></div>').join('')+'</div>'+help('Бонусы и прибавки от черт вводятся вручную по правилам выбранной редакции. В стандартном наборе значения меняются местами — каждое используется один раз.');

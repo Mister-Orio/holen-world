@@ -30,6 +30,7 @@ for(const kind of ['backgrounds','feats']){
  root.addEventListener('input',e=>{if(e.target.type==='search'){q=e.target.value.trim().toLocaleLowerCase('ru').replace(/ё/g,'е');results();}});
  root.addEventListener('change',e=>{if(e.target.matches('[data-option-edition]')){edition=e.target.value;updateSources();results();}if(e.target.matches('[data-option-source]')){source=e.target.value;results();}});
  window.addEventListener('holen-navigated',e=>{if(e.detail?.view===kind&&!root.children.length)setup();});
+ window.addEventListener('holen-backgrounds-changed',e=>{if(kind==='backgrounds'&&e.detail?.edition===edition&&root.children.length){updateSources();results();}});
  if(location.hash==='#'+kind)setup();
 }
 })();

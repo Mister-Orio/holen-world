@@ -117,6 +117,17 @@ function normalize(value){
  const result={...base};
  for(const key of ['background','subclass','alignment'])result[key]=text(s[key],160);
  for(const key of ['backgroundId','selectedSubclassId'])result[key]=text(s[key],120);
+ const snapshot=s.backgroundSnapshot;
+ if(snapshot&&snapshot.pack==='journeys'&&snapshot.edition===edition&&snapshot.record?.id===result.backgroundId&&
+  (snapshot.version===null||/^[0-9a-f-]{36}$/i.test(snapshot.version||''))&&JSON.stringify(snapshot).length<=16000){
+  const bg=snapshot.record;
+  const choices=bg.skillChoices;
+  if(typeof bg.name==='string'&&bg.name.length<=160&&typeof bg.source==='string'&&/^https:\/\/(?:(?:next|5e14)\.)?dnd\.su\/backgrounds\/[0-9]+-[a-z0-9-]+\/?$/.test(bg.source)&&Array.isArray(bg.skills)&&bg.skills.length<=18&&bg.skills.every(k=>skills.some(x=>x[0]===k))&&
+   (!choices||(Number.isInteger(choices.count)&&choices.count>=1&&choices.count<=18&&Array.isArray(choices.options)&&choices.options.length<=18&&choices.options.every(k=>skills.some(x=>x[0]===k))))){
+   const safe={};for(const key of ['id','name','nameEn','description','source','sourceBook','sourceName','sourceKind','homebrew','aliases','skills','skillChoices','originFeat'])if(Object.hasOwn(bg,key))safe[key]=JSON.parse(JSON.stringify(bg[key]));
+   result.backgroundSnapshot={pack:'journeys',edition,version:snapshot.version,record:safe};
+  }
+ }
  for(const key of ['features','spells','equipment','notes','appearance','backstory','allies','traits','ideals','bonds','flaws'])result[key]=text(s[key]);
  for(const key of ['playerName','age','gender','height','weight','eyes','hair','skin','languages','deity','personality'])result[key]=text(s[key],key==='personality'?8000:240);
  result.levelMode=s.levelMode==='xp'?'xp':'manual';

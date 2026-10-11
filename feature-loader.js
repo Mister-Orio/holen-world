@@ -1,17 +1,18 @@
 /* Section dependencies are loaded once, in order, with retry after a failed request. */
 (()=>{'use strict';
 const pending=new Map(),ready=new Set(),busy=new WeakMap(),failed=new WeakMap();
-const data='data.js?v=0126',model='dnd-data.js?v=0125',options='dnd-options-data.js?v=0125',srd='bestiary-srd.js?v=0120',library='dnd-library.css?v=0118';
+const data='data.js?v=0126',model='dnd-data.js?v=0128',options='dnd-options-data.js?v=0125',srd='bestiary-srd.js?v=0120',library='dnd-library.css?v=0118';
 const catalogs=[data,'catalog-data.js?v=0125',model];
-const choices=[model,options,library,'dnd-option-sources.js?v=0126','dnd-options-ui.js?v=0125'];
+const backgroundCatalog='background-catalog.js?v=0128';
+const choices=[model,options,backgroundCatalog,library,'dnd-option-sources.js?v=0126','dnd-options-ui.js?v=0128'];
 const rooms=[data,'squad-abilities.js?v=0116','bestiary-data.js?v=0115','online-room-ui.js?v=0119'];
 const views={
- admin:['admin.css?v=0127','admin-modules.js?v=0127','media-resolver.js?v=0127','admin-ui.js?v=0127'],
+ admin:[model,options,backgroundCatalog,'admin.css?v=0127','admin-modules.js?v=0127','media-resolver.js?v=0127','admin-ui.js?v=0128'],
  inventory:['inventory-data.js?v=0126','inventory.css?v=0126','inventory-ui.js?v=0126'],
  squads:[data],rules:[data,'holen-rules-data.js?v=0126'],
  classes:catalogs,races:catalogs,backgrounds:choices,feats:choices,
- profile:[data,model,options,'character-wizard.css?v=0123','character-ui.js?v=0122','character-wizard-model.js?v=0124','character-wizard.js?v=0125'],
- 'dnd-sheet':[model,options,srd,library,'dnd-builder.css?v=0117','dnd-sheet-ui.js?v=0119'],
+ profile:[data,model,options,backgroundCatalog,'character-wizard.css?v=0123','character-ui.js?v=0122','character-wizard-model.js?v=0128','character-wizard.js?v=0128'],
+ 'dnd-sheet':[model,options,backgroundCatalog,srd,library,'dnd-builder.css?v=0117','dnd-sheet-ui.js?v=0128'],
  'bestiary-journeys':[srd,library,'bestiary-ui.js?v=0120'],
  'bestiary-insects':['bestiary-data.js?v=0115',srd,library,'bestiary-ui.js?v=0120'],
  'lore-journeys':['items-data.js?v=0126'],'lore-insects':['items-data.js?v=0126'],
@@ -30,7 +31,7 @@ function resource(url){
 async function forView(view){
  const files=views[view]||[];
  await Promise.all(files.filter(x=>x.split('?')[0].endsWith('.css')).map(resource));
- for(const file of files)if(!file.split('?')[0].endsWith('.css'))await resource(file);
+ for(const file of files)if(!file.split('?')[0].endsWith('.css')){await resource(file);if(file===backgroundCatalog&&view!=='admin')await window.HOLEN_BACKGROUNDS.ready();}
 }
 function loading(root,view){
  if(!root)return ()=>{};

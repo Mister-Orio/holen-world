@@ -6,7 +6,7 @@ const params=new URLSearchParams(location.search),esc=s=>String(s??'').replace(/
 let characterId=params.get('character')||null,updatedAt=null,loadedId=null,loadEpoch=0,saving=false,dirty=false,userId=auth.currentUserId();
 let sheet=d.blank(params.get('edition')||'2014',params.get('class')||'fighter',params.get('race')||'human'),name=(params.get('name')||'Новый персонаж').slice(0,72);
 const newDraftId='new:'+sheet.edition+':'+sheet.classId+':'+sheet.speciesId+(['background','feat','name'].some(k=>params.has(k))?':'+(params.get('background')||'')+':'+(params.get('feat')||'')+':'+(params.get('name')||''):'');
-const prefillBackground=window.HOLEN_DND_OPTIONS?.editions[sheet.edition].backgrounds.find(x=>x.id===params.get('background'));if(prefillBackground){sheet.backgroundId=prefillBackground.id;sheet.background=prefillBackground.name;for(const id of prefillBackground.skills)sheet.skills[id]=1;if(prefillBackground.originFeat)sheet.featIds.push(prefillBackground.originFeat);}
+const prefillBackground=window.HOLEN_DND_OPTIONS?.editions[sheet.edition].backgrounds.find(x=>x.id===params.get('background'));if(prefillBackground){sheet.backgroundId=prefillBackground.id;sheet.background=prefillBackground.name;sheet.backgroundSnapshot=window.HOLEN_BACKGROUNDS?.selection(sheet.edition,prefillBackground.id);for(const id of prefillBackground.skills)sheet.skills[id]=1;if(prefillBackground.originFeat)sheet.featIds.push(prefillBackground.originFeat);}
 if(window.HOLEN_DND_OPTIONS?.editions[sheet.edition].feats.some(x=>x.id===params.get('feat')))sheet.featIds.push(params.get('feat'));
 const signed=n=>(n>=0?'+':'')+n;
 const input=(key,label,value,min=0,max=9999)=>'<label>'+esc(label)+'<input type="number" data-field="'+key+'" value="'+value+'" min="'+min+'" max="'+max+'" step="1"></label>';
@@ -85,6 +85,8 @@ function draw(){
  const subclassRows=[{id:'',name:sheet.subclass&&!sheet.selectedSubclassId?sheet.subclass:sheet.level<cls.subclassLevel?'Доступен с '+cls.subclassLevel+' уровня':'Выбери подкласс'},...subclasses];
  if(chosenSubclass&&!subclasses.some(x=>x.id===chosenSubclass.id))subclassRows.push({id:chosenSubclass.id,name:chosenSubclass.name+' · проверь условия'});
  const backgrounds=[{id:'',name:sheet.background&&!sheet.backgroundId?sheet.background:'Выбери предысторию'},...o.backgrounds];
+ const savedBackground=backgrounds.find(x=>x.id===sheet.backgroundId);if(savedBackground&&sheet.background&&savedBackground.name!==sheet.background)backgrounds[backgrounds.indexOf(savedBackground)]={...savedBackground,name:sheet.background+' · сохранённая'};
+ if(sheet.backgroundId&&!o.backgrounds.some(x=>x.id===sheet.backgroundId))backgrounds.push({id:sheet.backgroundId,name:(sheet.background||sheet.backgroundId)+' · сохранённая'});
  const availableFeats=window.HOLEN_DND_OPTIONS?.availableFeats?.(sheet)||o.feats;
  const availableIds=new Set(availableFeats.map(x=>x.id));
  const feats=[...availableFeats,...o.feats.filter(x=>sheet.featIds.includes(x.id)&&!availableIds.has(x.id))];
@@ -134,10 +136,10 @@ root.addEventListener('change',e=>{
  if(['edition','classId','speciesId','levelMode','hpMode','abilityMode','backgroundId','selectedSubclassId'].includes(key)){
   collect();const cls=d.editions[sheet.edition].classes.find(x=>x.id===sheet.classId),species=d.editions[sheet.edition].species.find(x=>x.id===sheet.speciesId);
   if(key==='edition'||key==='classId'){sheet.saveProficiencies=[...cls.saves];sheet.casting=cls.casting;sheet.subclass='';sheet.selectedSubclassId='';}
-  if(key==='edition'){sheet.backgroundId='';sheet.background='';sheet.featIds=[];sheet.spellIds=[];}
+  if(key==='edition'){sheet.backgroundId='';sheet.background='';delete sheet.backgroundSnapshot;sheet.featIds=[];sheet.spellIds=[];}
   if(key==='edition'||key==='speciesId')sheet.speed=species.speed;
   if(key==='abilityMode'&&sheet.abilityMode==='point-buy'&&(d.pointBuyCost(sheet.baseAbilities)===null||d.pointBuyCost(sheet.baseAbilities)>27)){sheet=d.reconcileHealth(sheet,{...sheet,baseAbilities:Object.fromEntries(Object.keys(d.abilities).map(k=>[k,8]))});}
-  if(key==='backgroundId'){const bg=optData().backgrounds.find(x=>x.id===sheet.backgroundId);sheet.background=bg?.name||'';for(const id of bg?.skills||[])sheet.skills[id]=Math.max(1,sheet.skills[id]||0);if(bg?.originFeat&&!sheet.featIds.includes(bg.originFeat))sheet.featIds.push(bg.originFeat);}
+  if(key==='backgroundId'){const bg=optData().backgrounds.find(x=>x.id===sheet.backgroundId);sheet.background=bg?.name||'';sheet.backgroundSnapshot=window.HOLEN_BACKGROUNDS?.selection(sheet.edition,sheet.backgroundId);for(const id of bg?.skills||[])sheet.skills[id]=Math.max(1,sheet.skills[id]||0);if(bg?.originFeat&&!sheet.featIds.includes(bg.originFeat))sheet.featIds.push(bg.originFeat);}
   if(key==='selectedSubclassId')sheet.subclass=optData().subclasses.find(x=>x.id===sheet.selectedSubclassId)?.name||'';
   dirty=true;storeDraft();draw();
  }

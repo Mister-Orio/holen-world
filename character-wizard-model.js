@@ -9,7 +9,7 @@ function budgets(s){
  origin:sh.edition==='2024'&&sh.speciesId==='human'?1:0,
  style:sh.edition==='2024'&&((sh.classId==='fighter'&&sh.level>=1)||(['paladin','ranger'].includes(sh.classId)&&sh.level>=2))?1:0};
 }
-function background(s){return o.editions[s.sheet.edition].backgrounds.find(x=>x.id===s.sheet.backgroundId);}
+function background(s){const snapshot=s.sheet.backgroundSnapshot;return snapshot?.edition===s.sheet.edition&&snapshot.record?.id===s.sheet.backgroundId?snapshot.record:o.editions[s.sheet.edition].backgrounds.find(x=>x.id===s.sheet.backgroundId);}
 function candidates(s){return o.availableFeats(s.sheet);}
 function mandatory(s){const id=background(s)?.originFeat;return id?[id]:[];}
 function category(f,s){return s.sheet.edition==='2024'&&f.category==='Origin'?'origin':s.sheet.edition==='2024'&&f.category==='Fighting Style'?'style':'general';}
@@ -28,6 +28,7 @@ function sync(s){
  const c=cls(s),bg=background(s),sub=o.availableSubclasses(s.sheet).find(x=>x.id===s.sheet.selectedSubclassId);
  s.sheet.subclass=sub?.name||'';s.sheet.selectedSubclassId=sub?.id||'';
  s.sheet.background=bg?.name||'';s.sheet.backgroundId=bg?.id||'';
+ if(bg&&!s.sheet.backgroundSnapshot&&window.HOLEN_BACKGROUNDS)s.sheet.backgroundSnapshot=window.HOLEN_BACKGROUNDS.selection(s.sheet.edition,bg.id);
  s.sheet.saveProficiencies=[...c.saves];s.sheet.casting=c.casting;
  s.backgroundSkills=[...new Set(s.backgroundSkills||[])].filter(id=>bg?.skillChoices?.options.includes(id)).slice(0,bg?.skillChoices?.count||0);
  s.sheet.skills=Object.fromEntries(d.skills.map(([id])=>[id,bg?.skills.includes(id)||s.backgroundSkills.includes(id)?1:0]));
@@ -63,7 +64,8 @@ function change(s,key,value){
  else if(key==='speciesId'){s.sheet.speciesId=value;s.sheet.speed=d.editions[s.sheet.edition].species.find(x=>x.id===value)?.speed||30;}
  else if(key==='level'){s.sheet.level=Number(value);}
  else if(key==='experience'){s.sheet.experience=Number(value);}
- else if(['levelMode','backgroundId','selectedSubclassId'].includes(key))s.sheet[key]=value;
+ else if(key==='backgroundId'){s.sheet.backgroundId=value;delete s.sheet.backgroundSnapshot;}
+ else if(['levelMode','selectedSubclassId'].includes(key))s.sheet[key]=value;
  return sync(s);
 }
 function validate(s,step=s.step,templates=[]){

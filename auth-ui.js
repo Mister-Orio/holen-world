@@ -12,22 +12,35 @@ const $=id=>document.getElementById(id);
 const form=$('auth-form'), name=$('auth-username'),email=$('auth-email'),pass=$('auth-password'),confirm=$('auth-confirm');
 const buttons={register:$('auth-register-btn'),login:$('auth-login-btn'),forgot:$('auth-forgot-btn')};
 const info=$('auth-response');
-let mode='login',session=null,authenticated=false;
+let mode='login',session=null,authenticated=false,pendingSubmit=null;
 function feedback(t,err=false){info.textContent=t;info.hidden=false;info.className='auth-response'+(err?' is-error':'');}
 function clear(){info.hidden=true;info.textContent='';}
 function store(s){session=s;try{s?localStorage.setItem(STORE,JSON.stringify(s)):localStorage.removeItem(STORE);}catch(_){}}
 try{session=JSON.parse(localStorage.getItem(STORE)||'null');}catch(_){session=null;}
-async function request(endpoint,{method='GET',body,token,headers={}}={}){
- const res=await fetch(PROJECT+endpoint,{method,headers:{'apikey':KEY,'Content-Type':'application/json',...headers,...(token?{'Authorization':'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
- let data;try{data=await res.json();}catch(_){data={};}
- if(!res.ok)throw Error(data.msg||data.error_description||data.message||'Сервер отклонил запрос ('+res.status+').');
- return data;
+async function request(endpoint,{method='GET',body,token,headers={},signal,timeoutMs=0}={}){
+ const controller=new AbortController();
+ const cancel=()=>controller.abort();
+ if(signal?.aborted)controller.abort();else signal?.addEventListener('abort',cancel,{once:true});
+ let timer;
+ try{
+   const deadline=timeoutMs>0?new Promise((_,reject)=>{timer=setTimeout(()=>{
+     const error=Error('Сервер не ответил вовремя. Проверьте соединение и попробуйте позже.');
+     error.code='auth_request_timeout';reject(error);controller.abort();
+   },timeoutMs);}):null;
+   const response=(async()=>{
+     const res=await fetch(PROJECT+endpoint,{method,signal:controller.signal,headers:{'apikey':KEY,'Content-Type':'application/json',...headers,...(token?{'Authorization':'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
+     let data;try{data=await res.json();}catch(e){if(controller.signal.aborted)throw e;data={};}
+     if(!res.ok)throw Error(data.msg||data.error_description||data.message||'Сервер отклонил запрос ('+res.status+').');
+     return data;
+   })();
+   return await (deadline?Promise.race([response,deadline]):response);
+ }finally{clearTimeout(timer);signal?.removeEventListener('abort',cancel);}
 }
 async function validSession(){
  if(!session?.access_token)return null;
  if(session.expires_at && Date.now()>session.expires_at-60000){
    try{
-     const fresh=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
+     const fresh=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token},timeoutMs:20000});
      store({...fresh,expires_at:Date.now()+fresh.expires_in*1000});
    }catch(_){store(null);renderSession(null);return null;}
  }
@@ -37,9 +50,9 @@ async function loadProfile(){
  const token=await validSession();
  if(!token){renderSession(null);return;}
  try{
-   const user=await request('/auth/v1/user',{token});
+   const user=await request('/auth/v1/user',{token,timeoutMs:20000});
    if(!user.id)throw Error('Сессия не подтверждена.');
-   let list=[];try{list=await request('/rest/v1/profiles?select=username&id=eq.'+encodeURIComponent(user.id),{token});}catch(_){}
+   let list=[];try{list=await request('/rest/v1/profiles?select=username&id=eq.'+encodeURIComponent(user.id),{token,timeoutMs:20000});}catch(_){}
    renderSession({user,username:list?.[0]?.username||'Путешественник'});
  }catch(_){store(null);renderSession(null);}
 }
@@ -72,8 +85,17 @@ function renderSession(data){
  }
  window.dispatchEvent(new Event('holen-auth-changed'));
 }
-function selectMode(next){
+function submitState(busy){
+ const labels={register:'Создать аккаунт',login:'Войти',recover:'Отправить ссылку',reset:'Сохранить новый пароль'};
+ const waiting={register:'Создаём аккаунт…',login:'Входим…',recover:'Отправляем ссылку…',reset:'Сохраняем пароль…'};
+ $('auth-submit').disabled=busy;
+ $('auth-submit').textContent=(busy?waiting:labels)[mode];
+ form.setAttribute('aria-busy',String(busy));
+}
+function selectMode(next,{focus=false}={}){
+ if(pendingSubmit){const previous=pendingSubmit;pendingSubmit=null;previous.controller.abort();}
  mode=next;clear();
+ submitState(false);
  window.HOLEN_AUTH_GATE?.sync(authenticated,{recovery:next==='reset'});
  $('auth-form').hidden=authenticated && next!=='reset';
  const reg=next==='register',login=next==='login',recover=next==='recover',reset=next==='reset';
@@ -86,16 +108,25 @@ function selectMode(next){
  $('auth-password-field').hidden=recover;
  $('auth-confirm-field').hidden=!(reg||reset);
  name.required=reg;email.required=!reset;pass.required=!recover;confirm.required=reg||reset;
+ name.disabled=!reg;email.disabled=reset;pass.disabled=recover;confirm.disabled=!(reg||reset);
+ $('auth-policy-accept').disabled=!reg;
+ // The email is the account's sign-in identifier, the nickname is public display data.
+ email.autocomplete='username';
  pass.autocomplete=reg||reset?'new-password':'current-password';
+ confirm.autocomplete='new-password';
+ for(const field of [pass,confirm])field.type='password';
+ document.querySelectorAll('[data-password-toggle]').forEach(b=>b.setAttribute('aria-pressed','false'));
  buttons.register.classList.toggle('primary',reg);
  buttons.login.classList.toggle('primary',login);
  $('auth-submit').textContent=reg?'Создать аккаунт':login?'Войти':recover?'Отправить ссылку':'Сохранить новый пароль';
  $('auth-forgot-btn').hidden=recover||reset;
  $('auth-back-login').hidden=!(recover||reset);
  $('auth-reset-help').hidden=!(recover||reset);
+ if(focus)(reg?name:reset?pass:email).focus();
 }
 function failure(e){
  const m=String(e?.message||'Ошибка соединения.');
+ if(/failed to fetch|networkerror|load failed/i.test(m))return 'Не удалось связаться с сервером. Проверьте соединение и попробуйте позже.';
  if(/invalid login credentials/i.test(m))return 'Неверная почта или пароль.';
  if(/email not confirmed/i.test(m))return 'Подтвердите адрес почты по ссылке из письма.';
  if(/already registered/i.test(m))return 'Этот адрес уже зарегистрирован.';
@@ -105,8 +136,9 @@ function failure(e){
  return m.length<240?m:'Ошибка сервера. Попробуйте позже.';
 }
 async function submit(e){
- e.preventDefault();clear();
- const btn=$('auth-submit');btn.disabled=true;
+ e.preventDefault();if(pendingSubmit)return;clear();
+ const attempt={mode,controller:new AbortController()};pendingSubmit=attempt;submitState(true);
+ const send=(endpoint,options)=>request(endpoint,{...options,signal:attempt.controller.signal,timeoutMs:20000});
  try{
    const username=name.value.trim().normalize('NFC'),mail=email.value.trim().toLowerCase(),password=pass.value;
    if(mode==='register'&&(!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)))throw Error('Логин: 3–24 символа, буквы, цифры, _ и -.');
@@ -115,25 +147,29 @@ async function submit(e){
    if(mode!=='recover' && (password.length<12||password.length>128))throw Error('Пароль должен содержать от 12 до 128 символов.');
    if((mode==='register'||mode==='reset')&&password!==confirm.value)throw Error('Пароли не совпадают.');
    if(mode==='register'){
-     const x=await request('/auth/v1/signup?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail,password,data:{username}}});
+     const x=await send('/auth/v1/signup?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail,password,data:{username}}});
+     if(pendingSubmit!==attempt)return;
      if(x.access_token)store({...x,expires_at:Date.now()+x.expires_in*1000});
      feedback('Если регистрация принята, проверьте почту и подтвердите адрес по ссылке. Без подтверждения вход может быть недоступен.');
      pass.value='';confirm.value='';
      if(x.access_token){await completeLogin();}
    }else if(mode==='login'){
-     const s=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:mail,password}});
+     const s=await send('/auth/v1/token?grant_type=password',{method:'POST',body:{email:mail,password}});
+     if(pendingSubmit!==attempt)return;
      store({...s,expires_at:Date.now()+s.expires_in*1000});pass.value='';
      await completeLogin();
    }else if(mode==='recover'){
-     await request('/auth/v1/recover?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail}});
+     await send('/auth/v1/recover?redirect_to='+encodeURIComponent(REDIRECT),{method:'POST',body:{email:mail}});
+     if(pendingSubmit!==attempt)return;
      feedback('Если аккаунт существует и почтовая отправка настроена, придёт письмо со ссылкой восстановления.');
    }else if(mode==='reset'){
-     const token=await validSession();if(!token)throw Error('Ссылка восстановления истекла. Запросите новую.');
-     await request('/auth/v1/user',{method:'PUT',body:{password},token});
+     const token=await validSession();if(pendingSubmit!==attempt)return;if(!token)throw Error('Ссылка восстановления истекла. Запросите новую.');
+     await send('/auth/v1/user',{method:'PUT',body:{password},token});
+     if(pendingSubmit!==attempt)return;
      pass.value='';confirm.value='';await logout();feedback('Пароль обновлён. Теперь войдите в аккаунт.');
    }
- }catch(e){feedback(failure(e),true);}
- finally{btn.disabled=false;}
+ }catch(e){if(pendingSubmit===attempt)feedback(e?.code==='auth_request_timeout'&&attempt.mode==='register'?'Ответ о регистрации не получен вовремя. Проверьте почту: аккаунт мог быть создан. Затем попробуйте войти или восстановить пароль.':failure(e),true);}
+ finally{if(pendingSubmit===attempt){pendingSubmit=null;submitState(false);}}
 }
 async function completeLogin(){
  await loadProfile();if(!authenticated)return;
@@ -147,14 +183,14 @@ function resumeNavigation(){
 function open(next='login'){if(authenticated && next!=='reset'){navigate('profile');return;}selectMode(next);navigate('auth');}
 async function logout(){
  const token=await validSession();
- try{if(token)await request('/auth/v1/logout',{method:'POST',token});}catch(_){}
+ try{if(token)await request('/auth/v1/logout',{method:'POST',token,timeoutMs:20000});}catch(_){}
  store(null);renderSession(null);selectMode('login');navigate('auth');feedback('Вы вышли из аккаунта.');
 }
 form.addEventListener('submit',submit);
-buttons.register.addEventListener('click',()=>selectMode('register'));
-buttons.login.addEventListener('click',()=>selectMode('login'));
-buttons.forgot.addEventListener('click',()=>selectMode('recover'));
-$('auth-back-login').addEventListener('click',()=>selectMode('login'));
+buttons.register.addEventListener('click',()=>selectMode('register',{focus:true}));
+buttons.login.addEventListener('click',()=>selectMode('login',{focus:true}));
+buttons.forgot.addEventListener('click',()=>selectMode('recover',{focus:true}));
+$('auth-back-login').addEventListener('click',()=>selectMode('login',{focus:true}));
 $('auth-logout').addEventListener('click',logout);
 $('profile-account-logout').addEventListener('click',logout);
 $('top-auth-open').addEventListener('click',()=>open('login'));

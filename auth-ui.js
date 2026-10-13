@@ -63,13 +63,16 @@ function renderSession(data){
  const note=$('auth-session'),profile=$('profile-auth-info'),top=$('top-auth-open');
  $('auth-form').hidden=authenticated && mode!=='reset';
  $('auth-bottom-meta')?.classList?.toggle('is-signed-in',authenticated);
- $('profile-auth-actions').hidden=authenticated;
- $('profile-demo-card').hidden=authenticated;
+ $('profile-auth-actions').hidden=true;
+ $('view-auth').hidden=authenticated && mode!=='reset';
+ $('profile-member-content').hidden=!authenticated || mode==='reset';
+ profile.hidden=!authenticated;
+ $('profile-demo-card').hidden=true;
  $('profile-account-card').hidden=!authenticated;
  $('auth-title').textContent=authenticated && mode!=='reset'?'Аккаунт активен':$('auth-title').textContent;
  if(data){
    const display=data.username;
-   note.hidden=false;
+   note.hidden=mode==='reset';
    $('auth-session-name').textContent=display;
    $('auth-session-email').textContent=data.user.email||'';
    $('profile-account-name').textContent=display;
@@ -77,7 +80,7 @@ function renderSession(data){
    profile.textContent='Вы вошли как '+display+'. Персонажи сохраняются в аккаунте; онлайн-комнаты проходят тестирование.';
    top.querySelector('span').textContent=display;
    $('profile-name').value=display;
-   $('auth-subtitle').textContent='Вы уже авторизованы. Перейдите в профиль для работы с персонажами.';
+   if(mode!=='reset')$('auth-subtitle').textContent='Вы уже авторизованы. Перейдите в профиль для работы с персонажами.';
  }else{
    note.hidden=true;
    profile.textContent='Чтобы сохранять персонажей, зарегистрируйтесь или войдите по почте.';
@@ -98,6 +101,8 @@ function selectMode(next,{focus=false}={}){
  submitState(false);
  window.HOLEN_AUTH_GATE?.sync(authenticated,{recovery:next==='reset'});
  $('auth-form').hidden=authenticated && next!=='reset';
+ $('view-auth').hidden=authenticated && next!=='reset';
+ $('profile-member-content').hidden=!authenticated || next==='reset';
  const reg=next==='register',login=next==='login',recover=next==='recover',reset=next==='reset';
  $('auth-title').textContent=reg?'Создать аккаунт':login?'Войти в Холэн':recover?'Восстановить пароль':'Новый пароль';
  $('auth-subtitle').textContent=reg?'Игровой ник, почта и пароль. Сначала подтвердите адрес электронной почты.':login?'Войдите с помощью электронной почты и пароля.':recover?'Отправим ссылку для восстановления, если этот адрес зарегистрирован.':'Введите новый пароль для своего аккаунта.';
@@ -180,11 +185,16 @@ function resumeNavigation(){
  if(target){const url=new URL(target);if(url.pathname===location.pathname&&url.search===location.search){navigate(url.hash.slice(1)||'home');return;}location.replace(target);return;}
  navigate('profile');
 }
-function open(next='login'){if(authenticated && next!=='reset'){navigate('profile');return;}selectMode(next);navigate('auth');}
+function open(next='login'){
+ if(authenticated && next!=='reset'){navigate('profile');return;}
+ // Resume an account-only action after signing in, not an unrelated public page.
+ if(['rooms','gm','dnd-sheet'].includes(currentView))window.HOLEN_AUTH_GATE?.remember(currentView);
+ selectMode(next);navigate('profile');
+}
 async function logout(){
  const token=await validSession();
  try{if(token)await request('/auth/v1/logout',{method:'POST',token,timeoutMs:20000});}catch(_){}
- store(null);renderSession(null);selectMode('login');navigate('auth');feedback('Вы вышли из аккаунта.');
+ store(null);renderSession(null);selectMode('login');navigate('profile');feedback('Вы вышли из аккаунта.');
 }
 form.addEventListener('submit',submit);
 buttons.register.addEventListener('click',()=>selectMode('register',{focus:true}));
@@ -202,13 +212,13 @@ if(hash.includes('access_token=') && hash.includes('refresh_token=')){
  const p=new URLSearchParams(hash.slice(1));
  const s={access_token:p.get('access_token'),refresh_token:p.get('refresh_token'),expires_in:Number(p.get('expires_in')||3600)};
  s.expires_at=Date.now()+s.expires_in*1000;store(s);
- history.replaceState(null,'',location.pathname+location.search+'#auth');
+ history.replaceState(null,'',location.pathname+location.search+'#profile');
  if(p.get('type')==='recovery'){selectMode('reset');feedback('Ссылка подтверждена. Введите новый пароль.');}
  else{selectMode('login');feedback('Адрес подтверждён. Вы вошли в аккаунт.');}
- navigate('auth',{push:false});
+ navigate('profile',{push:false});
 }
 loadProfile().then(()=>{
- if(authenticated&&mode!=='reset'&&currentView==='auth'){
+ if(authenticated&&mode!=='reset'&&(location.hash==='#auth'||new URLSearchParams(location.search).has('return_to'))){
   resumeNavigation();
  }
 });

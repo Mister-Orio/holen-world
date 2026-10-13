@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="ru" class="auth-gated auth-checking">
+<html lang="ru">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -9,7 +9,7 @@
 <title>Мир Холэна — игровая платформа</title>
 <link href="styles.css?v=0126" rel="stylesheet"/>
 <link href="ui-icons.css?v=0122a" rel="stylesheet"/>
-<style>#admin-nav[hidden]{display:none!important}</style>
+<style>#admin-nav[hidden],#profile-member-content[hidden],#view-auth[hidden]{display:none!important}.auth-promo-title{color:#f5f8ec;font-size:clamp(34px,3.8vw,50px);line-height:1.13;letter-spacing:-.04em;margin:20px 0 15px}@media(max-width:700px){.auth-promo-title{font-size:28px}}</style>
 
 </head>
 <body>
@@ -42,7 +42,7 @@
 <header class="topbar">
 <button aria-expanded="false" aria-label="Открыть меню" class="icon-button mobile-only" id="menu-toggle" type="button">☰</button><button aria-expanded="true" aria-label="Скрыть боковую панель" class="icon-button desktop-sidebar-toggle" id="sidebar-toggle" type="button" title="Скрыть / показать боковую панель">☰</button>
 <div class="breadcrumb" id="breadcrumbs" aria-label="Путь по сайту"><button type="button" class="crumb-link" data-crumb="home">ХОЛЭН</button><span class="crumb-sep">/</span><span>Главная</span></div>
-<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.9</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
+<div class="top-actions"><span class="proto-badge">ПРОТОТИП 0.12.10</span><button class="btn subtle top-auth-btn" id="top-auth-open" type="button"><span>Войти</span></button></div>
 </header>
 <main id="main" tabindex="-1"><div class="page-back-strip" hidden id="page-back-strip"><button class="btn subtle page-back-btn" id="page-back" type="button">← Назад</button><button class="btn subtle page-back-btn" id="page-home" type="button">⌂ Домой</button></div>
 <section aria-labelledby="home-heading" class="view active" id="view-home">
@@ -99,18 +99,14 @@
 <div class="pack-entry-grid"><button class="feature-card" data-go="squads" type="button"><span class="feature-symbol green">♟</span><span class="feature-title">Боевые отряды</span><span class="feature-text">Специализации и интерактивные листы боевых отрядов.</span><span class="feature-foot">Открыть каталог <b>↗</b></span></button><button class="feature-card" data-show-catalog="races" type="button"><span class="feature-symbol blue">◉</span><span class="feature-title">Игровой вид</span><span class="feature-text">Муравьи и принадлежность к колониям.</span><span class="feature-foot">Смотреть <b>↗</b></span></button></div>
 </section><section aria-labelledby="profile-heading" class="view" id="view-profile">
 <div class="page-heading"><span class="eyebrow">ЦЕНТР ЭКСПЕДИЦИИ / ЛИЧНОЕ</span><h1 id="profile-heading">Мой профиль</h1><p>Аккаунт, персонажи и онлайн-комнаты доступны на разных устройствах. Листы D&D сохраняются в аккаунте; здоровье D&D пока не связано с боем в комнате.</p></div>
-<form id="character-wizard" class="character-wizard" aria-label="Создание персонажа" hidden novalidate></form>
-<div class="profile-auth-actions" id="profile-auth-actions"><button class="btn primary" type="button" data-open-auth="register">Создать аккаунт</button><button class="btn subtle" type="button" data-open-auth="login">Войти</button></div><p class="auth-profile-note" id="profile-auth-info">Проверяем авторизацию…</p><div class="profile-layout"><div class="panel profile-card" id="profile-demo-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Локальный ник для демонстрации</h2><p>Только для тестовых вкладок. Ник постоянного аккаунта задаётся при регистрации.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="panel profile-card profile-account-card" id="profile-account-card" hidden><div aria-hidden="true" class="profile-avatar">◇</div><span class="overline">УЧЁТНАЯ ЗАПИСЬ</span><h2 id="profile-account-name">Путешественник</h2><p id="profile-account-email" class="profile-account-email"></p><p class="profile-account-tip">Персонажи и игровые заготовки сохраняются в твоём аккаунте и доступны на других устройствах.</p><button class="btn subtle" type="button" id="profile-account-logout">Выйти из аккаунта</button><a class="btn subtle" href="mailto:holen.world@gmail.com?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%BD%D0%B0%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0%20%D0%A5%D0%BE%D0%BB%D1%8D%D0%BD">Запросить удаление аккаунта</a><small>Удаление аккаунта обрабатывается через обращение на почту проекта, не автоматически.</small></div><div class="profile-extras"><div class="panel profile-characters"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Создавай, просматривай и редактируй своих персонажей. Для муравьиных отрядов доступны базовые характеристики и переход к интерактивному листу.</p><div id="character-list" class="character-collection" aria-live="polite"></div><button class="btn subtle" id="character-refresh" type="button">Обновить список</button>
-<div class="character-create-actions"><button class="btn primary" id="character-create-start" type="button">Создать персонажа →</button></div><p id="character-message" class="profile-feedback" role="status"></p></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
-</section>
 <!-- Личный кабинет: серверная авторизация по почте через Supabase -->
-<section class="view" id="view-auth" aria-labelledby="auth-title">
+<section class="profile-auth-panel" id="view-auth" aria-labelledby="auth-title">
  <div class="auth-layout">
   <aside class="auth-promo">
    <div class="auth-promo-content">
     <span class="eyebrow">МИР ХОЛЭНА · ЛИЧНЫЙ КАБИНЕТ</span>
     <div class="auth-sigil" aria-hidden="true">◇</div>
-    <h1>Твоя история<br>начинается здесь.</h1>
+    <h2 class="auth-promo-title">Твоя история<br>начинается здесь.</h2>
     <p>Единый аккаунт для приключений Холэна. Ник, персонажи и онлайн-комнаты — в одном месте.</p>
     <div class="auth-benefits"><span>✧ Постоянный игровой профиль</span><span>⌘ Персонажи для разных игровых паков</span><span>◇ Подтверждение почты для безопасности</span></div>
    </div>
@@ -156,7 +152,14 @@
     <p class="auth-bottom-meta">Пароли обрабатывает сервер Supabase Auth. На сайте не хранится собственная база паролей.</p>
   </div>
  </div>
-</section><section aria-labelledby="squads-heading" class="view" id="view-squads">
+</section>
+<div id="profile-member-content" hidden>
+<form id="character-wizard" class="character-wizard" aria-label="Создание персонажа" hidden novalidate></form>
+<div class="profile-auth-actions" id="profile-auth-actions"><button class="btn primary" type="button" data-open-auth="register">Создать аккаунт</button><button class="btn subtle" type="button" data-open-auth="login">Войти</button></div><p class="auth-profile-note" id="profile-auth-info">Проверяем авторизацию…</p><div class="profile-layout"><div class="panel profile-card" id="profile-demo-card"><div aria-hidden="true" class="profile-avatar">◉</div><h2>Локальный ник для демонстрации</h2><p>Только для тестовых вкладок. Ник постоянного аккаунта задаётся при регистрации.</p><label class="field-label" for="profile-name">Ник</label><input autocomplete="nickname" id="profile-name" maxlength="32" placeholder="Например, Мастер Холэна" type="text"/><button class="btn primary" id="profile-save" type="button">Сохранить ник</button><p class="profile-feedback" id="profile-message" role="status"></p></div><div class="panel profile-card profile-account-card" id="profile-account-card" hidden><div aria-hidden="true" class="profile-avatar">◇</div><span class="overline">УЧЁТНАЯ ЗАПИСЬ</span><h2 id="profile-account-name">Путешественник</h2><p id="profile-account-email" class="profile-account-email"></p><p class="profile-account-tip">Персонажи и игровые заготовки сохраняются в твоём аккаунте и доступны на других устройствах.</p><button class="btn subtle" type="button" id="profile-account-logout">Выйти из аккаунта</button><a class="btn subtle" href="mailto:holen.world@gmail.com?subject=%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%BD%D0%B0%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0%20%D0%A5%D0%BE%D0%BB%D1%8D%D0%BD">Запросить удаление аккаунта</a><small>Удаление аккаунта обрабатывается через обращение на почту проекта, не автоматически.</small></div><div class="profile-extras"><div class="panel profile-characters"><span class="overline">КОЛЛЕКЦИЯ</span><h2>Мои персонажи</h2><p>Создавай, просматривай и редактируй своих персонажей. Для муравьиных отрядов доступны базовые характеристики и переход к интерактивному листу.</p><div id="character-list" class="character-collection" aria-live="polite"></div><button class="btn subtle" id="character-refresh" type="button">Обновить список</button>
+<div class="character-create-actions"><button class="btn primary" id="character-create-start" type="button">Создать персонажа →</button></div><p id="character-message" class="profile-feedback" role="status"></p></div><div class="panel"><span class="overline">ИГРА</span><h2>Мои комнаты</h2><p>Онлайн-комнаты доступны со своего аккаунта на разных устройствах. Перейди в раздел «Комнаты», чтобы создать новую или открыть текущую.</p><button class="btn primary" type="button" data-go="rooms">Перейти к комнатам →</button></div></div></div>
+</div>
+</section>
+<section aria-labelledby="squads-heading" class="view" id="view-squads">
 <div class="page-heading"><span class="eyebrow">МИР НАСЕКОМЫХ / БОЕВЫЕ СПЕЦИАЛИЗАЦИИ</span><h1 id="squads-heading">Специализации отрядов</h1><p>Боевые специализации «Муравьиной революции». Это правила авторского пака, а не стандартные классы D&amp;D.</p></div>
 <div class="catalog-toolbar">
 <label class="search-wrap"><span class="visually-hidden">Найти отряд</span><span aria-hidden="true">⌕</span><input id="squad-search" placeholder="Поиск по названию или роли" type="search"/></label>
@@ -254,15 +257,15 @@
 <section class="view" id="view-inventory" aria-labelledby="inventory-heading"><div class="page-heading"><span class="eyebrow">СНАРЯЖЕНИЕ · D&amp;D 2014</span><h1 id="inventory-heading">Инвентарь</h1><p>Обычное оружие, доспехи и щиты. Сравни показатели и выбери снаряжение для приключения.</p></div><div class="inventory-toolbar"><label>Поиск<input id="inventory-search" type="search" placeholder="Название или свойство…"/></label><label>Раздел<select id="inventory-group"><option value="all">Все разделы</option><option value="simple">Простое оружие</option><option value="martial">Воинское оружие</option><option value="other">Другое оружие</option><option value="light">Лёгкие доспехи</option><option value="medium">Средние доспехи</option><option value="heavy">Тяжёлые доспехи</option><option value="shield">Щиты</option></select></label><label>Вид боя<select id="inventory-combat"><option value="all">Все виды</option><option value="melee">Рукопашное оружие</option><option value="ranged">Дальнобойное оружие</option></select></label><button class="btn subtle" type="button" id="inventory-clear">Сбросить</button><p id="inventory-count" role="status"></p></div><div class="inventory-notes"><p>Цены в валюте Холэна: 10 искр = 1 соль; 10 солей = 1 корон; 10 коронов = 1 империал. Стоимость соответствует PHB 2014. Дистанции — в футах, вес — в фунтах.</p><details><summary>Как читать показатели и особые правила</summary><p>Урон указан без модификатора характеристики. Две дистанции означают нормальную и максимальную дальность; на второй атака с помехой. Для КД используется модификатор Ловкости, а не само значение характеристики. Щит добавляет +2 к КД.</p><p>Длинное копьё: помеха по цели в пределах 5 футов; без верхового животного требует двух рук. Сеть опутывает подходящую цель, а не наносит урон; смотри ограничения в первоисточнике.</p><p>Если Сила ниже требования тяжёлого доспеха, скорость обычно снижается на 10 футов. Ношение без владения накладывает помеху на проверки, спасброски и атаки с Силой/Ловкостью и мешает заклинаниям.</p></details><a href="https://dnd.su/articles/inventory/147-armor-arms-equipment-tools/" target="_blank" rel="noopener noreferrer">Player’s Handbook 2014 · таблицы и полные свойства на DnD.su ↗</a></div><div id="inventory-tables"></div></section>
 <section class="view" id="view-admin" aria-label="Панель администратора"><div id="admin-root"></div></section>
 </main>
-<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.9</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a></span></footer>
+<footer class="footer"><span>МИР ХОЛЭНА · Прототип платформы 0.12.10</span><span>Аккаунты и онлайн-комнаты: Supabase · <a href="privacy.html">Конфиденциальность</a></span></footer>
 </div>
 </div>
 <div class="mobile-scrim" hidden="" id="mobile-scrim"></div>
-<script src="auth-gate.js?v=0124"></script>
+<script src="auth-gate.js?v=01210"></script>
 <script src="feature-loader.js?v=0128"></script>
 <script src="ui-icons.js?v=0127"></script>
-<script src="app.js?v=0127"></script>
-<script src="auth-ui.js?v=0129"></script>
+<script src="app.js?v=01210"></script>
+<script src="auth-ui.js?v=01210"></script>
 <script src="admin-access.js?v=0127"></script>
 </body>
 </html>

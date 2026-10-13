@@ -19,6 +19,11 @@ function key(id=draftOwner){return 'holen-character-wizard-v1:'+id;}
 function load(){savedEntry='';try{const value=JSON.parse(localStorage.getItem(key())||'null');savedEntry=typeof value?.prefillEntry==='string'?value.prefillEntry:'';return m.restore(value);}catch{return m.fresh();}}
 function remember(){try{localStorage.setItem(key(),JSON.stringify({...state,prefillEntry:savedEntry}));}catch{}}
 function say(message){const node=root.querySelector('.wizard-error');if(node)node.textContent=message;}
+function abilityFeedback(){
+ const sh=state.sheet,cost=d.pointBuyCost(sh.baseAbilities),budget=d.pointBudget(sh);
+ const points=root.querySelector('.wizard-points');if(points)points.textContent='Осталось очков: '+(cost===null?'—':budget-cost)+' из '+budget;
+ root.querySelectorAll('[data-wizard-total]').forEach(node=>{const k=node.dataset.wizardTotal;node.textContent=sh.abilities[k]+' ('+signed(d.modifier(sh.abilities[k]))+')';});
+}
 function start(){
  if(busy)return;
  if(!prefilled&&hasPrefill){
@@ -63,11 +68,11 @@ function body(){
   if(step===2)return '<h2>Специализация отряда</h2><p>Каждая специализация использует собственный боевой лист.</p>'+select('Специализация','templateId',templates(),state.templateId,'Выбери специализацию')+(t?help(esc(t.short)+'<br>Базовые ОЗ: '+esc(t.hp)+' · КД: '+esc(t.ac)):'');
   return '<h2>Отряд готов</h2><dl class="wizard-summary"><div><dt>Имя</dt><dd>'+esc(state.name)+'</dd></div><div><dt>Специализация</dt><dd>'+esc(t?.name)+'</dd></div></dl>'+help('В аккаунт сохранится заготовка отряда. Его автономный боевой лист пока хранит текущие показатели в этом браузере.');
  }
- if(step===2)return '<h2>Класс и раса</h2><p>Класс определит здоровье, спасброски и доступные подклассы.</p><div class="wizard-fields">'+select('Класс','classId',ed.classes,sh.classId)+select('Раса / вид','speciesId',ed.species,sh.speciesId)+'</div>'+help('Кость здоровья: d'+c.hitDie+' · Подкласс с '+c.subclassLevel+' уровня · Основные характеристики: '+esc(c.primary)+'.')+help('Размер: '+esc(d.speciesSize(sh))+' · Ходьба: '+species.speed+' футов.'+(species.supplement?'<br>'+esc(species.sourceBook+' · '+species.sourceName)+'<br>'+esc(species.worldAccess)+' <a href="'+esc(d.referenceUrl(sh.edition,'species',species.id))+'" target="_blank" rel="noopener">Справка расы ↗</a>':'')+(species.size.includes('или')?'<br>Выбери размер и отметь его в полном листе.':''))+(sh.edition==='2014'&&sh.speciesId==='human'?check('Вариант человека: дополнительная черта с 1 уровня (с разрешения ГМ).','variantHuman',state.variantHuman):'');
+ if(step===2)return '<h2>Класс и раса</h2><p>Класс определит здоровье, спасброски и доступные подклассы.</p><div class="wizard-fields">'+select('Класс','classId',ed.classes,sh.classId)+select('Раса / вид','speciesId',ed.species,sh.speciesId)+'</div>'+help('Кость здоровья: d'+c.hitDie+' · Подкласс с '+c.subclassLevel+' уровня · Основные характеристики: '+esc(c.primary)+'.')+help(esc(species.description)+'<br>Размер: '+esc(d.speciesSize(sh))+' · Ходьба: '+species.speed+' футов.'+'<br><a href="'+esc(d.referenceUrl(sh.edition,'species',species.id))+'" target="_blank" rel="noopener">Особенности расы ↗</a>'+(species.supplement?'<br>'+esc(species.sourceBook+' · '+species.sourceName)+'<br>'+esc(species.worldAccess)+' <a href="'+esc(d.referenceUrl(sh.edition,'species',species.id))+'" target="_blank" rel="noopener">Справка расы ↗</a>':'')+(species.size.includes('или')?'<br>Выбери размер и отметь его в полном листе.':''))+(sh.edition==='2014'&&sh.speciesId==='human'?check('Вариант человека: дополнительная черта с 1 уровня (с разрешения ГМ).','variantHuman',state.variantHuman):'');
  if(step===3)return '<h2>Предыстория</h2><p>Кем персонаж был до начала приключений? Выбранная версия сохраняется вместе с персонажем.</p>'+select('Предыстория','backgroundId',backgroundRows,sh.backgroundId,'Выбери предысторию')+(bg?help(esc(bg.description)+'<br>Навыки: '+(bg.skills.map(k=>esc(d.skills.find(x=>x[0]===k)?.[1]||k)).join(', ')||'на выбор')+(bg.originFeat?'<br>Черта происхождения: '+esc(o.editions[sh.edition].feats.find(x=>x.id===bg.originFeat)?.name||bg.originFeat):'')+'<br><a href="'+esc(bg.source)+'" target="_blank" rel="noopener">Правила предыстории ↗</a>')+(bg.skillChoices?'<fieldset class="wizard-skill-choices"><legend>Выбери '+bg.skillChoices.count+(bg.skillChoices.count===1?' навык':' навыка')+'</legend>'+bg.skillChoices.options.map(id=>'<label><input type="checkbox" data-background-skill="'+esc(id)+'" '+(state.backgroundSkills.includes(id)?'checked':'')+' '+(!state.backgroundSkills.includes(id)&&state.backgroundSkills.length>=bg.skillChoices.count?'disabled':'')+'> '+esc(d.skills.find(x=>x[0]===id)?.[1]||id)+'</label>').join('')+'</fieldset>':''):'');
  if(step===4){
-  const cost=d.pointBuyCost(sh.baseAbilities),methods=[{id:'point-buy',name:'Покупка за 27 очков'},{id:'standard-array',name:'Набор 15, 14, 13, 12, 10, 8'},{id:'manual',name:'Ввести значения вручную'}];
-  return '<h2>Характеристики</h2><p>Распредели основу, затем укажи бонусы расы, предыстории и повышения уровня.</p>'+select('Способ распределения','abilityMode',methods,sh.abilityMode)+(sh.abilityMode==='point-buy'?'<strong class="wizard-points '+(cost>27?'over-budget':'')+'">Осталось очков: '+(27-cost)+' из 27</strong>':'')+'<div class="wizard-abilities">'+Object.entries(d.abilities).map(([k,name])=>'<div class="wizard-ability"><strong>'+name+'</strong>'+(sh.abilityMode==='standard-array'?select('Основа','base:'+k,d.standardArray.map(n=>({id:n,name:String(n)})),sh.baseAbilities[k]):number('Основа','base:'+k,sh.baseAbilities[k],sh.abilityMode==='point-buy'?8:1,sh.abilityMode==='point-buy'?15:30))+number('Бонус','bonus:'+k,sh.abilityBonuses[k],-20,20)+'<span class="wizard-total">'+sh.abilities[k]+' <small>('+signed(d.modifier(sh.abilities[k]))+')</small></span></div>').join('')+'</div>'+help('Бонусы и прибавки от черт вводятся вручную по правилам выбранной редакции. В стандартном наборе значения меняются местами — каждое используется один раз.');
+  const cost=d.pointBuyCost(sh.baseAbilities),budget=d.pointBudget(sh),buy=d.usesPointBuy(sh),methods=[{id:'point-buy',name:'Покупка за 27 очков'},{id:'custom-point-buy',name:'Покупка с лимитом ГМа'},{id:'standard-array',name:'Набор 15, 14, 13, 12, 10, 8'},{id:'manual',name:'Ввести значения вручную'}];
+  return '<h2>Характеристики</h2><p>Распредели основу, затем укажи бонусы расы, предыстории и повышения уровня.</p>'+help('Класс: '+esc(c.name)+'. Приоритет: '+esc(c.primary)+'. Телосложение влияет на здоровье; Ловкость — на инициативу и защиту без тяжёлого доспеха. '+(sh.edition==='2024'?'Прибавки происхождения определяет предыстория, а не вид.':'Прибавки происхождения зависят от расы и подрасы; сверяй выбранный вариант.'))+select('Способ распределения','abilityMode',methods,sh.abilityMode)+(sh.abilityMode==='custom-point-buy'?number('Лимит покупки по решению ГМа','pointBuyBudget',sh.pointBuyBudget,0,54):'')+(buy?'<strong class="wizard-points">Осталось очков: '+(cost===null?'—':budget-cost)+' из '+budget+'</strong>':'')+'<div class="wizard-abilities">'+Object.entries(d.abilities).map(([k,name])=>'<div class="wizard-ability"><strong>'+name+'</strong>'+(sh.abilityMode==='standard-array'?select('Основа','base:'+k,d.standardArray.map(n=>({id:n,name:String(n)})),sh.baseAbilities[k]):number('Основа','base:'+k,sh.baseAbilities[k],buy?8:1,buy?15:30))+number('Бонус','bonus:'+k,sh.abilityBonuses[k],-20,20)+'<span class="wizard-total" data-wizard-total="'+k+'">'+sh.abilities[k]+' <small>('+signed(d.modifier(sh.abilities[k]))+')</small></span></div>').join('')+'</div>'+help('Стоимость покупки относится только к основе, не к сумме значений и не к бонусам. В режиме бросков бюджет покупки не применяется. Бонусы вводятся отдельно по источнику расы, предыстории или черты; наличие поля не означает разрешение произвольной прибавки. В стандартном наборе значения меняются местами — каждое используется один раз.');
  }
  if(step===5){
   const subs=o.availableSubclasses(sh),bud=m.budgets(state),forced=m.mandatory(state),candidates=m.candidates(state);
@@ -75,7 +80,7 @@ function body(){
   return '<h2>Подкласс и черты</h2><p>Доступные варианты для '+esc(c.name)+' '+sh.level+' уровня.</p>'+(subs.length?select('Подкласс','selectedSubclassId',subs,sh.selectedSubclassId,'Выбери подкласс'):help('Подкласс откроется с '+c.subclassLevel+' уровня.'))+help('Выборы черт: '+bud.general+' при развитии персонажа'+(bud.origin?' · '+bud.origin+' дополнительная черта происхождения':'')+(bud.style?' · '+bud.style+' боевой стиль':'')+'. Можно оставить выбор черт на потом. При выборе черты вместо повышения характеристик учти это в бонусах на прошлом шаге.')+(requestedFeat&&!sh.featIds.includes(requestedFeat)?help('Черта из каталога появится в списке, когда будут выполнены её требования и появится свободный выбор.'):'')+featPicker(selectable,forced)+help('Прочие требования черт (например, владения и умение колдовать) проверь по источнику. Их эффекты не изменяют характеристики автоматически.');
  }
  const p=m.payload(state),featNames=o.editions[sh.edition].feats.filter(x=>sh.featIds.includes(x.id)).map(x=>x.name).join(', ');
- return '<h2>Проверь персонажа</h2><p>После сохранения откроется полный лист со снаряжением, заклинаниями и боевыми настройками.</p><dl class="wizard-summary">'+[['Имя',state.name],['Пак / редакция','Путешествия Холэна · '+sh.edition],['Класс / раса',c.name+' · '+species.name],['Уровень / здоровье',sh.level+' · '+p.maxHp+' ОЗ'],['Предыстория',bg?.name],['Подкласс',sh.subclass||'Пока недоступен'],['Характеристики',Object.entries(d.abilities).map(([k,n])=>n+': '+sh.abilities[k]).join(' · ')],['Черты',featNames||'Не выбраны']].map(([name,value],i)=>'<div class="'+(i>5?'wide':'')+'"><dt>'+name+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl>'+help('ОЗ рассчитаны по среднему приросту кости класса и Телосложению. КД '+p.armorClass+' — без доспеха.')+'<details class="wizard-next-settings"><summary>Что ещё настроить в полном листе</summary><ul><li>Проверь бонусы характеристик от происхождения и черт.</li><li>Выбери владения класса, навыки и инструменты.</li><li>Добавь оружие, доспех и стартовое снаряжение.</li><li>Если персонаж колдует, выбери заклинания и ячейки.</li><li>Заполни способности класса и их ресурсы.</li></ul></details>';
+ return '<h2>Проверь персонажа</h2><p>После сохранения откроется полный лист со снаряжением, заклинаниями и боевыми настройками.</p><dl class="wizard-summary">'+[['Имя',state.name],['Пак / редакция','Путешествия Холэна · '+sh.edition],['Класс / раса',c.name+' · '+species.name],['Уровень / здоровье',sh.level+' · '+p.maxHp+' ОЗ'],['Предыстория',bg?.name],['Подкласс',sh.subclass||'Пока недоступен'],['Характеристики',Object.entries(d.abilities).map(([k,n])=>n+': '+sh.abilities[k]).join(' · ')],['Черты',featNames||'Не выбраны']].map(([name,value],i)=>'<div class="'+(i>5?'wide':'')+'"><dt>'+name+'</dt><dd>'+esc(value)+'</dd></div>').join('')+'</dl>'+help('ОЗ рассчитаны по среднему приросту кости класса и Телосложению. КД '+p.armorClass+' — без доспеха.')+'<details class="wizard-next-settings"><summary>Что ещё настроить в полном листе</summary><ul><li>Проверь бонусы характеристик от происхождения и черт.</li><li>Выбери владения класса, навыки и инструменты.</li><li>Добавь оружие, доспех и стартовое снаряжение.</li><li>Если персонаж колдует, выбери заклинания и проверь расчёт ячеек. Изобретатель и магические подклассы воина/плута пока используют ручные ячейки.</li><li>Заполни способности класса и их ресурсы.</li></ul></details>';
 }
 function signed(n){return n>=0?'+'+n:String(n);}
 function render(focus=false){
@@ -88,7 +93,13 @@ function render(focus=false){
 root.addEventListener('input',e=>{
  if(e.target.matches('[data-feat-search]')){featQuery=e.target.value;filterFeats();return;}
  if(busy||!e.target.dataset.field||!['text','number'].includes(e.target.type))return;
- m.change(state,e.target.dataset.field,e.target.value);remember();
+ const key=e.target.dataset.field;
+ m.change(state,key,e.target.value);
+ if(state.error){
+  say(state.error);
+  if(e.target.value!=='')e.target.value=key==='pointBuyBudget'?state.sheet.pointBuyBudget:key.startsWith('base:')?state.sheet.baseAbilities[key.slice(5)]:key.startsWith('bonus:')?state.sheet.abilityBonuses[key.slice(6)]:e.target.value;
+ }else say('');
+ abilityFeedback();remember();
 });
 root.addEventListener('change',e=>{
  if(busy)return;
@@ -97,7 +108,7 @@ root.addEventListener('change',e=>{
  if(e.target.dataset.field)m.change(state,e.target.dataset.field,e.target.type==='checkbox'?e.target.checked:e.target.value);
  else if(e.target.dataset.feat)m.change(state,'feat',[e.target.dataset.feat,e.target.checked]);
  else return;
- render();
+ const message=state.error;render();if(message)say(message);
 });
 root.addEventListener('click',e=>{
  const action=e.target.closest('[data-wizard]')?.dataset.wizard;if(!action||busy)return;
@@ -107,6 +118,8 @@ root.addEventListener('click',e=>{
 });
 root.addEventListener('submit',async e=>{
  e.preventDefault();if(busy)return;
+ const empty=[...root.querySelectorAll('input[type="number"]')].find(x=>x.value==='');
+ if(empty){say('Заполни числовое поле целым числом.');empty.focus();return;}
  const issue=m.validate(state,state.step,templates());if(issue){say(issue);return;}
  if(state.step<m.steps(state).length-1){
   state.step++;

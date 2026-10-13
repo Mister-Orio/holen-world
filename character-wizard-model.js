@@ -44,12 +44,18 @@ function restore(value){
  s.step=Math.max(0,Math.min(steps(s).length-1,Number.isInteger(v.step)?v.step:0));return sync(s);
 }
 function change(s,key,value){
+ s.error='';
+ if(key==='pointBuyBudget'||key.startsWith('base:')||key.startsWith('bonus:')){
+  const error=d.abilityEditError(s.sheet,key,value);
+  if(error){s.error=error;return s;}
+ }
  if(key==='edition'){if(s.sheet.edition!==value){s.sheet=d.blank(value);s.sheet.abilityMode='point-buy';s.sheet.baseAbilities=Object.fromEntries(keys.map(k=>[k,8]));s.extras=[];s.variantHuman=false;}}
  else if(['pack','name','templateId','variantHuman'].includes(key)){s[key]=value;if(key==='pack')s.step=0;}
  else if(key==='abilityMode'){
   s.sheet.abilityMode=value;
-  s.sheet.baseAbilities=Object.fromEntries(keys.map((k,i)=>[k,value==='standard-array'?d.standardArray[i]:value==='point-buy'?8:10]));
- }else if(key.startsWith('base:')){
+  s.sheet.baseAbilities=Object.fromEntries(keys.map((k,i)=>[k,value==='standard-array'?d.standardArray[i]:d.usesPointBuy(s.sheet)?8:10]));
+ }else if(key==='pointBuyBudget')s.sheet.pointBuyBudget=Number(value);
+ else if(key.startsWith('base:')){
   const k=key.slice(5),n=Number(value);
   if(s.sheet.abilityMode==='standard-array'){const other=keys.find(x=>x!==k&&s.sheet.baseAbilities[x]===n);if(other)s.sheet.baseAbilities[other]=s.sheet.baseAbilities[k];}
   s.sheet.baseAbilities[k]=n;
@@ -75,7 +81,8 @@ function validate(s,step=s.step,templates=[]){
  if(step===2)return !cls(s)||!d.editions[s.sheet.edition].species.some(x=>x.id===s.sheet.speciesId)?'Выбери класс и расу.':'';
  if(step===3){const bg=background(s);return !bg?'Выбери предысторию.':bg.skillChoices&&s.backgroundSkills.length!==bg.skillChoices.count?'Выбери навыки предыстории: '+bg.skillChoices.count+'.':'';}
  if(step===4){
-  if(s.sheet.abilityMode==='point-buy'&&(keys.some(k=>s.sheet.baseAbilities[k]<8||s.sheet.baseAbilities[k]>15)||d.pointBuyCost(s.sheet.baseAbilities)>27))return 'На покупку характеристик доступно 27 очков; значения — от 8 до 15.';
+  for(const k of keys){const error=d.abilityEditError(s.sheet,'bonus:'+k,s.sheet.abilityBonuses[k]);if(error)return error;}
+  if(d.usesPointBuy(s.sheet)&&(d.pointBuyCost(s.sheet.baseAbilities)===null||d.pointBuyCost(s.sheet.baseAbilities)>d.pointBudget(s.sheet)))return 'На покупку доступно '+d.pointBudget(s.sheet)+' очков; значения — от 8 до 15.';
   if(s.sheet.abilityMode==='standard-array'&&[...keys.map(k=>s.sheet.baseAbilities[k])].sort((a,b)=>a-b).join()!==[...d.standardArray].sort((a,b)=>a-b).join())return 'Используй каждое значение стандартного набора один раз.';
  }
  if(step===5&&o.availableSubclasses(s.sheet).length&&!s.sheet.selectedSubclassId)return 'Выбери подкласс для своего уровня.';
@@ -84,6 +91,13 @@ function validate(s,step=s.step,templates=[]){
 function validateAll(s,templates=[]){for(let i=0;i<steps(s).length-1;i++){const error=validate(s,i,templates);if(error)return {step:i,error};}return null;}
 function payload(s){
  const sh=d.normalize(s.sheet),c=cls(s);
+ const plan=d.spellSlotPlan(sh);
+ if(plan.supported){
+  sh.spellSlotMode='class';sh.casting=plan.casting;
+  sh.slots=plan.slots.map(max=>({max,current:max}));
+  sh.pactSlots=plan.pact?{...plan.pact,current:plan.pact.max}:{level:0,max:0,current:0};
+  if(plan.pact)sh.resources=sh.resources.filter(x=>x.name!=='Ячейки договора');
+ }
  sh.armorClass=10+d.modifier(sh.abilities.dex)+(sh.classId==='barbarian'?d.modifier(sh.abilities.con):sh.classId==='monk'?d.modifier(sh.abilities.wis):0);
  sh.features=[...o.editions[sh.edition].feats.filter(f=>sh.featIds.includes(f.id)).map(f=>f.name),...(s.variantHuman?['Вариант человека (согласован с ГМ)']:[])].join('\n');
  return sh;

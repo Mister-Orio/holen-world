@@ -1,7 +1,7 @@
 /* Section dependencies are loaded once, in order, with retry after a failed request. */
 (()=>{'use strict';
 const pending=new Map(),ready=new Set(),busy=new WeakMap(),failed=new WeakMap();
-const data='data.js?v=0126',model='dnd-data.js?v=0128',options='dnd-options-data.js?v=0125',srd='bestiary-srd.js?v=0120',library='dnd-library.css?v=0118';
+const data='data.js?v=0126',model='dnd-data.js?v=01211',options='dnd-options-data.js?v=0125',srd='bestiary-srd.js?v=0120',library='dnd-library.css?v=0118';
 const catalogs=[data,'catalog-data.js?v=0125',model];
 const backgroundCatalog='background-catalog.js?v=0128';
 const choices=[model,options,backgroundCatalog,library,'dnd-option-sources.js?v=0126','dnd-options-ui.js?v=0128'];
@@ -11,8 +11,8 @@ const views={
  inventory:['inventory-data.js?v=0126','inventory.css?v=0126','inventory-ui.js?v=0126'],
  squads:[data],rules:[data,'holen-rules-data.js?v=0126'],
  classes:catalogs,races:catalogs,backgrounds:choices,feats:choices,
- profile:[data,model,options,backgroundCatalog,'character-wizard.css?v=0123','character-ui.js?v=0122','character-wizard-model.js?v=0128','character-wizard.js?v=0128'],
- 'dnd-sheet':[model,options,backgroundCatalog,srd,library,'dnd-builder.css?v=0117','dnd-sheet-ui.js?v=0128'],
+ profile:[data,model,options,backgroundCatalog,'character-wizard.css?v=0123','character-ui.js?v=0122','character-wizard-model.js?v=01211','character-wizard.js?v=01211'],
+ 'dnd-sheet':[model,options,backgroundCatalog,srd,library,'dnd-builder.css?v=01211','dnd-sheet-ui.js?v=01211'],
  'bestiary-journeys':[srd,library,'bestiary-ui.js?v=0120'],
  'bestiary-insects':['bestiary-data.js?v=0115',srd,library,'bestiary-ui.js?v=0120'],
  'lore-journeys':['items-data.js?v=0126'],'lore-insects':['items-data.js?v=0126'],

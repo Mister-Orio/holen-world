@@ -79,6 +79,44 @@ function pointBuyCost(value){
  }
  const score=number(value);return Number.isInteger(score)&&Object.hasOwn(pointBuyCosts,score)?pointBuyCosts[score]:null;
 }
+const usesPointBuy=s=>['point-buy','custom-point-buy'].includes(s.abilityMode);
+const pointBudget=s=>s.abilityMode==='custom-point-buy'?int(s.pointBuyBudget,0,54,27):27;
+// Single-class spellcasting tables: SRD 5.1 / 5.2.1 (Wizards, CC BY 4.0).
+// A plan is separate from a saved sheet: old manual resources are never migrated
+// merely because the user opens their character.
+const fullSlots=[[],[2],[3],[4,2],[4,3],[4,3,2],[4,3,3],[4,3,3,1],[4,3,3,2],[4,3,3,3,1],[4,3,3,3,2],[4,3,3,3,2,1],[4,3,3,3,2,1],[4,3,3,3,2,1,1],[4,3,3,3,2,1,1],[4,3,3,3,2,1,1,1],[4,3,3,3,2,1,1,1],[4,3,3,3,2,1,1,1,1],[4,3,3,3,3,1,1,1,1],[4,3,3,3,3,2,1,1,1],[4,3,3,3,3,2,2,1,1]];
+function spellSlotPlan(s){
+ const level=s.levelMode==='xp'?levelFromXp(s.experience):int(s.level,1,20,1),cls=s.classId;
+ let effective=0,casting=editions[s.edition]?.classes.find(x=>x.id===cls)?.casting||'',supported=true;
+ const pact=cls==='warlock'?{level:Math.min(5,Math.ceil(level/2)),max:level>=17?4:level>=11?3:level>=2?2:1}:null;
+ if(['bard','cleric','druid','sorcerer','wizard'].includes(cls))effective=level;
+ else if(['paladin','ranger'].includes(cls))effective=level===1&&s.edition==='2014'?0:Math.ceil(level/2);
+ else if(cls==='artificer'||['fighter-eldritch-knight','rogue-arcane-trickster'].includes(s.selectedSubclassId))supported=false;
+ else if(!['barbarian','fighter','monk','rogue','warlock'].includes(cls))supported=false;
+ if(!effective&&!pact)casting='';
+ return {supported,casting,slots:Array.from({length:9},(_,i)=>fullSlots[effective]?.[i]||0),pact};
+}
+// Validate the proposed edit before normalizing it: normalization alone hides
+// invalid input by clamping it, while the visible field still shows that input.
+function abilityEditError(s,key,value){
+ const n=number(value);
+ if(!Number.isInteger(n))return 'Введи целое число.';
+ if(key==='pointBuyBudget'){
+  if(n<0||n>54)return 'Лимит покупки должен быть от 0 до 54.';
+  const spent=pointBuyCost(s.baseAbilities);
+  return spent===null||n<spent?'Невозможно опустить лимит ниже уже потраченных очков.':'';
+ }
+ const [kind,k]=key.split(':');if(!Object.hasOwn(abilities,k))return 'Неизвестная характеристика.';
+ const base=kind==='base'?n:s.baseAbilities[k],bonus=kind==='bonus'?n:s.abilityBonuses[k];
+ if(kind==='base'&&(n<(usesPointBuy(s)?8:1)||n>(usesPointBuy(s)?15:30)))return usesPointBuy(s)?'При покупке основа должна быть от 8 до 15.':'Основа должна быть от 1 до 30.';
+ if(kind==='bonus'&&(n< -20||n>20))return 'Бонус должен быть от −20 до +20; его источник согласуй с ГМом.';
+ if(base+bonus<1||base+bonus>30)return 'Итоговая характеристика должна быть от 1 до 30.';
+ if(kind==='base'&&usesPointBuy(s)){
+  const cost=pointBuyCost({...s.baseAbilities,[k]:n});
+  if(cost===null||cost>pointBudget(s))return 'Недостаточно очков покупки для этого значения.';
+ }
+ return '';
+}
 function totalCopper(value){const coins=normalizeCoins(value);return Object.entries(coinValues).reduce((total,[k,rate])=>total+coins[k]*rate,0);}
 function exchangeCoins(value,from,to,amount){
  const coins=normalizeCoins(value),fail=reason=>({ok:false,coins,exchanged:0,received:0,remainder:0,reason});
@@ -131,7 +169,8 @@ function normalize(value){
  for(const key of ['features','spells','equipment','notes','appearance','backstory','allies','traits','ideals','bonds','flaws'])result[key]=text(s[key]);
  for(const key of ['playerName','age','gender','height','weight','eyes','hair','skin','languages','deity','personality'])result[key]=text(s[key],key==='personality'?8000:240);
  result.levelMode=s.levelMode==='xp'?'xp':'manual';
- result.abilityMode=['point-buy','standard-array'].includes(s.abilityMode)?s.abilityMode:'manual';
+ result.abilityMode=['point-buy','custom-point-buy','standard-array'].includes(s.abilityMode)?s.abilityMode:'manual';
+ result.pointBuyBudget=int(s.pointBuyBudget,0,54,27);
  // Old sheets have a hand-entered maximum. Importing one never replaces that maximum.
  result.hpMode=['average','rolled','manual'].includes(s.hpMode)?s.hpMode:'manual';
  result.hpAdjustment=int(s.hpAdjustment,-9999,9999);
@@ -148,7 +187,11 @@ function normalize(value){
  result.skills=Object.fromEntries(skills.map(([id])=>[id,int(s.skills?.[id],0,2)]));
  result.casting=['','int','wis','cha'].includes(s.casting)?s.casting:base.casting;
  result.inspiration=!!s.inspiration;
- result.slots=Array.from({length:9},(_,i)=>{const max=int(s.slots?.[i]?.max,0,20);return {max,current:int(s.slots?.[i]?.current,0,max)};});
+ const slotPlan=spellSlotPlan(result);
+ result.spellSlotMode=s.spellSlotMode==='class'&&slotPlan.supported?'class':'manual';
+ result.slots=Array.from({length:9},(_,i)=>{const max=result.spellSlotMode==='class'?slotPlan.slots[i]:int(s.slots?.[i]?.max,0,20);return {max,current:int(s.slots?.[i]?.current,0,max)};});
+ const pactMax=result.spellSlotMode==='class'?(slotPlan.pact?.max||0):int(s.pactSlots?.max,0,20);
+ result.pactSlots={level:result.spellSlotMode==='class'?(slotPlan.pact?.level||0):int(s.pactSlots?.level,0,5),max:pactMax,current:int(s.pactSlots?.current,0,pactMax)};
  result.resources=(Array.isArray(s.resources)?s.resources:base.resources).filter(r=>r&&typeof r==='object').slice(0,12).map(r=>{const max=int(r.max,0,999);return {name:text(r.name,80),max,current:int(r.current,0,max)};});
  result.attacks=(Array.isArray(s.attacks)?s.attacks:[]).filter(a=>a&&typeof a==='object'&&!Array.isArray(a)).slice(0,20).map(a=>({name:text(a.name,80),weaponId:text(a.weaponId,120),ability:Object.hasOwn(abilities,a.ability)?a.ability:'str',proficient:!!a.proficient,bonus:int(a.bonus,-30,30),damage:text(a.damage,120),range:text(a.range,80)}));
  result.inventory=(Array.isArray(s.inventory)?s.inventory:[]).filter(r=>r&&typeof r==='object'&&!Array.isArray(r)).slice(0,100).map((r,i)=>({id:text(r.id,120)||'item-'+(i+1),name:text(r.name,160),quantity:int(r.quantity,0,999999,1),weight:decimal(r.weight,0,999999),...(r.costCopper!==undefined?{costCopper:int(r.costCopper,0,coinLimit)}:{}),equipped:!!r.equipped,notes:text(r.notes,2000)}));
@@ -158,8 +201,14 @@ function normalize(value){
 function reconcileHealth(previous,next){
  const before=normalize(previous),after=normalize(next);
  if(before.maxHp!==after.maxHp)after.hp=Math.max(0,after.maxHp-Math.max(0,before.maxHp-before.hp));
+ // Changing level does not count as resting. Preserve spent slots, including
+ // pact magic when its slot level changes. Switching from manual only clamps.
+ if(before.spellSlotMode==='class'&&after.spellSlotMode==='class'){
+  after.slots.forEach((slot,i)=>{if(slot.max!==before.slots[i].max)slot.current=Math.max(0,slot.max-(before.slots[i].max-before.slots[i].current));});
+  if(after.pactSlots.max!==before.pactSlots.max)after.pactSlots.current=Math.max(0,after.pactSlots.max-(before.pactSlots.max-before.pactSlots.current));
+ }
  return after;
 }
 const referenceUrl=(edition,kind,id)=>'dnd-reference.html?'+new URLSearchParams({edition,kind,id});
-window.HOLEN_DND={speciesSize,abilities,editions,skills,modifier,proficiency,blank,normalize,referenceUrl,xpThresholds,standardArray,pointBuyCosts,coinValues,coinLimit,levelFromXp,xpForLevel,pointBuyCost,hpMaximum,reconcileHealth,totalCopper,exchangeCoins};
+window.HOLEN_DND={speciesSize,abilities,editions,skills,modifier,proficiency,blank,normalize,referenceUrl,xpThresholds,standardArray,pointBuyCosts,coinValues,coinLimit,levelFromXp,xpForLevel,pointBuyCost,usesPointBuy,pointBudget,abilityEditError,spellSlotPlan,hpMaximum,reconcileHealth,totalCopper,exchangeCoins};
 })();

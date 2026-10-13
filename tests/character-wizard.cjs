@@ -5,7 +5,7 @@ const {HOLEN_CHARACTER_WIZARD:m,HOLEN_DND:d,HOLEN_DND_OPTIONS:o,HOLEN_OPTION_SOU
 let checks=0;const eq=(a,b)=>{assert.deepEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)));checks++;},ok=x=>{assert.ok(x);checks++;};
 let s=m.fresh();eq(m.steps(s).length,7);eq(d.pointBuyCost(s.sheet.baseAbilities),0);
 for(const k of Object.keys(d.abilities))m.change(s,'base:'+k,15);
-ok(m.validate(s,4));m.change(s,'abilityMode','standard-array');ok(!m.validate(s,4));
+ok(s.error);ok(d.pointBuyCost(s.sheet.baseAbilities)<=27);ok(!m.validate(s,4));m.change(s,'abilityMode','standard-array');ok(!m.validate(s,4));
 m.change(s,'base:str',8);eq(s.sheet.baseAbilities.cha,15);ok(!m.validate(s,4));
 m.change(s,'classId','wizard');eq(m.cls(s).name,'Волшебник');eq(s.sheet.casting,'int');eq(s.sheet.saveProficiencies,['int','wis']);
 m.change(s,'level',2);ok(o.availableSubclasses(s.sheet).length>0);ok(m.validate(s,5));

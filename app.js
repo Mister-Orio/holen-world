@@ -44,8 +44,10 @@ function closeMenu() {
 }
 let navigationEpoch=0;
 async function navigate(name, {push=true}={}) {
-  if(window.HOLEN_AUTH_GATE?.isLocked()&&name!=='auth'){
-    window.HOLEN_AUTH_GATE.remember(VIEWS.includes(name)?name:'home');name='auth';
+  // Legacy email links keep working; account forms now live in the profile.
+  if(name==='auth')name='profile';
+  if(window.HOLEN_AUTH_GATE?.isLocked()&&name!=='profile'){
+    window.HOLEN_AUTH_GATE.remember(VIEWS.includes(name)?name:'home');name='profile';
   }
   const token=++navigationEpoch;
   const view = VIEWS.includes(name)?name:'home';

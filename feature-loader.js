@@ -5,7 +5,7 @@ const data='data.js?v=0126',model='dnd-data.js?v=01211',options='dnd-options-dat
 const catalogs=[data,'catalog-data.js?v=0125',model];
 const backgroundCatalog='background-catalog.js?v=0128';
 const choices=[model,options,backgroundCatalog,library,'dnd-option-sources.js?v=0126','dnd-options-ui.js?v=0128'];
-const rooms=[data,'squad-abilities.js?v=0116','bestiary-data.js?v=0115','online-room-ui.js?v=0119'];
+const rooms=[data,'squad-abilities.js?v=0116','bestiary-data.js?v=0115','online-room-ui.js?v=01212'];
 const views={
  admin:[model,options,backgroundCatalog,'admin.css?v=0127','admin-modules.js?v=0127','media-resolver.js?v=0127','admin-ui.js?v=0128'],
  inventory:['inventory-data.js?v=0126','inventory.css?v=0126','inventory-ui.js?v=0126'],

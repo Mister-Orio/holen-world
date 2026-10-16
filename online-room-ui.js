@@ -1,4 +1,4 @@
-/* Холэн v0.10 — защищённые онлайн-комнаты через Supabase RPC.
+/* Холэн v0.12.12 — защищённые онлайн-комнаты через Supabase RPC.
    Состояние хранится сервером; изменения прав и ОЗ проверяет PostgreSQL.
    Альфа: синхронизация опросом каждые 6 секунд, не WebSocket.
 */
@@ -10,15 +10,21 @@ if(!root||!gmRoot||!auth)return;
 const key='holen_online_active_room_v10';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-let activeId=null, snapshot=null, rooms=[], characters=[], charactersLoadedFor=null, status='', busy=false, loading=false,lastSnapshot=0,err='';
-try{activeId=sessionStorage.getItem(key)||null;}catch(_){}
-function notice(t,isError=false){status=t;err=isError?'is-error':'';const n=$('online-status');if(n){n.textContent=t;n.className='online-status '+err;}}
-const api=(path,opts)=>auth.api(path,opts);
+let activeId=null, snapshot=null, rooms=[], characters=[], charactersLoadedFor=null, status='', busy=null, loading=null,lastSnapshot=0,err='',epoch=0;
+let accountId=auth.currentUserId(),savedOwner=null;
+try{activeId=sessionStorage.getItem(key)||null;savedOwner=sessionStorage.getItem(key+'_owner')||null;}catch(_){}
+function notice(t,isError=false){status=t;err=isError?'is-error':'';document.querySelectorAll('[data-online-status]').forEach(n=>{n.textContent=t;n.className='online-status '+err;});}
+// Bound room requests too: an unanswered write may have reached the server.
+const api=(path,opts={})=>auth.api(path,{timeoutMs:20000,...opts});
 async function rpc(name,args){return api('/rest/v1/rpc/'+name,{method:'POST',body:args});}
+function context(){return {room:activeId,user:auth.currentUserId(),epoch};}
+function current(c){return c.epoch===epoch&&c.room===activeId&&c.user===auth.currentUserId()&&auth.isAuthenticated();}
 function currentMember(){return snapshot?.members?.find(m=>m.user_id===auth.currentUserId())||null;}
 function setRoom(id){
- activeId=id; snapshot=null;characters=[];charactersLoadedFor=null;
- try{id?sessionStorage.setItem(key,id):sessionStorage.removeItem(key);}catch(_){}
+ epoch++;activeId=id; snapshot=null;characters=[];charactersLoadedFor=null;loading=null;busy=null;
+ savedOwner=id?auth.currentUserId():null;
+ try{if(id){sessionStorage.setItem(key,id);sessionStorage.setItem(key+'_owner',savedOwner);}else{sessionStorage.removeItem(key);sessionStorage.removeItem(key+'_owner');}}catch(_){}
+ status='';err='';paint(true);
 }
 function packLabel(p){return p==='insects'?'Муравьиная революция':'Путешествия Холэна';}
 function roomChoices(){
@@ -34,7 +40,7 @@ function lobby(){
  '<form id="online-create" class="panel online-card"><span class="overline">ВЕДУЩИЙ</span><h2>Создать онлайн-комнату</h2>'+
  '<label class="field-label" for="online-title">Название</label><input id="online-title" maxlength="72" required placeholder="Например, Красный тоннель">'+
  '<label class="field-label" for="online-pack">Игровой пак</label><select id="online-pack" class="room-select"><option value="insects">Муравьиная революция</option><option value="journeys">Путешествия Холэна (листы D&D в профиле)</option></select>'+
- '<button type="submit" class="btn primary wide">Создать</button></form>'+
+ '<p>Бой и здоровье подключены для «Муравьиной революции». В «Путешествиях Холэна» пока доступны приглашения и список участников; листы D&D ведутся в профиле.</p><button type="submit" class="btn primary wide">Создать</button></form>'+
  '<form id="online-join" class="panel online-card"><span class="overline">ИГРОК</span><h2>Присоединиться</h2><p>Попроси у ГМа код приглашения. У каждого участника должен быть свой аккаунт.</p>'+
  '<label class="field-label" for="online-join-code">Код комнаты</label><input id="online-join-code" maxlength="24" required autocapitalize="characters" placeholder="HOL-XXXXXXXXXXXX">'+
  '<button class="btn primary wide" type="submit">Войти в комнату</button></form></div>'+roomChoices();
@@ -53,7 +59,7 @@ function unitCard(u){
 }
 function roomView(){
  const s=snapshot;if(!s?.room)return '<p class="room-empty">Загружаем комнату…</p>';
- const room=s.room,me=currentMember(),gm=me?.role==='gm';
+ const room=s.room,me=currentMember(),gm=me?.role==='gm',tactical=room.pack_key==='insects';
  const units=s.units||[],friends=units.filter(u=>u.owner_id),enemies=units.filter(u=>!u.owner_id && u.hp!==0);
  const self=units.find(u=>u.owner_id===auth.currentUserId());
  const knownSheet=self && (window.ANT_DATA?.squads||[]).some(t=>t.id===self.template_key);
@@ -61,6 +67,7 @@ function roomView(){
   'sheets/'+encodeURIComponent(self.template_key)+'.html?room='+encodeURIComponent(room.id)+'&character='+encodeURIComponent(self.character_id)+
   '#'+encodeURIComponent(room.id)+'-'+encodeURIComponent(self.character_id):'';
  const roster=(s.members||[]).map(m=>{
+  if(!tactical)return '<tr><th scope="row"><strong>'+esc(m.display_name)+'</strong><small>'+(m.role==='gm'?'Ведущий':'Игрок · лист D&D в профиле')+'</small></th></tr>';
   const u=units.find(u=>u.owner_id===m.user_id),abilities=u?(window.HOLEN_SQUAD_ABILITIES?.[u.template_key]||[]):[];
   const charges=u&&u.charges!==null&&u.charges!==undefined&&(u.charges>0||['acid','medic'].includes(u.template_key)||abilities.some(a=>/заряд/i.test(a.description)));
   const ratio=u?.cap?Math.min(100,Math.max(0,Math.round(100*u.hp/u.cap))):0;
@@ -71,14 +78,14 @@ function roomView(){
    '<td class="room-table-stats">'+(u?'<span>КД <b>'+esc(u.armor_class)+'</b></span><span>Скорость <b>'+esc(u.speed)+'</b></span>':'<span class="room-table-muted">—</span>')+'</td></tr>';
  }).join('');
  const select=(!gm&&!self&&room.status==='active')?
-  '<div class="panel online-picker"><h3>Выбери своего персонажа</h3><p>Показываются персонажи из твоего профиля, подходящие этому паку.</p>'+
+  '<div class="panel online-picker"><h3>'+(tactical?'Выбери своего персонажа':'Лист персонажа D&D')+'</h3>'+(tactical?'<p>Показываются персонажи из твоего профиля, подходящие этому паку.</p>':'')+
   (room.pack_key==='insects'?
    (characters.length?'<div class="online-character-options">'+characters.map(c=>{
     const t=(window.ANT_DATA?.squads||[]).find(x=>x.id===c.sheet_data?.templateId);
     return t?'<button type="button" class="btn subtle" data-online-action="choose" data-id="'+esc(c.id)+'">'+esc(c.name)+' · '+esc(t.name)+'</button>':'';
    }).join('')+'</div>':'<p>Сначала создай персонажа в разделе «Мой профиль».</p>'):
    '<p>Листы D&D доступны в профиле. Добавление этих персонажей в бой онлайн-комнаты ещё не подключено.</p>')+
-  '<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> '+
+  (room.pack_key==='insects'?'<button type="button" class="btn subtle" data-online-action="refresh-chars">Обновить список</button> ':'')+
   '<button type="button" class="btn subtle" data-online-action="profile">Открыть профиль →</button></div>':'';
  const pending=(s.requests||[]).some(r=>r.actor_id===auth.currentUserId());
  const attackTargets=enemies.filter(u=>u.hp===null||u.hp>0);
@@ -101,13 +108,13 @@ function roomView(){
  '<h2>'+esc(room.name)+'</h2><p>'+esc(packLabel(room.pack_key))+'</p>'+
  '<p>Код приглашения: <strong>'+esc(room.invite_code)+'</strong></p></div>'+
  '<div class="room-head-actions"><button class="btn subtle" type="button" data-online-action="focus">'+(document.body.classList.contains('room-focus-mode')?'Обычный вид':'Развернуть комнату')+'</button><button class="btn subtle" type="button" data-online-action="copy">Копировать код</button>'+
- '<button class="btn subtle" type="button" data-online-action="back">К списку комнат</button></div></div>'+
- '<p class="online-live-note">Участников: '+s.members.length+' / 8 · Обновление каждые 6 секунд · '+(room.status==='active'?'Комната активна':'Комната закрыта')+(room.hide_enemy_hp?' · ОЗ противников скрыты для игроков':'')+'</p>'+
- '<h3>Участники и здоровье</h3><div class="room-party-table-wrap"><table class="room-party-table"><thead><tr><th scope="col">Способности</th><th scope="col">Игрок / персонаж</th><th scope="col">Здоровье</th><th scope="col">Показатели</th></tr></thead><tbody>'+roster+'</tbody></table></div>'+
+ '<button class="btn subtle" type="button" data-online-action="retry">Обновить комнату</button><button class="btn subtle" type="button" data-online-action="back">К списку комнат</button></div></div>'+
+ '<p class="online-live-note">Участников: '+s.members.length+' / 8 · Обновление каждые 6 секунд · '+(room.status==='active'?'Комната активна':'Комната закрыта')+(tactical&&room.hide_enemy_hp?' · ОЗ противников скрыты для игроков':'')+'</p>'+
+ '<h3>'+(tactical?'Участники и здоровье':'Участники')+'</h3><div class="room-party-table-wrap"><table class="room-party-table"><thead><tr>'+(tactical?'<th scope="col">Способности</th><th scope="col">Игрок / персонаж</th><th scope="col">Здоровье</th><th scope="col">Показатели</th>':'<th scope="col">Участник / роль</th>')+'</tr></thead><tbody>'+roster+'</tbody></table></div>'+
  (gm?'<button type="button" class="btn primary" data-online-action="gm">Открыть рубку ГМа →</button>':'')+
  select+
 
- '<h3>Противники</h3><div class="room-unit-list">'+(enemies.length?enemies.map(unitCard).join(''):'<div class="room-empty">Противников пока нет. Их добавляет только ГМ.</div>')+'</div>'+
+ (tactical?'<h3>Противники</h3><div class="room-unit-list">'+(enemies.length?enemies.map(unitCard).join(''):'<div class="room-empty">Противников пока нет. Их добавляет только ГМ.</div>')+'</div>':'<p class="online-warning">Бой D&D пока не подключён к комнате. Здоровье, отдых и существа ведутся отдельно; изменения листа здесь не синхронизируются.</p>')+
  (sheetHref?'<div class="online-sheet-access"><a class="btn primary" href="'+esc(sheetHref)+'" target="_blank" rel="noopener noreferrer">Открыть свой игровой лист ↗</a><p class="online-spawn-note">Игровые кнопки доступны только владельцу персонажа в активной комнате. Отметки способностей пока сохраняются в этом браузере; здоровье на сервере меняет ГМ.</p></div>':'')+
  actions+
  '<h3>Журнал событий</h3><ol class="online-events">'+(s.events||[]).map(e=>'<li>'+esc(e.message)+'</li>').join('')+'</ol>'+
@@ -117,6 +124,8 @@ function gmView(){
  const s=snapshot,member=currentMember();
  if(!auth.isAuthenticated())return '<div class="panel online-intro">Для управления онлайн-комнатой войди в аккаунт.</div>';
  if(!s||member?.role!=='gm')return '<div class="panel online-intro"><h2>Онлайн-рубка ГМа</h2><p>Создай онлайн-комнату или открой принадлежащую тебе сессию.</p><button class="btn primary" data-online-action="rooms" type="button">В комнаты →</button></div>';
+ // The live combat RPCs implement ant squads, not D&D character rules.
+ if(s.room.pack_key!=='insects')return '<section class="panel online-session"><h2>'+esc(s.room.name)+'</h2><p>'+esc(packLabel(s.room.pack_key))+'</p><h3>Комната общения и подготовки</h3><p>Приглашения и список участников работают. Подключение персонажей D&D, их здоровья, отдыха и существ к бою комнаты ещё не реализовано.</p><p>Листы персонажей доступны в профиле, существа — в бестиарии. Изменения листа пока не передаются в эту комнату.</p><button class="btn subtle" type="button" data-online-action="profile">Открыть профиль</button> <button class="btn subtle" type="button" data-online-action="rooms">В комнату</button><hr><h3>Управление комнатой</h3><button class="btn online-close-btn" type="button" data-online-action="close">Завершить комнату</button></section>';
  const items=(s.units||[]).map(u=>'<option value="'+esc(u.id)+'">'+esc(u.name)+' ('+u.hp+'/'+u.cap+')</option>').join('');
  const roster=(s.members||[]);
  const requests=(s.requests||[]).map(q=>{
@@ -147,46 +156,55 @@ function gmView(){
  '<button class="btn primary" type="button" data-online-action="spawn-monster">Добавить в комнату</button>':'<p>Для этого пака бестиарий пока не готов.</p>')+
  '<p class="online-spawn-note">Размеры 2×2 и 3×1 фиксируются в данных, но автоматическое размещение на тактической карте ещё не готово.</p>'+
  '<button class="btn subtle" type="button" data-online-action="dummy">Добавить тренировочного врага</button></section>'+
- '<section class="online-gm-card"><h3>Управление комнатой</h3><p>Закрытая комната останется доступна для просмотра, но новые игроки присоединиться не смогут.</p>'+
+ '<section class="online-gm-card"><h3>Управление комнатой</h3><p>После завершения участники вернутся к списку комнат, новые игроки войти не смогут. История комнаты сохранится на сервере.</p>'+
  '<button class="btn online-close-btn" type="button" data-online-action="close">Завершить комнату</button></section></div>'+
  ((s.units||[]).some(u=>u.owner_id===null&&u.hp===0)?
  '<div class="online-defeated"><h3>Побеждённые противники · только для ГМа</h3><p>Их карточки исчезли из комнаты игроков. Обычное лечение не действует на уничтоженных. Чтобы вернуть противника, выбери его целью и явно используй «Исключение ГМа» выше.</p>'+
  (s.units||[]).filter(u=>u.owner_id===null&&u.hp===0).map(u=>'<div class="online-defeated-entry">'+esc(u.name)+'</div>').join('')+'</div>':'')+
  '<button class="btn subtle" type="button" data-online-action="rooms">← В комнату</button></section>';
 }
-function paint(){
+function paint(force=false){
  const focus=document.activeElement;
- if((root.contains(focus)||gmRoot.contains(focus))&&['INPUT','SELECT','TEXTAREA'].includes(focus?.tagName))return;
- root.innerHTML='<div class="online-status '+err+'" id="online-status" role="status" aria-live="polite">'+esc(status)+'</div>'+
- (activeId?roomView():lobby());
- gmRoot.innerHTML=gmView();
+ if(!force&&(root.contains(focus)||gmRoot.contains(focus))&&['INPUT','SELECT','TEXTAREA'].includes(focus?.tagName))return;
+ const statusView='<div class="online-status '+err+'" data-online-status role="status" aria-live="polite">'+esc(status)+'</div>';
+ const recovery=err?'<div class="online-inline"><button class="btn subtle" type="button" data-online-action="retry">Повторить обновление</button>'+(activeId?'<button class="btn subtle" type="button" data-online-action="back">К списку комнат</button>':'')+'</div>':'';
+ root.innerHTML=statusView+recovery+
+ (auth.isAuthenticated()&&activeId?roomView():lobby());
+ gmRoot.innerHTML=statusView+recovery+gmView();
 }
-async function ownRooms(){
- if(!auth.isAuthenticated()){rooms=[];return;}
+async function ownRooms(c){
+ if(!current(c))return;
  const v=await api('/rest/v1/rooms?select=id,name,pack_key,invite_code,status&status=eq.active&order=created_at.desc');
- rooms=Array.isArray(v)?v:[];
+ if(current(c))rooms=Array.isArray(v)?v:[];
 }
 async function refresh(force=false){
  if(!['#rooms','#gm'].includes(location.hash))return;
- if(loading||!auth.isAuthenticated()){if(!auth.isAuthenticated()){snapshot=null;rooms=[];paint();}return;}
+ if(!auth.isAuthenticated()){snapshot=null;rooms=[];paint();return;}
+ if(loading)return;
  if(!force&&document.hidden)return;
- loading=true;
+ const c=context();loading=c;
  try{
   if(activeId){
-   snapshot=await rpc('holen_room_snapshot',{p_room:activeId});
+   const next=await rpc('holen_room_snapshot',{p_room:c.room});
+   if(!current(c))return;
+   snapshot=next;
    if(!snapshot?.room)throw Error('Комната не найдена.');
-   if(snapshot.room.status==='closed'){setRoom(null);await ownRooms();notice('Комната завершена. Вы вернулись к выбору комнат.');navigate('rooms');paint();return;}
-   if(snapshot.room.status==='active'&&currentMember()?.role==='player'&&!snapshot.units?.some(u=>u.owner_id===auth.currentUserId())&&charactersLoadedFor!==activeId){
-    characters=await auth.listCharacters(snapshot.room.pack_key);
+   if(snapshot.room.status==='closed'){setRoom(null);const lobbyContext=context();await ownRooms(lobbyContext);if(!current(lobbyContext))return;notice('Комната завершена. Вы вернулись к выбору комнат.');navigate('rooms');paint();return;}
+   if(snapshot.room.pack_key==='insects'&&snapshot.room.status==='active'&&currentMember()?.role==='player'&&!snapshot.units?.some(u=>u.owner_id===auth.currentUserId())&&charactersLoadedFor!==activeId){
+    const nextCharacters=await api('/rest/v1/characters?select=id,name,pack_key,sheet_data,updated_at&pack_key=eq.'+encodeURIComponent(snapshot.room.pack_key)+'&order=created_at.desc');
+    if(!current(c))return;
+    characters=Array.isArray(nextCharacters)?nextCharacters:[];
     charactersLoadedFor=activeId;
    }
-  }else await ownRooms();
+  }else await ownRooms(c);
+  if(!current(c))return;
   if(!status||err)notice('',false);
   paint();
  }catch(e){
+  if(!current(c))return;
   notice('Не удалось синхронизировать комнату: '+(e?.message||'ошибка сети'),true);
   paint();
- }finally{loading=false;lastSnapshot=Date.now();}
+ }finally{if(loading===c){loading=null;lastSnapshot=Date.now();}}
 }
 function askRest(kind){
  return new Promise(resolve=>{
@@ -205,20 +223,24 @@ function askRest(kind){
   shade.querySelector('[data-rest-no]').focus();
  });
 }
-async function action(fn){
- if(busy)return;busy=true;notice('Выполняем действие…');
- try{await fn();notice('Сохранено на сервере.');await refresh(true);}
- catch(e){notice(e?.message||'Не удалось выполнить действие.',true);}
- finally{busy=false;}
+async function action(fn,{switchRoom=false,leaveRoom=false}={}){
+ if(busy||!auth.isAuthenticated())return;const c=context();busy=c;notice('Выполняем действие…');
+ try{const result=await fn();if(!current(c))return;
+  if(switchRoom)setRoom(result?.id||result);
+  else if(leaveRoom){setRoom(null);if(location.hash==='#gm')navigate('rooms');}
+  else {epoch++;loading=null;}
+  notice('Сохранено на сервере.');await refresh(true);
+ }catch(e){if(current(c)){notice((e?.message||'Не удалось выполнить действие.')+(e?.code==='auth_request_timeout'?' Обнови комнату перед повтором: действие могло сохраниться.':''),true);paint();}}
+ finally{if(busy===c)busy=null;}
 }
 document.addEventListener('submit',event=>{
  const form=event.target;
  if(form.id==='online-create'){
   event.preventDefault();const title=$('online-title').value,pack=$('online-pack').value;
-  action(async()=>{const a=await rpc('holen_room_create',{p_name:title,p_pack:pack});setRoom(a.id);});
+  action(()=>rpc('holen_room_create',{p_name:title,p_pack:pack}),{switchRoom:true});
  }else if(form.id==='online-join'){
   event.preventDefault();const code=$('online-join-code').value;
-  action(async()=>{const id=await rpc('holen_room_join',{p_code:code});setRoom(id);});
+  action(()=>rpc('holen_room_join',{p_code:code}),{switchRoom:true});
  }
 });
 document.addEventListener('click',event=>{
@@ -237,6 +259,7 @@ document.addEventListener('click',event=>{
  if(a==='focus'){document.body.classList.toggle('room-focus-mode');paint();return;}
  if(a==='login'){auth.open('login');return;}
  if(a==='profile'){navigate('profile');return;}
+ if(a==='retry'){refresh(true);return;}
  if(a==='refresh-chars'){charactersLoadedFor=null;refresh(true);return;}
  if(a==='rooms'){navigate('rooms');return;}
  if(a==='gm'){navigate('gm');return;}
@@ -263,7 +286,7 @@ document.addEventListener('click',event=>{
    return action(async()=>rpc('holen_gm_decide',{p_room:activeId,p_request:b.dataset.id,p_approve:a==='approve'}));
  if(a==='leave'){
   if(!confirm('Покинуть онлайн-комнату?'))return;
-  return action(async()=>{await rpc('holen_room_leave',{p_room:activeId});setRoom(null);});
+  return action(()=>rpc('holen_room_leave',{p_room:activeId}),{leaveRoom:true});
  }
  if(a==='damage'||a==='heal'){
   const id=$('online-gm-target')?.value,amount=Number($('online-gm-amount')?.value);
@@ -279,7 +302,7 @@ document.addEventListener('click',event=>{
  }
  if(a==='rest-short'||a==='rest-long'){
   const kind=a==='rest-short'?'short':'long';
-  askRest(kind).then(ok=>{if(ok)action(async()=>rpc('holen_gm_rest',{p_room:activeId,p_kind:kind}));});
+  const c=context();askRest(kind).then(ok=>{if(ok&&current(c))action(()=>rpc('holen_gm_rest',{p_room:c.room,p_kind:kind}));});
   return;
  }
  if(a==='toggle-enemy-hp')return action(async()=>rpc('holen_gm_enemy_hp_visibility',
@@ -292,12 +315,13 @@ document.addEventListener('click',event=>{
  if(a==='dummy')return action(async()=>rpc('holen_gm_dummy',{p_room:activeId}));
  if(a==='close'){
   if(!confirm('Завершить комнату? Новые игроки больше не смогут войти.'))return;
-  return action(async()=>{await rpc('holen_gm_close',{p_room:activeId});setRoom(null);navigate('rooms');});
+  return action(()=>rpc('holen_gm_close',{p_room:activeId}),{leaveRoom:true});
  }
 });
-window.addEventListener('holen-auth-changed',()=>{if(!auth.isAuthenticated()){snapshot=null;rooms=[];setRoom(null);}refresh(true);});
+window.addEventListener('holen-auth-changed',()=>{const next=auth.currentUserId();if(!auth.isAuthenticated()||(accountId!==null&&next!==accountId)||(savedOwner!==null&&next!==savedOwner)){rooms=[];setRoom(null);}accountId=next;refresh(true);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastSnapshot>4000)refresh(true);});
 setInterval(()=>{if(auth.isAuthenticated()&&activeId&&(location.hash==='#rooms'||location.hash==='#gm'))refresh();},6000);
 window.addEventListener('holen-navigated',e=>{if(['rooms','gm'].includes(e.detail?.view))refresh(true);});
+if(auth.isAuthenticated()&&savedOwner!==null&&savedOwner!==accountId)setRoom(null);
 paint();
 })();
